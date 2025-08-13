@@ -1,4 +1,4 @@
-console.log("locations");// DODGE.IO - MUSIC.JS
+console.log("more control over values");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
