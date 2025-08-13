@@ -1,4 +1,4 @@
-console.log("removing all the updateData stuff")// DODGE.IO - FUNCTIONS.JS
+console.log("renaming some mouseOver variables")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
