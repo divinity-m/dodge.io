@@ -1,4 +1,4 @@
-console.log("working on DIVINE LETS GOOOOOOOO")// DODGE.IO - FUNCTIONS.JS
+console.log("working on DIVINE! LETS GOOOOOOOO")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
