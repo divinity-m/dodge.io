@@ -1,4 +1,4 @@
-console.log("musicSliderX")// DODGE.IO - SCRIPT.JS
+console.log("updateData")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -49,6 +49,7 @@ let mouseOver = {
     disableMMBtn: false,
     volumeSlider: false,
     sfxSlider: false,
+    updateData: false,
 };
 
 let mouseX;
