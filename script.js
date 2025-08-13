@@ -120,6 +120,9 @@ let highscore = {
     easy: 0,
     medium: 0,
     hard: 0,
+    limbo: 0,
+    andromeda: 0,
+    divine: 0,
 };
 let difficulty = {
     level: "easy",
@@ -177,7 +180,10 @@ if (localData) {
 
         // checks to see if the userData is missing any elements and replaces it with default data
         ["player", "highscore", "settings"].forEach(data => {
-            if (!(data in userData)) userData[data] = eval(data);
+            if (data in userData) {
+                if (userData[data] !== eval(data)) userData[data] = eval(data);
+            }
+            else userData[data] = eval(data);
         }); 
 
         // updates the current data to the locally saved data
