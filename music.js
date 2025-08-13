@@ -1,4 +1,4 @@
-console.log("more control over values");// DODGE.IO - MUSIC.JS
+console.log("more control over values & increased spike hitbox");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -371,7 +371,7 @@ function musicCollisions() {
                 }
             }
             if (danger.type === "spike") {
-                if (distance <= danger.r+player.r) {
+                if (distance <= danger.r*1.5+player.r) {
                     player.lives--;
                     player.hit = Date.now();
                     sharpPop.currentTime = 0;
