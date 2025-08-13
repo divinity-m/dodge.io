@@ -1,4 +1,4 @@
-console.log("lowercase typo")// DODGE.IO - SCRIPT.JS
+console.log("player values save fix")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -202,16 +202,14 @@ if (localData) {
             if (userData?.settings?.[setting]) s[setting] = userData.settings[setting];
         })
                 
-        userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, slowed: 1, dodger: "evader",
-                                color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)", facingAngle: 0,},
+        userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, slowed: 1, dodger: p.dodger,
+                                color: p.color, subColor: p.subColor, facingAngle: 0,},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, divine: hs.divine,},
                     settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM,
                                 musicSliderX: s.musicSliderX, sfxSliderX: s.sfxSliderX,}};
         // updates the current data to the locally saved data
-        player.dodger = userData.player.dodger;
-        player.color = userData.player.color;
-        player.subColor = userData.player.subColor;
+        player = userData.player;
         highscore = userData.highscore;
         settings = userData.settings;
     }
