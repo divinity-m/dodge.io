@@ -220,11 +220,11 @@ function spawnAndDrawDanger() {
     allDangers.forEach(danger => {
         ctx.fillStyle = danger.color;
         ctx.strokeStyle = danger.color;
-        if (danger.type !== "spike") {
-            if (danger.colorValue >= 255) danger.despawn = true;
-            if (danger.colorValue < 255 && !danger.despawn) danger.colorValue += 0.25;
-            if (danger.despawn) danger.colorValue -= 2;
-        }
+        
+        if (danger.colorValue >= 255 && danger.type !== "spike") danger.despawn = true;
+        if (danger.colorValue < 255 && (!danger?.despawn || !danger?.reachedWall)) danger.colorValue += 0.25;
+        if (danger?.despawn) danger.colorValue -= 2;
+        if (danger.colorValue > 185 && danger?.reachedWall) danger.colorValue -= 0.5;
         
         if (danger.type === "beam") {
             if (danger.variant === "vertical") {
@@ -244,9 +244,6 @@ function spawnAndDrawDanger() {
             }
         }
         else if (danger.type === "spike") {
-            if (danger.colorValue < 255 && !danger.reachedWall) danger.colorValue += 0.25;
-            else if (danger.colorValue > 185 && danger.reachedWall) danger.colorValue -= 0.5;
-            
             drawCircle(danger.x, danger.y, danger.r);
             let w = 1.75;
             let h = 1.5;
