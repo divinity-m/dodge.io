@@ -1,12 +1,12 @@
-console.log("volumeSliderX");// DODGE.IO - MUSIC.JS
+console.log("musicVolume");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
     player.hit = 0;
-    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
+    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
     sharpPop.volume = sfxVolume/100;
-    music.var.volume = volume/100;
+    music.var.volume = musicVolume/100;
     music.var.currentTime = 0;
     music.promise = music.var.play();
     music.timestamps = [...music.backUpTS];
