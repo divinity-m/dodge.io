@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Dodge.io</title>
+        <link rel="icon" type="image/x-icon" href="DodgeImages/dodgeIcon.png" />
+
+        <script defer src="functions.js"></script>
+        <script defer src="music.js"></script>
+        <script defer src="script.js"></script>
+
+        <!-- CSS -->
+        <style>
+            body {
+                text-align: center;
+                font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                margin: auto;
+            }
+            p {
+                display: inline;
+                margin-right: 50px;
+                font-weight: bold;
+            }
+            #evades {
+                color: #8ED5FF;
+            }
+            #evades:hover {
+                color: #B8E4FF;
+            }
+            #jsab {
+                color: #FF2F7A;
+            }
+            #jsab:hover {
+                color: #FF77A8;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="display: none;">
+            <!-- Images -->
+            <img id="gear-filled" src="DodgeImages/gear-filled.png">
+            <img id="gear-unfilled" src="DodgeImages/gear-unfilled.png">
+        </div>
+
+        <!-- Title & Description -->
+        <h1>Dodge.io</h1>
+        <p style="display: block; margin: 0px;">
+            Inspired by <a id="evades" href="https://www.evades.io" target="_blank">Evades.io</a> and 
+            <a id="jsab" href="https://www.justshapesandbeats.com/" target="_blank">Just Shapes & Beats</a>
+        </p>
+        <br>
+
+        <!-- Canvas -->
+        <canvas id="canvas" width="800" height="650"></canvas>
+    </body>
+</html>
