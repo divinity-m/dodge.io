@@ -1,4 +1,4 @@
-console.log("player.radius --> player.r")// DODGE.IO - FUNCTIONS.JS
+console.log("if mouseOver updateData")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -109,7 +109,7 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        if (mouseOver.enemyOutBtn || mouseOver.disableMMBtn || mouseOver.volumeSlider || mouseOver.sfxSlider) {
+        if (mouseOver.enemyOutBtn || mouseOver.disableMMBtn || mouseOver.musicSlider || mouseOver.sfxSlider) {
             if (mouseOver.enemyOutBtn) {
                 if (settings.enemyOutlines) settings.enemyOutlines = false;
                 else if (!settings.enemyOutlines) settings.enemyOutlines = true;
@@ -360,8 +360,8 @@ function drawCircle(x, y, r = 12.5, type = "fill") {
 }
 
 function drawStartScreen() {
-    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
-    music.var.volume = volume/100;
+    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
+    music.var.volume = musicVolume/100;
     
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
         // PLAY BUTTON //
@@ -373,7 +373,7 @@ function drawStartScreen() {
         }
         playBtn.xw = playBtn.x + playBtn.w
         playBtn.yh = playBtn.y + playBtn.h
-        mouseOver.play = (mouseX > playBtn.x && mouseX < playBtn.xw) && (mouseY > playBtn.y && mouseY < playBtn.yh)
+        mouseOver.play = mouseX > playBtn.x && mouseX < playBtn.xw && mouseY > playBtn.y && mouseY < playBtn.yh;
         const playGrad = ctx.createLinearGradient(playBtn.x, playBtn.y, playBtn.xw, playBtn.yh)
         const playGrad2 = ctx.createLinearGradient(playBtn.x, playBtn.yh, playBtn.xw, playBtn.y)
         
@@ -432,7 +432,7 @@ function drawStartScreen() {
         }
         selectorBtn.xw = selectorBtn.x + selectorBtn.w
         selectorBtn.yh = selectorBtn.y + selectorBtn.h
-        mouseOver.selector = (mouseX > selectorBtn.x && mouseX < selectorBtn.xw) && (mouseY > selectorBtn.y && mouseY < selectorBtn.yh);
+        mouseOver.selector = mouseX > selectorBtn.x && mouseX < selectorBtn.xw && mouseY > selectorBtn.y && mouseY < selectorBtn.yh;
         const selectorGrad = ctx.createLinearGradient(selectorBtn.x, selectorBtn.y, selectorBtn.xw, selectorBtn.yh)
         const selectorGrad2 = ctx.createLinearGradient(selectorBtn.x, selectorBtn.yh, selectorBtn.xw, selectorBtn.y)
         
@@ -488,7 +488,7 @@ function drawSettings() {
     const distGear = Math.hypot(gear.x+20 - mouseX, gear.y+20 - mouseY); // (770, 620) is the center of the gear
     mouseOver.settings = distGear < 30;
 
-    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
+    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
 
     if (innerGameState === "mainMenu") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
@@ -504,24 +504,25 @@ function drawSettings() {
         ctx.fillText("Disable Mouse Movement Activation", 50, 100);
         ctx.fillText("Music Volume", 50, 150);
         ctx.fillText("SFX Volume", 50, 200);
+        ctx.fillText("Update Data", 50, 400);
         
         // Enemy Outlines Button
-        mouseOver.enemyOutBtn = (mouseX > 170 && mouseX < 190 && mouseY > 35 && mouseY < 55);
+        mouseOver.enemyOutBtn = mouseX > 170 && mouseX < 190 && mouseY > 35 && mouseY < 55;
         if (settings.enemyOutlines) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
         ctx.fillRect(170, 35, 20, 20);
     
         // Disable Mouse Movement Button
-        mouseOver.disableMMBtn = (mouseX > 317.5 && mouseX < 337.5 && mouseY > 85 && mouseY < 105);
+        mouseOver.disableMMBtn = mouseX > 317.5 && mouseX < 337.5 && mouseY > 85 && mouseY < 105;
         if (settings.disableMM) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
         ctx.fillRect(317.5, 85, 20, 20);
 
         // Music Volume Slider & SFX Volume Slider (wider than the actual rectangles for larger hitbox)
-        mouseOver.volumeSlider = mouseX >= 155 && mouseX <= 325 && mouseY >= 130 && mouseY <= 160;
+        mouseOver.musicSlider = mouseX >= 155 && mouseX <= 325 && mouseY >= 130 && mouseY <= 160;
         mouseOver.sfxSlider = mouseX >= 142 && mouseX <= 312 && mouseY >= 180 && mouseY <= 210;
         
-        if (mouseDown && mouseOver.volumeSlider) {
+        if (mouseDown && mouseOver.musicSlider) {
             if (mouseX >= 165 && mouseX <= 315) settings.musicSliderX = mouseX;
             if (mouseX >= 315) settings.musicSliderX = 315;
             if (mouseX <= 165) settings.musicSliderX = 165;
@@ -558,8 +559,17 @@ function drawSettings() {
         ctx.textAlign = "center";
         ctx.font = "bold 15px Arial";
         ctx.fillStyle = "white";
-        ctx.fillText(`${volume}`, 340, 150);
+        ctx.fillText(`${musicVolume}`, 340, 150);
         ctx.fillText(`${sfxVolume}`, 327, 200);
+
+        // Update Data Button
+        mouseOver.updateData =  mouseX >= 50 && mouseX <= 250 && mouseY >= 400 && mouseY <= 600;
+        if (mouseOver.updateData) "rgb(0, 0, 235)";
+        else ctx.fillStyle = "rgb(0, 0, 255)";
+        ctx.fillRect(50, 400, 200, 150);
+        
+        ctx.font = "10px Arial";
+        ctx.fillText("highscores are saved", 50, 400);
     }
 }
 
@@ -573,27 +583,27 @@ function drawDifficultySelection() {
         }
     }
 
-    mouseOver.easy = (mouseX > 50 && mouseX < 250) && (mouseY > 250 && mouseY < 350);
+    mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
     ctx.fillRect(50, 250, 200, 100);
 
-    mouseOver.medium = (mouseX > 300 && mouseX < 500) && (mouseY > 250 && mouseY < 350);
+    mouseOver.medium = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
     ctx.fillRect(300, 250, 200, 100);
 
-    mouseOver.hard = (mouseX > 550 && mouseX < 750) && (mouseY > 250 && mouseY < 350);
+    mouseOver.hard = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
     ctx.fillRect(550, 250, 200, 100);
 
-    mouseOver.alarm9 = (mouseX > 50 && mouseX < 250) && (mouseY > 450 && mouseY < 550);
+    mouseOver.alarm9 = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
     decideFillStyle(mouseOver.alarm9, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
     ctx.fillRect(50, 450, 200, 100);
 
-    mouseOver.astralProjection = (mouseX > 300 && mouseX < 500) && (mouseY > 450 && mouseY < 550);
+    mouseOver.astralProjection = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
     decideFillStyle(mouseOver.astralProjection, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
     ctx.fillRect(300, 450, 200, 100);
 
-    mouseOver.divine = (mouseX > 550 && mouseX < 750) && (mouseY > 450 && mouseY < 550);
+    mouseOver.divine = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
     decideFillStyle(mouseOver.divine, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
     ctx.fillRect(550, 450, 200, 100);
     
@@ -640,16 +650,16 @@ function drawDodgerSelection() {
 
     // Coordinates
     const evader = { x: 50, y: 50, };
-    mouseOver.evader = (mouseX > evader.x && mouseX < evader.x + 200) && (mouseY > evader.y && mouseY < evader.y + 100);
+    mouseOver.evader = mouseX > evader.x && mouseX < evader.x + 200 && mouseY > evader.y && mouseY < evader.y + 100;
 
     const jsab = { x: 300, y: 50, };
-    mouseOver.jsab = (mouseX > jsab.x && mouseX < jsab.x + 200) && (mouseY > jsab.y && mouseY < jsab.y + 100);
+    mouseOver.jsab = mouseX > jsab.x && mouseX < jsab.x + 200 && mouseY > jsab.y && mouseY < jsab.y + 100;
 
     const jötunn = { x: 550, y: 50, };
-    mouseOver.jötunn = (mouseX > jötunn.x && mouseX < jötunn.x + 200) && (mouseY > jötunn.y && mouseY < jötunn.y + 100);
+    mouseOver.jötunn = mouseX > jötunn.x && mouseX < jötunn.x + 200 && mouseY > jötunn.y && mouseY < jötunn.y + 100;
 
     const jolt = { x: 300, y: 200, };
-    mouseOver.jolt = (mouseX > jolt.x && mouseX < jolt.x + 200) && (mouseY > jolt.y && mouseY < jolt.y + 100);
+    mouseOver.jolt = mouseX > jolt.x && mouseX < jolt.x + 200 && mouseY > jolt.y && mouseY < jolt.y + 100;
     
     // Backgrounds
     decideFillStyle(mouseOver.evader, "rgb(230, 230, 230)", "rgb(220, 220, 220)");
@@ -686,7 +696,7 @@ function drawGameOver() {
     const grad = ctx.createLinearGradient(250, 50, 550, 150)
     const grad2 = ctx.createLinearGradient(250, 150, 550, 50)
 
-    mouseOver.restart = (mouseX > 250 && mouseX < 550) && (mouseY > 50 && mouseY < 150);
+    mouseOver.restart = mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
 
     if (mouseOver.restart) {
         grad.addColorStop(0, "rgb(255, 0, 0)");
@@ -1102,10 +1112,10 @@ function restartEndless() { // Resets certain variables once the play button is 
         ...allEnemies.filter(enemy => enemy.ability !== "decelerator")
     ]
 
-    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
+    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
     sharpPop.volume = sfxVolume/100;
-    music.var.volume = volume/100;
+    music.var.volume = musicVolume/100;
     music.var.currentTime = 0;
     music.promise = music.var.play();
     
