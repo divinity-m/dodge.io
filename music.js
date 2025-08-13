@@ -173,7 +173,6 @@ function createSpike(variant="none") {
             else return false
         },
     }
-    
     if (variant !== "none") spike.variant = variant;
     allDangers.unshift(spike);
     return spike;
@@ -188,6 +187,11 @@ function spawnAndDrawDanger() {
             if (music.var.currentTime >= timestamp) {
                 if (dangerType === "beam" || dangerType === "horizontal" || dangerType === "vertical") {
                     createBeam();
+                    if (music.timestamps[i][2]) {
+                        allDangers[0].w = music.timestamps[i][2];
+                        allDangers[0].h = music.timestamps[i][2];
+                    }
+                    
                     if (dangerType === "vertical") allDangers[0].variant = "vertical";
                     else if (dangerType === "horizontal") allDangers[0].variant = "horizontal";
                     
@@ -200,6 +204,9 @@ function spawnAndDrawDanger() {
                     allDangers[0].y = (timestamp*100)-(cnv.height*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
                     createCircle();
+                    if (music.timestamps[i][2]) allDangers[0].r = music.timestamps[i][2];
+                    allDangers[0].lineWidth = allDangers[0].r;
+                    
                     if (dangerType === "bomb") allDangers[0].variant = "bomb";
                     else if (dangerType === "ring") allDangers[0].variant = "ring";
         
@@ -209,6 +216,7 @@ function spawnAndDrawDanger() {
                 } else if (dangerType === "spike") {
                     createSpike();
                     const location = music.timestamps[i][2];
+                    if (music.timestamps[i][3]) allDangers[0].r = music.timestamps[i][3];
                     const radiusSpace = allDangers[0].r * 1.5;
                     
                     // spikes spawn on the edge of the walls
