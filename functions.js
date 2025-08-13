@@ -360,7 +360,7 @@ function drawCircle(x, y, r = 12.5, type = "fill") {
 }
 
 function drawStartScreen() {
-    volume = Math.floor((settings.volumeSliderX - 165) / 1.5);
+    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
     music.var.volume = volume/100;
     
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
@@ -488,7 +488,7 @@ function drawSettings() {
     const distGear = Math.hypot(gear.x+20 - mouseX, gear.y+20 - mouseY); // (770, 620) is the center of the gear
     mouseOver.settings = distGear < 30;
 
-    volume = Math.floor((settings.volumeSliderX - 165) / 1.5);
+    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
 
     if (innerGameState === "mainMenu") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
@@ -522,9 +522,9 @@ function drawSettings() {
         mouseOver.sfxSlider = mouseX >= 142 && mouseX <= 312 && mouseY >= 180 && mouseY <= 210;
         
         if (mouseDown && mouseOver.volumeSlider) {
-            if (mouseX >= 165 && mouseX <= 315) settings.volumeSliderX = mouseX;
-            if (mouseX >= 315) settings.volumeSliderX = 315;
-            if (mouseX <= 165) settings.volumeSliderX = 165;
+            if (mouseX >= 165 && mouseX <= 315) settings.musicSliderX = mouseX;
+            if (mouseX >= 315) settings.musicSliderX = 315;
+            if (mouseX <= 165) settings.musicSliderX = 165;
         }
         if (mouseDown && mouseOver.sfxSlider) {
             if (mouseX >= 152 && mouseX <= 302) settings.sfxSliderX = mouseX;
@@ -545,13 +545,13 @@ function drawSettings() {
         // volume bar fill
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.roundRect(165, 140, settings.volumeSliderX - 165, 10, 5);
+        ctx.roundRect(165, 140, settings.musicSliderX - 165, 10, 5);
         ctx.fill();
         ctx.beginPath();
         ctx.roundRect(152, 190, settings.sfxSliderX - 152, 10, 5);
         ctx.fill();
         
-        drawCircle(settings.volumeSliderX, 145, 10);
+        drawCircle(settings.musicSliderX, 145, 10);
         drawCircle(settings.sfxSliderX, 195, 10);
 
         // volume text
@@ -1102,7 +1102,7 @@ function restartEndless() { // Resets certain variables once the play button is 
         ...allEnemies.filter(enemy => enemy.ability !== "decelerator")
     ]
 
-    volume = Math.floor((settings.volumeSliderX - 165) / 1.5);
+    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
     sharpPop.volume = sfxVolume/100;
     music.var.volume = volume/100;
