@@ -1,4 +1,4 @@
-console.log("musicVolume");// DODGE.IO - MUSIC.JS
+console.log("locations");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -209,14 +209,25 @@ function spawnAndDrawDanger() {
                 } else if (dangerType === "spike") {
                     createSpike();
                     location = music.timestamps[i][2];
+                    const radiusSpace = allDangers[0].r * 1.5;
                     
                     // spikes spawn on the edge of the walls
-                    if (location === "rand") {
+                    if (!location) {
                         const rand = Math.random();
-                        if (rand < 0.25) allDangers[0].x = allDangers[0].r * 1.5;
-                        else if (rand < 0.5) allDangers[0].x = cnv.width - allDangers[0].r * 1.5;
-                        else if (rand < 0.75) allDangers[0].y = allDangers[0].r * 1.5;
-                        else if (rand < 1) allDangers[0].y = cnv.height - allDangers[0].r * 1.5;
+                        if (rand < 0.25) allDangers[0].x = radiusSpace;
+                        else if (rand < 0.5) allDangers[0].x = cnv.width - radiusSpace;
+                        else if (rand < 0.75) allDangers[0].y = radiusSpace;
+                        else if (rand < 1) allDangers[0].y = cnv.height - radiusSpace;
+                    } else {
+                        locations = {tl: [radiusSpace, radiusSpace], tr: [cnv.width-radiusSpace, radiusSpace],
+                                     bl: [radiusSpace, cnv.height-radiusSpace], br: [cnv.width-radiusSpace, cnv.height-radiusSpace],
+                                     tm: [cnv.width/2, radiusSpace], lm: [radiusSpace, cnv.height/2],
+                                     bm: [cnv.width/2, cnv.height-radiusSpace], rm: [cnv.width-radiusSpace, cnv.height/2]}
+                        
+                        if (locations?.[location]) {
+                            allDangers[0].x = locations[location][0];
+                            allDangers[0].y = locations[location][1];
+                        }
                     }
                 }
                 music.timestamps.splice(i, 1);
