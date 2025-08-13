@@ -144,10 +144,10 @@ function recordLeftClick() {
                 restartEndless();
             }
         });
-        ["alarm9", "astralProjection", "divine"].forEach(level => {
+        ["limbo", "andromeda", "divine"].forEach(level => {
             if (mouseOver[level]) {
                 pauseAudio(music.promise, music.var);
-                if (mouseOver?.alarm9) {
+                if (mouseOver?.limbo) {
                     music = {var: alarm9, name: "Alarm 9", artist: "Blue Cxve",
                              color: "rgb(100, 0, 100)", subColor: "rgb(128, 0, 128)", textColor: "rgb(163, 0, 163)",
                              timestamps: [[0.079], [2.79], [3.13], [3.49], [3.81], [4.17], [5.58], [6.28],
@@ -159,7 +159,7 @@ function recordLeftClick() {
                     }
                     music.timestamps = music.timestamps.map(x => [x[0]-0.025, x[1]]); // delay slightly for better visual to audio sync
                 }
-                if (mouseOver?.astralProjection) {
+                if (mouseOver?.andromeda) {
                     function solo8Beam(time) {
                         return [ // 8-beam - [0.225, 0.24, 0.23, 0.236, 0.217, 0.258, 0.228]
                         [time, "horizontal"], [time+0.225, "horizontal"], [time+0.456, "vertical"], [time+0.695, "vertical"],
@@ -585,12 +585,12 @@ function drawDifficultySelection() {
     decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
     ctx.fillRect(550, 250, 200, 100);
 
-    mouseOver.alarm9 = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.alarm9, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
+    mouseOver.limbo = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
     ctx.fillRect(50, 450, 200, 100);
 
-    mouseOver.astralProjection = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.astralProjection, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
+    mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
     ctx.fillRect(300, 450, 200, 100);
 
     mouseOver.divine = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
