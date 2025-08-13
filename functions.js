@@ -276,6 +276,8 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.map(x => [x[0]-0.025, x[1]]);
                 }
                 if (mouseOver?.divine) {
+                    const xMid = cnv.width/2
+                    const yMid = cnv.height/2
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
                              color: "rgb(223, 255, 156)", subColor: "rgb(224, 255, 232)", textColor: "rgb(255, 165, 252)",
                              timestamps: [
@@ -287,13 +289,18 @@ function recordLeftClick() {
                                  [24.075, "vertical", {size: 100, coords: [700, 0]}], [24.592, "horizontal", {size: 100, coords: [0, 550]}],
                                  [25.100, "vertical", {size: 100, coords: [100, 0]}], [25.688, "horizontal", {size: 100, coords: [0, 100]}],
                                  [26.175, "vertical", {size: 100, coords: [600, 0]}], [26.700, "horizontal", {size: 100, coords: [0, 450]}],
-                                 [27.220, "bomb", {size: 300, coords: [cnv.width/2, cnv.height/2]}],
-                                 [],
+                                 [27.220, "bomb", {size: 300, coords: [xMid, yMid]}],
+                                 [29.246, "ring", {size: 300, coords: [xMid, yMid], despawnRate: 4}],
+                                 [30.050, "ring", {size: 175, coords: [xMid, yMid], despawnRate: 4}],
+                                 [30.800, "ring", {size: 75, coords: [xMid, yMid], despawnRate: 4}],
+                                 [32.093, "bomb", {size: 100, coords: [xMid, yMid], despawnRate: 3}],
+                                 [32.630, "bomb", {size: 250, coords: [xMid, yMid], despawnRate: 3}],
+                                 [32.930, "bomb", {size: 400, coords: [xMid, yMid], despawnRate: 3}],
                              ]
                             };
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                     for (let i = 1; i < 16; i++) {
-                        music.timestamps.push([i, "ring", {size: 35+(i-1)*25, coords: [cnv.width/2, cnv.height/2]}]);
+                        music.timestamps.push([i, "ring", {size: 35+(i-1)*25, coords: [xMid, yMid]}]);
                     }
                 }
                 music.backUpTS = [...music.timestamps];
