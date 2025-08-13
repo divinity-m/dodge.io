@@ -1199,37 +1199,21 @@ function abilities() { // player-specific-abilities
             const enemyDist = Math.hypot(dxEnemy, dyEnemy);
 
             if (enemy.ability === "none") {
-                if (enemyDist < 100) {
-                    enemy.color = "rgb(55, 77, 107)";
-                } else if (enemyDist < 125) {
-                    enemy.color = "rgb(68, 84, 107)";
-                } else if (enemyDist < 150) {
-                    enemy.color = "rgb(81, 91, 105)";
-                } else if (enemyDist < 175) {
-                    enemy.color = "rgb(95, 100, 107)";
-                }
+                if (enemyDist < 100) enemy.color = "rgb(55, 77, 107)";
+                else if (enemyDist < 125) enemy.color = "rgb(68, 84, 107)";
+                else if (enemyDist < 150) enemy.color = "rgb(81, 91, 105)";
+                else if (enemyDist < 175) enemy.color = "rgb(95, 100, 107)";
             } else if (enemy.ability === "decelerator") {
-                if (enemyDist < 100) {
-                    enemy.color = "rgb(210, 0, 0)";
-                } else if (enemyDist < 125) {
-                    enemy.color = "rgb(220, 0, 0)";
-                } else if (enemyDist < 150) {
-                    enemy.color = "rgb(230, 0, 0)";
-                } else if (enemyDist < 175) {
-                    enemy.color = "rgb(240, 0, 0)";
-                }
+                if (enemyDist < 100) enemy.color = "rgb(210, 0, 0)";
+                else if (enemyDist < 125) enemy.color = "rgb(220, 0, 0)";
+                else if (enemyDist < 150) enemy.color = "rgb(230, 0, 0)";
+                else if (enemyDist < 175) enemy.color = "rgb(240, 0, 0)";
             } else if (enemy.ability === "homing") {
-                if (enemyDist < 100) {
-                    enemy.color = "rgb(190, 146, 0)";
-                } else if (enemyDist < 125) {
-                    enemy.color = "rgb(206, 158, 0)";
-                } else if (enemyDist < 150) {
-                    enemy.color = "rgb(216, 166, 0)";
-                } else if (enemyDist < 175) {
-                    enemy.color = "rgb(235, 180, 0)";
-                }
+                if (enemyDist < 100) enemy.color = "rgb(190, 146, 0)";
+                else if (enemyDist < 125) enemy.color = "rgb(206, 158, 0)";
+                else if (enemyDist < 150) enemy.color = "rgb(216, 166, 0)";
+                else if (enemyDist < 175) enemy.color = "rgb(235, 180, 0)";
             }
-
         })
     }
     if (player.dodger === "jolt") {
