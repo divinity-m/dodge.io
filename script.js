@@ -1,4 +1,4 @@
-console.log("updateData")// DODGE.IO - SCRIPT.JS
+console.log("more dataSaving methods")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -182,8 +182,27 @@ if (localData) {
         // checks to see if the userData is missing any elements and replaces it with default data
         ["player", "highscore", "settings"].forEach(data => {
             if (!(data in userData)) userData[data] = eval(data);
-        }); 
-
+        });
+        
+        let p = {dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)"};
+        ["dodger", "color", "subColor"].forEach(attribute => {
+            if (userData?.player?.[attribute]) p[attribute] = userdata.player[attribute];
+        })
+        let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, divine: 0};
+        ["easy", "medium", "hard", "limbo", "andromeda", "divine"].forEach(score => {
+            if (userData?.highscore?.[score]) hs[score] = userdata.highscore[score];
+        })
+        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240,};
+        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX"].forEach(setting => {
+            if (userData?.settings?.[setting]) s[setting] = userData.settings[setting];
+        })
+                
+        userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, slowed: 1, dodger: "evader",
+                                color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)", facingAngle: 0,},
+                    highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
+                                limbo: hs.limbo, andromeda: hs.andromeda, divine: hs.divine,},
+                    settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM,
+                                musicSliderX: s.musicSliderX, sfxSliderX: s.sfxSliderX,}};
         // updates the current data to the locally saved data
         player.dodger = userData.player.dodger;
         player.color = userData.player.color;
