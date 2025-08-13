@@ -1,4 +1,4 @@
-console.log("danger array")// DODGE.IO - SCRIPT.JS
+console.log("new highscore options")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
