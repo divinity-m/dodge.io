@@ -1,4 +1,4 @@
-console.log("modifiers");// DODGE.IO - MUSIC.JS
+console.log("spawnrate and despawnrate");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -118,6 +118,8 @@ function createBeam(variant="none") {
         w: (Math.random() * 20) + 80,
         h: (Math.random() * 20) + 50,
         colorValue: 185,
+        spawnRate: 0.25,
+        despawnRate: 2,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
@@ -137,6 +139,8 @@ function createCircle(variant="none") {
         y: Math.random() * cnv.height,
         r: (Math.random() * 40) + 80,
         colorValue: 185,
+        spawnRate: 0.25,
+        despawnRate: 2,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
@@ -158,6 +162,8 @@ function createSpike(variant="none") {
         r: (Math.random() * 10) + 10,
         rotate: 0,
         colorValue: 185,
+        spawnRate: 0.5,
+        despawnRate: 0.5,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
@@ -237,6 +243,8 @@ function spawnAndDrawDanger() {
                     }
                 }
                 if (modifiers?.coords) { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
+                if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
+                if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
                 
                 music.timestamps.splice(i, 1);
             }
@@ -246,17 +254,16 @@ function spawnAndDrawDanger() {
     allDangers.forEach(danger => {
         ctx.fillStyle = danger.color;
         ctx.strokeStyle = danger.color;
-        
+        // colorValue
         if (danger.colorValue >= 255 && danger.type !== "spike") danger.despawn = true;
         if (danger.colorValue < 255 &&
-            ( (!danger?.despawn && danger.type !== "spike") || (!danger?.reachedWall && danger.type === "spike") )
-           ) {
-            danger.colorValue += 0.25;
-            if (danger.type === "spike") danger.colorValue += 0.25;
-        }
-        if (danger?.despawn) danger.colorValue -= 2;
-        if (danger.colorValue > 185 && danger?.reachedWall) danger.colorValue -= 0.5;
-        
+            (
+            (!danger?.despawn && danger.type !== "spike") || (!danger?.reachedWall && danger.type === "spike")
+            )
+           ) danger.colorValue += danger.spawnRate;
+        if (danger.colorValue > 185 && (danger?.despawn || danger?.reachedWall)) danger.colorValue -= danger.despawnRate;
+
+        // shape
         if (danger.type === "beam") {
             if (danger.variant === "vertical") {
                 ctx.fillRect(danger.x, 0, danger.w, cnv.height);
