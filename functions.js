@@ -1,4 +1,4 @@
-console.log("renaming some mouseOver variables")// DODGE.IO - FUNCTIONS.JS
+console.log("working on DIVINE LETS GOOOOOOOO")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -278,9 +278,22 @@ function recordLeftClick() {
                 if (mouseOver?.divine) {
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
                              color: "rgb(223, 255, 156)", subColor: "rgb(224, 255, 232)", textColor: "rgb(255, 165, 252)",
-                             timestamps: [[16.730, "horizontal"], [17.268, "vertical"], [17.835, "horizontal"], [18.400, "vertical"]],};
+                             timestamps: [
+                                 [16.730, "vertical", {size: 80, coords: [140, 0]}], [17.268, "vertical", {size: 80, coords: [360, 0]}], [17.835, "vertical", {size: 80, coords: [580, 0]}],
+                                 [18.400, "horizontal", {size: 80, coords: [0, 490/3]}], [18.900, "horizontal", {size: 80, coords: [0, 2*490/3 + 80]}],
+                                 [19.400, "vertical", {size: 200, coords: [50, 0]}], [19.670, "vertical", {size: 200, coords: [300, 0]}], [19.950, "vertical", {size: 200, coords: [550, 0]}],
+                                 [20.430, "horizontal", {size: 200, coords: [0, 250/3]}], [20.800, "horizontal", {size: 200, coords: [0, 2*250/3 + 200]}],
+                                 [23.550, "vertical", {size: 100, coords: [0, 0]}], [23.800, "horizontal", {size: 100, coords: [0, 0]}],
+                                 [24.075, "vertical", {size: 100, coords: [700, 0]}], [24.592, "horizontal", {size: 100, coords: [0, 550]}],
+                                 [25.100, "vertical", {size: 100, coords: [100, 0]}], [25.688, "horizontal", {size: 100, coords: [0, 100]}],
+                                 [26.175, "vertical", {size: 100, coords: [600, 0]}], [26.700, "horizontal", {size: 100, coords: [0, 450]}],
+                                 [27.220, "bomb", {size: 300, coords: [cnv.width/2, cnv.height/2]}],
+                                 [],
+                             ]
+                            };
+                    music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                     for (let i = 1; i < 16; i++) {
-                        music.timestamps.push([i, "ring"]);
+                        music.timestamps.push([i, "ring", {size: 35+(i-1)*25, coords: [cnv.width/2, cnv.height/2]}]);
                     }
                 }
                 music.backUpTS = [...music.timestamps];
