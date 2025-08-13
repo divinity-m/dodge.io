@@ -41,8 +41,8 @@ let mouseOver = {
     easy: false,
     medium: false,
     hard: false,
-    alarm9: false,
-    astralProjection: false,
+    limbo: false,
+    andromeda: false,
     divine: false,
 
     enemyOutBtn: false,
