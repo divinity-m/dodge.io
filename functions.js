@@ -1261,6 +1261,12 @@ function abilities() { // player-specific-abilities
             if (now - enemy.resetRadius >= 5000) {
                 enemy.radius = enemy.baseRadius;
                 if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius;
+
+                // prevents no-clipping
+                if (enemy.x - enemy.radius <= 0) enemy.x = enemy.radius + 1;
+                if (enemy.x + enemy.radius >= cnv.width) enemy.x = cnv.width - enemy.radius - 1;
+                if (enemy.y - enemy.radius <= 0) enemy.y = enemy.radius + 1;
+                if (enemy.y + enemy.radius >= cnv.height) enemy.y = cnv.height - enemy.radius - 1;
             }
             // Decrease the radius of enemies under the effect of shockwave
             else {
