@@ -93,7 +93,7 @@ let shockwave = {
 let settings = {
     enemyOutlines: true,
     disableMM: false,
-    volumeSliderX: 240,
+    musicSliderX: 240,
     sfxSliderX: 240,
 };
 
