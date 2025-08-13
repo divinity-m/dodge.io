@@ -1,4 +1,4 @@
-console.log("despawnbugfix");// DODGE.IO - MUSIC.JS
+console.log("modifiers");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -182,15 +182,13 @@ function spawnAndDrawDanger() {
     // Danger Spawning
     if (music.timestamps.length > 0) {
         for (let i = music.timestamps.length-1; i >= 0; i--) {
-            let timestamp = music.timestamps[i][0];
-            let dangerType = music.timestamps[i][1];
+            const timestamp = music.timestamps[i][0];
+            const dangerType = music.timestamps[i][1];
+            const modifiers = music.timestamps[i][2];
             if (music.var.currentTime >= timestamp) {
                 if (dangerType === "beam" || dangerType === "horizontal" || dangerType === "vertical") {
                     createBeam();
-                    if (music.timestamps[i][2]) {
-                        allDangers[0].w = music.timestamps[i][2];
-                        allDangers[0].h = music.timestamps[i][2];
-                    }
+                    if (modifiers?.size) { allDangers[0].w = modifiers.size; allDangers[0].h = modifiers.size; }
                     
                     if (dangerType === "vertical") allDangers[0].variant = "vertical";
                     else if (dangerType === "horizontal") allDangers[0].variant = "horizontal";
@@ -204,7 +202,7 @@ function spawnAndDrawDanger() {
                     allDangers[0].y = (timestamp*100)-(cnv.height*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
                     createCircle();
-                    if (music.timestamps[i][2]) allDangers[0].r = music.timestamps[i][2];
+                    if (modifiers?.size) allDangers[0].r = modifiers.size;
                     allDangers[0].lineWidth = allDangers[0].r;
                     
                     if (dangerType === "bomb") allDangers[0].variant = "bomb";
@@ -215,10 +213,10 @@ function spawnAndDrawDanger() {
                     allDangers[0].y = player.y;
                 } else if (dangerType === "spike") {
                     createSpike();
-                    const location = music.timestamps[i][2];
-                    if (music.timestamps[i][3]) allDangers[0].r = music.timestamps[i][3];
+                    if (modifiers?.size) allDangers[0].r = modifiers.size;
                     const radiusSpace = allDangers[0].r * 1.5;
                     
+                    const location = modifiers.location;
                     // spikes spawn on the edge of the walls
                     if (!location) {
                         const rand = Math.random();
@@ -238,6 +236,8 @@ function spawnAndDrawDanger() {
                         }
                     }
                 }
+                if (modifiers?.coords) { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
+                
                 music.timestamps.splice(i, 1);
             }
         }
