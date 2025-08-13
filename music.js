@@ -208,7 +208,7 @@ function spawnAndDrawDanger() {
                     allDangers[0].y = player.y;
                 } else if (dangerType === "spike") {
                     createSpike();
-                    location = music.timestamps[i][2];
+                    const location = music.timestamps[i][2];
                     const radiusSpace = allDangers[0].r * 1.5;
                     
                     // spikes spawn on the edge of the walls
