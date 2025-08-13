@@ -49,7 +49,6 @@ let mouseOver = {
     disableMMBtn: false,
     musicSlider: false,
     sfxSlider: false,
-    updateData: false,
 };
 
 let mouseX;
