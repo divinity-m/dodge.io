@@ -1,9 +1,9 @@
-console.log("despawn fade out");// DODGE.IO - MUSIC.JS
+console.log("volumeSliderX");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
     player.hit = 0;
-    volume = Math.floor((settings.volumeSliderX - 165) / 1.5);
+    volume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
     sharpPop.volume = sfxVolume/100;
     music.var.volume = volume/100;
