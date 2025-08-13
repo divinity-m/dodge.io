@@ -1,4 +1,4 @@
-console.log("if mouseOver updateData")// DODGE.IO - FUNCTIONS.JS
+console.log("removing all the updateData stuff")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -504,7 +504,6 @@ function drawSettings() {
         ctx.fillText("Disable Mouse Movement Activation", 50, 100);
         ctx.fillText("Music Volume", 50, 150);
         ctx.fillText("SFX Volume", 50, 200);
-        ctx.fillText("Update Data", 50, 400);
         
         // Enemy Outlines Button
         mouseOver.enemyOutBtn = mouseX > 170 && mouseX < 190 && mouseY > 35 && mouseY < 55;
@@ -561,15 +560,6 @@ function drawSettings() {
         ctx.fillStyle = "white";
         ctx.fillText(`${musicVolume}`, 340, 150);
         ctx.fillText(`${sfxVolume}`, 327, 200);
-
-        // Update Data Button
-        mouseOver.updateData =  mouseX >= 50 && mouseX <= 250 && mouseY >= 400 && mouseY <= 600;
-        if (mouseOver.updateData) "rgb(0, 0, 235)";
-        else ctx.fillStyle = "rgb(0, 0, 255)";
-        ctx.fillRect(50, 400, 200, 150);
-        
-        ctx.font = "10px Arial";
-        ctx.fillText("highscores are saved", 50, 400);
     }
 }
 
