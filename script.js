@@ -130,7 +130,7 @@ let difficulty = {
 };
 
 // Music
-let volume = 50;
+let musicVolume = 50;
 let sfxVolume = 50;
 
 let alarm9 = document.createElement("audio");
