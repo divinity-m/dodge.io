@@ -180,10 +180,7 @@ if (localData) {
 
         // checks to see if the userData is missing any elements and replaces it with default data
         ["player", "highscore", "settings"].forEach(data => {
-            if (data in userData) {
-                if (userData[data] !== eval(data)) userData[data] = eval(data);
-            }
-            else userData[data] = eval(data);
+            if (!(data in userData)) userData[data] = eval(data);
         }); 
 
         // updates the current data to the locally saved data
