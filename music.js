@@ -1,4 +1,4 @@
-console.log("new despawn methods");// DODGE.IO - MUSIC.JS
+console.log("despawn fade out");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
