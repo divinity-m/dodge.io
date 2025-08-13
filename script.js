@@ -1,4 +1,4 @@
-console.log("more dataSaving methods")// DODGE.IO - SCRIPT.JS
+console.log("lowercase typo")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -176,8 +176,14 @@ let resetLocalData = false;
 if (localData) {
     // retrieves the users local data and watches for corrupted data
     try {
-        userData = JSON.parse(localData);
+        userData = JSON.parse(localData);       
+    } catch (exception) {
+        console.warn('Local user data was invalid, resetting.', exception);
+        localStorage.removeItem('localUserData');
+        resetLocalData = true;
+    }
 
+    if (!resetLocalData) {
         // checks to see if the userData is missing any elements and replaces it with default data
         ["player", "highscore", "settings"].forEach(data => {
             if (!(data in userData)) userData[data] = eval(data);
@@ -185,11 +191,11 @@ if (localData) {
         
         let p = {dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)"};
         ["dodger", "color", "subColor"].forEach(attribute => {
-            if (userData?.player?.[attribute]) p[attribute] = userdata.player[attribute];
+            if (userData?.player?.[attribute]) p[attribute] = userData.player[attribute];
         })
         let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, divine: 0};
         ["easy", "medium", "hard", "limbo", "andromeda", "divine"].forEach(score => {
-            if (userData?.highscore?.[score]) hs[score] = userdata.highscore[score];
+            if (userData?.highscore?.[score]) hs[score] = userData.highscore[score];
         })
         let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240,};
         ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX"].forEach(setting => {
@@ -208,10 +214,6 @@ if (localData) {
         player.subColor = userData.player.subColor;
         highscore = userData.highscore;
         settings = userData.settings;
-    } catch (exception) {
-        console.warn('Local user data was invalid, resetting.', exception);
-        localStorage.removeItem('localUserData');
-        resetLocalData = true;
     }
 }
 
