@@ -1,4 +1,4 @@
-console.log("more control over values & increased spike hitbox");// DODGE.IO - MUSIC.JS
+console.log("despawnbugfix");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -248,7 +248,12 @@ function spawnAndDrawDanger() {
         ctx.strokeStyle = danger.color;
         
         if (danger.colorValue >= 255 && danger.type !== "spike") danger.despawn = true;
-        if (danger.colorValue < 255 && (!danger?.despawn || !danger?.reachedWall)) danger.colorValue += 0.25;
+        if (danger.colorValue < 255 &&
+            ( (!danger?.despawn && danger.type !== "spike") || (!danger?.reachedWall && danger.type === "spike") )
+           ) {
+            danger.colorValue += 0.25;
+            if (danger.type === "spike") danger.colorValue += 0.25;
+        }
         if (danger?.despawn) danger.colorValue -= 2;
         if (danger.colorValue > 185 && danger?.reachedWall) danger.colorValue -= 0.5;
         
