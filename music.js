@@ -1,4 +1,4 @@
-console.log("spawnrate and despawnrate");// DODGE.IO - MUSIC.JS
+console.log("jotunn slows spawnrate");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -113,13 +113,10 @@ function createBeam(variant="none") {
     let beam = {
         type: "beam",
         variant: Math.random(),
-        x: Math.random() * cnv.width,
-        y: Math.random() * cnv.height,
-        w: (Math.random() * 20) + 80,
-        h: (Math.random() * 20) + 50,
+        x: Math.random() * cnv.width, y: Math.random() * cnv.height,
+        w: (Math.random() * 20) + 80, h: (Math.random() * 20) + 50,
+        spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
         colorValue: 185,
-        spawnRate: 0.25,
-        despawnRate: 2,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
@@ -135,12 +132,9 @@ function createCircle(variant="none") {
     let circle = {
         type: "circle",
         variant: Math.random(),
-        x: Math.random() * cnv.width,
-        y: Math.random() * cnv.height,
-        r: (Math.random() * 40) + 80,
+        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 40) + 80,
+        spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
         colorValue: 185,
-        spawnRate: 0.25,
-        despawnRate: 2,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
@@ -157,13 +151,10 @@ function createSpike(variant="none") {
     let spike = {
         type: "spike",
         variant: "none",
-        x: Math.random() * cnv.width,
-        y: Math.random() * cnv.height,
-        r: (Math.random() * 10) + 10,
-        rotate: 0,
+        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 10) + 10,
+        rotate: 0, 
+        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 0.5,
         colorValue: 185,
-        spawnRate: 0.5,
-        despawnRate: 0.5,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
@@ -338,6 +329,8 @@ function spawnAndDrawDanger() {
                 const dist = Math.hypot(dx, dy);
                 danger.movex = (dx/dist)*danger.speed;
                 danger.movey = (dy/dist)*danger.speed;
+                danger.baseMovex = danger.movex;
+                danger.baseMovey = danger.movey;
                 danger.facingAngle = Math.atan2(dx, dy);
                 danger.launched = true;
             }
@@ -360,9 +353,9 @@ function spawnAndDrawDanger() {
 
 function musicCollisions() {
     allDangers.forEach(danger => {
-        const distance = Math.hypot(player.x-danger.x, player.y-danger.y);
         if (timeLeft > 0 && innerGameState !== "musicModeFail" && danger.colorValue >= 255 &&
             now-player.hit >= 1500 && !dash.activated && now-dash.lastEnded >= 300) {
+            let distance = Math.hypot(player.x-danger.x, player.y-danger.y);
             if (danger.type === "beam") {
                 if ((danger.variant === "vertical" && player.x+player.r >= danger.x && player.x-player.r <= danger.x+danger.w) ||
                    (danger.variant === "horizontal" && player.y+player.r >= danger.y && player.y-player.r <= danger.y+danger.h)) {
@@ -389,6 +382,41 @@ function musicCollisions() {
                     sharpPop.currentTime = 0;
                     sharpPop.play();
                 }
+            }
+        }
+
+        if (player.dodger === "jötunn") {
+            let distance = Math.hypot(player.x-danger.x, player.y-danger.y) - player.r;
+            
+            if (danger.variant === "vertical") distance = Math.abs(player.x - (danger.x + danger.w/2)) - danger.w/2 + player.r;
+            if (danger.variant === "horizontal") distance = Math.abs(player.y - (danger.y + danger.h/2)) - danger.h/2 + player.r;
+            if (danger.variant === "bomb") distance -= danger.r;
+            if (danger.variant === "ring") {
+                innerDist = -(distance - danger.r + danger.lineWidth/2); // if the player is inside the ring
+                distance -= danger.r + danger.lineWidth/2;
+                if (innerDist > 0) distance = innerDist;
+                }
+            if (danger.type === "spike") distance -= danger.r*1.5;
+            if (distance < 0) distance = 0;
+            
+            const slowStart = 175;
+            const slowEnd = 75;
+            
+            const maxDist = Math.max(distance, slowEnd);
+            const factor = Math.min(1, (maxDist - slowEnd) / (slowStart - slowEnd));
+            const slowFactor = 0.8 + 0.2*factor;
+            const colorFactor = 0.9 + 0.1*factor;
+            danger.spawnRate = danger.baseSpawnRate * slowFactor;
+
+            Object.defineProperty(danger, "color", {
+                get() {
+                    return `rgb(${this.colorValue*colorFactor}, ${this.colorValue*colorFactor}, ${this.colorValue})`;
+                }
+            })
+            
+            if (danger?.launched) {
+                danger.movex = danger.baseMovex * slowFactor;
+                danger.movey = danger.baseMovex * slowFactor;
             }
         }
     })
