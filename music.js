@@ -1,4 +1,4 @@
-console.log("jotunn slows spawnrate");// DODGE.IO - MUSIC.JS
+console.log("spikes dont kill themselves");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -211,7 +211,7 @@ function spawnAndDrawDanger() {
                 } else if (dangerType === "spike") {
                     createSpike();
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
-                    const radiusSpace = allDangers[0].r * 1.5;
+                    const radiusSpace = allDangers[0].r * 1.501;
                     
                     const location = modifiers.location;
                     // spikes spawn on the edge of the walls
@@ -329,6 +329,12 @@ function spawnAndDrawDanger() {
                 const dist = Math.hypot(dx, dy);
                 danger.movex = (dx/dist)*danger.speed;
                 danger.movey = (dy/dist)*danger.speed;
+                // top and bottom aim
+                if ( (danger.y < danger.r*1.502 && player.y < danger.r*1.502) || 
+                     (danger.y > cnv.height-danger.r*1.502 && player.y > cnv.height-danger.r*1.502) ) danger.movey = 0;
+                // left and right aim
+                else if ( (danger.x < danger.r*1.502 && player.x < danger.r*1.502) ||
+                     (danger.x > cnv.width-danger.r*1.502 && player.x > cnv.width-danger.r*1.502) ) danger.movex = 0;;
                 danger.baseMovex = danger.movex;
                 danger.baseMovey = danger.movey;
                 danger.facingAngle = Math.atan2(dx, dy);
