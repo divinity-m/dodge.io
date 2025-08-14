@@ -283,7 +283,7 @@ function recordLeftClick() {
                                 // 2.095, 2.47
                                 [time+2.00, "bomb", {size: 150}], [time+2.375, "bomb", {size: 180}],];
                                                 //  3.06, 3.538
-                        if (spikes === "yes") lT.push([time+1.900, "spike", {size: 22.5, spawnRate: 0.8}], [time+2.275, "spike", {size: 22.5, spawnRate: 0.8}]);
+                        if (spikes === "yes") lT.push([time+1.900, "spike", {size: 22.5, spawnRate: 0.6}], [time+2.275, "spike", {size: 22.5, spawnRate: 0.6}]);
                         return lT;
                     }
                     function heyAh_heyHi(time) {
@@ -307,11 +307,10 @@ function recordLeftClick() {
                                  [30.800, "ring", {size: 75, coords: [xMid, yMid], spawnRate: 0.5, despawnRate: 3}],
                                  [32.093, "bomb", {size: 100, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}], // growth
                                  [32.630, "bomb", {size: 250, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
+                                 [32.930, "bomb", {size: 350, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
                                  [32.631, "spike", {size: 20, speed: 3.5, location: "tl", spawnRate: 0.8, despawnRate: 3}],
                                  [32.632, "spike", {size: 20, speed: 3.5, location: "tr", spawnRate: 0.5, despawnRate: 3}],
-                                 [32.930, "bomb", {size: 350, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
-                                 [32.931, "spike", {size: 20, speed: 3.5, location: "bl", spawnRate: 0.4, despawnRate: 3}],
-                                 [32.932, "spike", {size: 20, speed: 3.5, location: "br", spawnRate: 0.4, despawnRate: 3}],
+                                 [32.931, "spike", {size: 20, speed: 3.5, location: "br", spawnRate: 0.4, despawnRate: 3}],
                                  [73.081, "vertical", {size: cnv.width/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}], // 4 walls
                                  [73.610, "vertical", {size: cnv.width/2, coords: [xMid, 0], spawnRate: 1, despawnRate: 5}],
                                  [74.125, "horizontal", {size: cnv.height/2, coords: [0, yMid], spawnRate: 1, despawnRate: 5}],
@@ -323,7 +322,7 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(lessThan(33.590));
                     music.timestamps = music.timestamps.concat(lessThan(37.760));
                     music.timestamps = music.timestamps.concat(lessThan(41.930));
-                    music.timestamps = music.timestamps.concat(lessThan(46.123, "no spikes"));
+                    music.timestamps = music.timestamps.concat(lessThan(46.123));
                     let spb = 60/115; // bpm = 115
                     let startBeat = 50.102;
                     let beats = 29;
