@@ -1,4 +1,4 @@
-console.log("working on DIVINE! LETS GOOOOOOOO")// DODGE.IO - FUNCTIONS.JS
+console.log("threetwothree")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -278,6 +278,12 @@ function recordLeftClick() {
                 if (mouseOver?.divine) {
                     const xMid = cnv.width/2
                     const yMid = cnv.height/2
+                    function threeTwoThree(time) {
+                        return [[time, "horizontal", {size: 150, coords: ["player"]}], [time+0.388, "vertical", {size: 150, coords: ["player"]}], [time+0.902, "beam", {size: 150, coords: ["player"]}],
+                                [time+2.095, "bomb", {size: 120}], [time+2.47, "bomb", {size: 150}],
+                                // 2.98, 3.24, 3.51
+                                [time+2.38, "spike", {size: 20, spawnRate: 1.5}], [time+2.74, "spike", {size: 20, spawnRate: 1.5}], [time+2.91, "spike", {size: 20, spawnRate: 1.5}]];
+                    }
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
                              color: "rgb(223, 255, 156)", subColor: "rgb(224, 255, 232)", textColor: "rgb(255, 165, 252)",
                              timestamps: [
@@ -290,14 +296,26 @@ function recordLeftClick() {
                                  [25.100, "vertical", {size: 100, coords: [100, 0]}], [25.688, "horizontal", {size: 100, coords: [0, 100]}],
                                  [26.175, "vertical", {size: 100, coords: [600, 0]}], [26.700, "horizontal", {size: 100, coords: [0, 450]}],
                                  [27.220, "bomb", {size: 300, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 2.5}],
-                                 [29.246, "ring", {size: 300, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 4}],
-                                 [30.050, "ring", {size: 175, coords: [xMid, yMid], spawnRate: 0.4, despawnRate: 4}],
-                                 [30.800, "ring", {size: 75, coords: [xMid, yMid], spawnRate: 0.5, despawnRate: 4}],
+                                 [29.246, "ring", {size: 400, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 2.2}],
+                                 [30.050, "ring", {size: 200, coords: [xMid, yMid], spawnRate: 0.4, despawnRate: 2.5}],
+                                 [30.800, "ring", {size: 75, coords: [xMid, yMid], spawnRate: 0.5, despawnRate: 3}],
                                  [32.093, "bomb", {size: 100, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
                                  [32.630, "bomb", {size: 250, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
-                                 [32.930, "bomb", {size: 400, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
+                                 [32.631, "spike", {size: 20, speed: 3.5, location: "tl", spawnRate: 0.8, despawnRate: 3}],
+                                 [32.632, "spike", {size: 20, speed: 3.5, location: "tr", spawnRate: 0.5, despawnRate: 3}],
+                                 [32.930, "bomb", {size: 350, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
+                                 [32.931, "spike", {size: 20, speed: 3.5, location: "bl", spawnRate: 0.4, despawnRate: 3}],
+                                 [32.932, "spike", {size: 20, speed: 3.5, location: "br", spawnRate: 0.4, despawnRate: 3}],
                              ]
                             };
+                    music.timestamps = music.timestamps.concat(threeTwoThree(33.590));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(37.760));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(41.930));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(46.123));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(50.814));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(54.460));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(58.620));
+                    music.timestamps = music.timestamps.concat(threeTwoThree(62.810));
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                     for (let i = 1; i < 16; i++) {
                         music.timestamps.push([i, "ring", {size: 40+(i-1)*25, coords: [xMid, yMid]}]);
@@ -1233,7 +1251,7 @@ function abilities() { // player-specific-abilities
             ctx.rotate(shockwave.facingAngle);
 
             // draw the beam
-            ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+            ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
             ctx.fill(beamPath);
 
             // checks for collisions
@@ -1253,8 +1271,8 @@ function abilities() { // player-specific-abilities
             shockwave.x += shockwave.movex;
             shockwave.y += shockwave.movey;
 
-            // once the radius is greater than 150, end the entire ability
-            if (shockwave.radius >= 150) {
+            // once the radius is greater than 200, end the entire ability
+            if (shockwave.radius >= 200) {
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
