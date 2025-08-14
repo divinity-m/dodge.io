@@ -1,4 +1,4 @@
-console.log("done half of divine")// DODGE.IO - FUNCTIONS.JS
+console.log("141.458 euphoria")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -276,20 +276,34 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.map(x => [x[0]-0.025, x[1]]);
                 }
                 if (mouseOver?.euphoria) {
-                    const xMid = cnv.width/2
-                    const yMid = cnv.height/2
-                    function lessThan(time, spikes = "yes") {
-                        let lT = [[time, "horizontal", {size: 150, coords: ["player"]}], [time+0.388, "vertical", {size: 150, coords: ["player"]}], [time+0.902, "beam", {size: 150, coords: ["player"]}],
-                                // 2.095, 2.47
-                                [time+2.00, "bomb", {size: 150}], [time+2.375, "bomb", {size: 180}],];
-                                                //  3.06, 3.538
-                        if (spikes === "yes") lT.push([time+1.900, "spike", {size: 22.5, spawnRate: 0.6}], [time+2.275, "spike", {size: 22.5, spawnRate: 0.6}]);
-                        return lT;
+                    const xMid = cnv.width/2;
+                    const yMid = cnv.height/2;
+                    function lessThan(time = 33.590) {
+                        return [[time, "horizontal", {size: 150, coords: ["player"]}], [time+0.388, "vertical", {size: 150, coords: ["player"]}], [time+0.902, "horizontal", {size: 150, coords: ["player"]}],
+                                  // 2.095, 2.47
+                                  [time+2.00, "bomb", {size: 150}], [time+2.375, "bomb", {size: 180}],
+                                  // 3.06, 3.538
+                                  [time+1.900, "spike", {size: 22.5, spawnRate: 0.6}], [time+2.275, "spike", {size: 22.5, spawnRate: 0.6}]];
                     }
-                    function heyAh_heyHi(time) {
+                    function heyAh_heyHi(time = 66.920) {
                         return [[time, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+0.18, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}],
                                 [time+1.083, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+1.606, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}]];
                     }
+                    function bg16Beat(time = 91.834, difficulty = "easy") {
+                        bg = [[time, "spike"], [time+0.547, "spike"], [time+1.091, "spike"], [time+1.586, "spike"],
+                                [time+2.133, "horizontal"], [time+2.637, "horizontal"], [time+3.178, "horizontal"],
+                                [time+3.694, "bomb"], [time+3.942, "bomb"],
+                                [time+4.222, "spike"], [time+4.74, "spike"], [time+5.265, "spike"], [time+5.775, "spike"],
+                                [time+6.307, "horizontal", {despawnRate: 3}], [time+6.826, "horizontal", {despawnRate: 3}], [time+7.336, "horizontal", {despawnRate: 3}]];
+                        if (difficulty !== "easy") {
+                            bg.push([time+1.036, "ring"], [time+3.096, "ring"], [time+5.175, "ring"], [time+7.246, "ring"]);
+                            if (difficulty === "hard") { for (let i = 0; i < 16; i++) bg.push([bg[i][0]+0.231, "vertical"]); }
+                            bg.push([time, "bomb", {size: 150, despawnRate: 3}], [time+2.07, "bomb", {size: 150, despawnRate: 3}],
+                                    [time+4.167, "bomb", {size: 150, despawnRate: 3}], [time+6.253, "bomb", {size: 150, despawnRate: 3}]);
+                        }
+                        return bg;
+                    }
+                    
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
                              color: "rgb(223, 255, 156)", subColor: "rgb(224, 255, 232)", textColor: "rgb(255, 165, 252)",
                              timestamps: [
@@ -317,6 +331,8 @@ function recordLeftClick() {
                                  [74.646, "horizontal", {size: cnv.height/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                                  [85.341, "vertical", {size: 200, coords: ["player"]}], [87.219, "vertical", {size: 200, coords: ["player"]}],
                                  [87.400, "horizontal", {size: 200, coords: ["player"]}], [89.331, "horizontal", {size: 200, coords: ["player"]}],
+                                 [140.914, "bomb", {size: 600, coords: [cnv.width, cnv.height], spawnRate: 1, despawnRate: 5}], // semi circles
+                                 [141.458, "bomb", {size: 600, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                              ]
                             };
                     music.timestamps = music.timestamps.concat(lessThan(33.590));
@@ -326,19 +342,15 @@ function recordLeftClick() {
                     let spb = 60/115; // bpm = 115
                     let startBeat = 50.102;
                     let beats = 29;
-                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
-                        music.timestamps.push([i, "beam", {spawnRate: 0.5}]);
-                    }
+                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) music.timestamps.push([i, "beam", {spawnRate: 0.5}]);
                     music.timestamps = music.timestamps.concat(lessThan(50.814));
                     music.timestamps = music.timestamps.concat(lessThan(54.460));
                     music.timestamps = music.timestamps.concat(lessThan(58.620));
                     // music.timestamps = music.timestamps.concat(lessThan(62.810)); disincluded
                     startBeat = 66.797;
                     beats = 12;
-                    music.timestamps.push([64.749, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 0.325}]);
-                    for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) {
-                        music.timestamps.push([i-0.2, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 1}]);
-                    }
+                    music.timestamps.push([64.749, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 0.325}]); // ring spam to shrink map
+                    for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) music.timestamps.push([i-0.2, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 1}]);
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(66.920));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(69.020));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(71.120));
@@ -356,11 +368,33 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(77.350));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(79.434));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(81.521));
+                    music.timestamps = music.timestamps.concat(bg16Beat(91.834));
+                    music.timestamps = music.timestamps.concat(bg16Beat(100.233, "medium"));
+                    music.timestamps = music.timestamps.concat(bg16Beat(108.580, "hard"));
+                    music.timestamps = music.timestamps.concat(bg16Beat(116.926, "medium"));
+                    music.timestamps = music.timestamps.concat(lessThan(117.032));
+                    music.timestamps = music.timestamps.concat(lessThan(121.180));
+                    music.timestamps = music.timestamps.concat(lessThan(125.376));
+                    // music.timestamps = music.timestamps.concat(bg16Beat(125.276, "medium")); disincluded
+                    // music.timestamps = music.timestamps.concat(lessThan(129.568)); disincluded
+                    // music.timestamps = music.timestamps.concat(lessThan(133.700)); disincluded
+                    startBeat = 133.619;
+                    beats = 15;
+                    let side = 1;
+                    coords = {1:[0, 0, "vertical", xMid], 2:[0, 0, "horizontal", yMid],
+                              3:[xMid, 0, "vertical", xMid], 4:[0, yMid, "horizontal", yMid]};
+                    music.timestamps.push([131.571, "vertical", {size: cnv.width/2, coords: [0, 0], spawnRate: 0.325, despawnRate: 5,}]);
+                    for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) {
+                        side++;
+                        if (side > 4) side = 1;
+                        music.timestamps.push([i-0.2, coords[side][2], {size: coords[side][3], coords: coords[side], spawnRate: 1, despawnRate: 5,}]);
+                    }
+                    // 140.914-141.458 
+
+                    console.log("replacement loaded")
                     
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
-                    for (let i = 1; i < 16; i++) {
-                        music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, coords: [xMid, yMid]}]);
-                    }
+                    for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, coords: [xMid, yMid]}]);
                 }
                 music.backUpTS = [...music.timestamps];
                 mouseMovementOn = previousMM;
