@@ -159,7 +159,7 @@ function createSpike(variant="none") {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
         get speed() {
-            return 2 + 3 * (music.var.currentTime/music.var.duration);
+            return 2.5 + 2 * (music.var.currentTime/music.var.duration);
         },
         launched: false,
         get reachedWall() {
