@@ -1,4 +1,4 @@
-console.log("player coords");// DODGE.IO - MUSIC.JS
+console.log("spike 15-20");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -151,7 +151,7 @@ function createSpike(variant="none") {
     let spike = {
         type: "spike",
         variant: "none",
-        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 10) + 20,
+        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 5) + 15,
         rotate: 0, 
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
