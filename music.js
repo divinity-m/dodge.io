@@ -1,4 +1,4 @@
-console.log("spikes dont kill themselves");// DODGE.IO - MUSIC.JS
+console.log("spikes speed");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
