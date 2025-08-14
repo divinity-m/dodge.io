@@ -1,4 +1,4 @@
-console.log("spikes despawn rate");// DODGE.IO - MUSIC.JS
+console.log("location");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -213,7 +213,7 @@ function spawnAndDrawDanger() {
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
                     const radiusSpace = allDangers[0].r * 1.501;
                     
-                    const location = modifiers.location;
+                    const location = modifiers?.location;
                     // spikes spawn on the edge of the walls
                     if (!location) {
                         const rand = Math.random();
