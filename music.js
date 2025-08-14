@@ -153,7 +153,7 @@ function createSpike(variant="none") {
         variant: "none",
         x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 10) + 10,
         rotate: 0, 
-        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 0.5,
+        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
