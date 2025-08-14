@@ -1,4 +1,4 @@
-console.log("beam player spawn");// DODGE.IO - MUSIC.JS
+console.log("spike spawn fix");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
