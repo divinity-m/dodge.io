@@ -1,4 +1,4 @@
-console.log("site wont update")// DODGE.IO - FUNCTIONS.JS
+console.log("done half of divine")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
