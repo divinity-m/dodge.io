@@ -163,8 +163,8 @@ function createSpike(variant="none") {
         },
         launched: false,
         get reachedWall() {
-            if (this.x - this.r * 1.5 < 0 || this.x + this.r * 1.5 > cnv.width ||
-                this.y - this.r * 1.5 < 0 || this.y + this.r * 1.5 > cnv.height && this.launched) {
+            if ((this.x - this.r * 1.5 < 0 || this.x + this.r * 1.5 > cnv.width ||
+                this.y - this.r * 1.5 < 0 || this.y + this.r * 1.5 > cnv.height) && this.launched) {
                 return true
             }
             else return false
