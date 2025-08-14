@@ -133,11 +133,11 @@ function recordLeftClick() {
     // Difficulty Choice
     else if (innerGameState === "selectDifficulty" && mouseOver) {
         ["easy", "medium", "hard"].forEach(level => {
-            if (mouseOver[level]) {
+            if (mouseOver?.[level]) {
                 pauseAudio(music.promise, music.var);
-                if (mouseOver.easy) difficulty = {level: "easy", color: "rgb(0, 225, 255)"};
-                if (mouseOver.medium) difficulty = {level: "medium", color: "rgb(255, 255, 0)"};
-                if (mouseOver.hard) difficulty = {level: "hard", color: "rgb(0, 0, 0)"};
+                if (mouseOver?.easy) difficulty = {level: "easy", color: "rgb(0, 225, 255)"};
+                if (mouseOver?.medium) difficulty = {level: "medium", color: "rgb(255, 255, 0)"};
+                if (mouseOver?.hard) difficulty = {level: "hard", color: "rgb(0, 0, 0)"};
                 music = {var: interstellar, name: "interstellar", artist: "pandora., chillwithme, & cødy",
                          color: "rgb(105, 105, 105)", subColor: "rgb(115, 115, 115)",};
                 mouseMovementOn = previousMM;
@@ -145,7 +145,7 @@ function recordLeftClick() {
             }
         });
         ["limbo", "andromeda", "euphoria"].forEach(level => {
-            if (mouseOver[level]) {
+            if (mouseOver?.[level]) {
                 pauseAudio(music.promise, music.var);
                 if (mouseOver?.limbo) {
                     music = {var: alarm9, name: "Alarm 9", artist: "Blue Cxve",
