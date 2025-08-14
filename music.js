@@ -151,7 +151,7 @@ function createSpike(variant="none") {
     let spike = {
         type: "spike",
         variant: "none",
-        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 5) + 15,
+        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: 20,
         rotate: 0, 
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
