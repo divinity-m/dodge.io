@@ -151,7 +151,7 @@ function createSpike(variant="none") {
     let spike = {
         type: "spike",
         variant: "none",
-        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: 20,
+        x: 0, y: 0, r: 20,
         rotate: 0, 
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
@@ -170,6 +170,8 @@ function createSpike(variant="none") {
             else return false
         },
     }
+    spike.x = Math.random()*(cnv.width-(radiusSpace*2)) + radiusSpace;
+    spike.y = Math.random()*(cnv.height-(radiusSpace*2)) + radiusSpace;
     if (variant !== "none") spike.variant = variant;
     allDangers.unshift(spike);
     return spike;
