@@ -287,7 +287,7 @@ function recordLeftClick() {
                         return lT;
                     }
                     function heyAh_heyHi(time) {
-                        return [[time, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}}], [time+0.18, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}],
+                        return [[time, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+0.18, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}],
                                 [time+1.083, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+1.606, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}]];
                     }
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
