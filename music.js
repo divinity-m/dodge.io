@@ -1,4 +1,4 @@
-console.log("spike spawn fix");// DODGE.IO - MUSIC.JS
+console.log("spike spawn fix, radius space");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -170,6 +170,7 @@ function createSpike(variant="none") {
             else return false
         },
     }
+    const radiusSpace = spike.r * 1.501;
     spike.x = Math.random()*(cnv.width-(radiusSpace*2)) + radiusSpace;
     spike.y = Math.random()*(cnv.height-(radiusSpace*2)) + radiusSpace;
     if (variant !== "none") spike.variant = variant;
