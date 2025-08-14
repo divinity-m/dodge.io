@@ -144,7 +144,7 @@ function recordLeftClick() {
                 restartEndless();
             }
         });
-        ["limbo", "andromeda", "divine"].forEach(level => {
+        ["limbo", "andromeda", "euphoria"].forEach(level => {
             if (mouseOver[level]) {
                 pauseAudio(music.promise, music.var);
                 if (mouseOver?.limbo) {
@@ -275,7 +275,7 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(ending(159.426));
                     music.timestamps = music.timestamps.map(x => [x[0]-0.025, x[1]]);
                 }
-                if (mouseOver?.divine) {
+                if (mouseOver?.euphoria) {
                     const xMid = cnv.width/2
                     const yMid = cnv.height/2
                     function lessThan(time, spikes = "yes") {
@@ -672,8 +672,8 @@ function drawDifficultySelection() {
     decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
     ctx.fillRect(300, 450, 200, 100);
 
-    mouseOver.divine = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.divine, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
+    mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
     ctx.fillRect(550, 450, 200, 100);
     
     // Text
@@ -704,7 +704,7 @@ function drawDifficultySelection() {
     
     drawDifficultyText("rgb(163, 0, 163)", "LIMBO", "Beams", 60, 480);
     drawDifficultyText("rgb(0, 0, 0)", "ANDROMEDA", "+Bombs & Rings", 310, 480);
-    drawDifficultyText("rgb(255, 165, 252)", "DIVINE", "+Spikes", 560, 480);
+    drawDifficultyText("rgb(255, 165, 252)", "EUPHORIA", "+Spikes", 560, 480);
 }
 
 function drawDodgerSelection() {
