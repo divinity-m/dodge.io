@@ -1,4 +1,4 @@
-console.log("location");// DODGE.IO - MUSIC.JS
+console.log("player coords");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -240,7 +240,10 @@ function spawnAndDrawDanger() {
                         })
                     }
                 }
-                if (modifiers?.coords) { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
+                if (modifiers?.coords) {
+                    if (modifiers.coords[0] === "player") { allDangers[0].x = player.x; allDangers[0].y = player.y }
+                    else { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
+                }
                 if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
                 if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
                 
