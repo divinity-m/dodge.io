@@ -1,4 +1,4 @@
-console.log("player values save fix")// DODGE.IO - SCRIPT.JS
+console.log("divine --> euphoria")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -43,7 +43,7 @@ let mouseOver = {
     hard: false,
     limbo: false,
     andromeda: false,
-    divine: false,
+    euphoria: false,
 
     enemyOutBtn: false,
     disableMMBtn: false,
@@ -122,7 +122,7 @@ let highscore = {
     hard: 0,
     limbo: 0,
     andromeda: 0,
-    divine: 0,
+    euphoria: 0,
 };
 let difficulty = {
     level: "easy",
@@ -193,8 +193,8 @@ if (localData) {
         ["dodger", "color", "subColor"].forEach(attribute => {
             if (userData?.player?.[attribute]) p[attribute] = userData.player[attribute];
         })
-        let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, divine: 0};
-        ["easy", "medium", "hard", "limbo", "andromeda", "divine"].forEach(score => {
+        let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0};
+        ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score]) hs[score] = userData.highscore[score];
         })
         let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240,};
@@ -205,7 +205,7 @@ if (localData) {
         userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, slowed: 1, dodger: p.dodger,
                                 color: p.color, subColor: p.subColor, facingAngle: 0,},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
-                                limbo: hs.limbo, andromeda: hs.andromeda, divine: hs.divine,},
+                                limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria,},
                     settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM,
                                 musicSliderX: s.musicSliderX, sfxSliderX: s.sfxSliderX,}};
         // updates the current data to the locally saved data
