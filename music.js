@@ -1,4 +1,4 @@
-console.log("spikes speed");// DODGE.IO - MUSIC.JS
+console.log("spikes despawn rate");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
