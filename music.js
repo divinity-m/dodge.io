@@ -242,8 +242,8 @@ function spawnAndDrawDanger() {
                 }
                 if (modifiers?.coords) {
                     if (modifiers.coords[0] === "player") {
-                        if (allDangers[0].type !== "beam") allDangers[0].x = player.x; allDangers[0].y = player.y;
-                        else allDangers[0].x = player.x - allDangers[0].w/2; allDangers[0].y = player.y - allDangers[0].h/2;
+                        if (allDangers[0].type !== "beam") { allDangers[0].x = player.x; allDangers[0].y = player.y; }
+                        else { allDangers[0].x = player.x - allDangers[0].w/2; allDangers[0].y = player.y - allDangers[0].h/2; }
                     }
                     else { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
                 }
