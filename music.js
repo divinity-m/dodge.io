@@ -232,6 +232,13 @@ function spawnAndDrawDanger() {
                             allDangers[0].y = locations[location][1];
                         }
                     }
+                    if (modifiers?.speed) {
+                        Object.defineProperty(allDangers[0], "speed", {
+                            get() {
+                                return modifiers.speed;
+                            }
+                        })
+                    }
                 }
                 if (modifiers?.coords) { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
                 if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
