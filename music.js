@@ -1,4 +1,4 @@
-console.log("text");// DODGE.IO - MUSIC.JS
+console.log("font");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -179,7 +179,7 @@ function createText(variant="none") {
         type: "text",
         variant: "none",
         x: 0, y: 0,
-        text: "placeholder", textAlign: "left",
+        text: "placeholder", textAlign: "left", font: "50px Verdana",
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
         get color() {
@@ -257,6 +257,7 @@ function spawnAndDrawDanger() {
                     allDangers.unshift(createText());
                     if (modifiers?.text) allDangers[0].text = modifiers.text;
                     if (modifiers?.textAlign) allDangers[0].textAlign = modifiers.textAlign;
+                    if (modifiers?.font) allDangers[0].font = modifiers.font;
                 }
                 if (modifiers?.coords) {
                     if (modifiers.coords[0] === "player") {
@@ -365,7 +366,7 @@ function spawnAndDrawDanger() {
         }
         else if (danger.type === "text") {
             ctx.textAlign = danger.textAlign;
-            ctx.font = "50px Verdana";
+            ctx.font = danger.font;
             ctx.fillText(danger.text, danger.x, danger.y);
         }
     })
