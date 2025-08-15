@@ -1,4 +1,4 @@
-console.log("0 is undefined");// DODGE.IO - MUSIC.JS
+console.log("disabled euphorias highscore to test if the level is possible");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -41,7 +41,7 @@ function drawEndLevel() {
         let percentage = Math.floor(music.var.currentTime / music.var.duration * 100);
         if (music.name === "Alarm 9") highscore.limbo = percentage;
         if (music.name === "Astral Projection") highscore.andromeda = percentage;
-        if (music.name === "Divine") highscore.euphoria = percentage;
+        //if (music.name === "Divine") highscore.euphoria = percentage;
 
         // Rect Variables
         let exitX = 150;
