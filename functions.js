@@ -1,4 +1,4 @@
-console.log("Absolute Zero's functionality")// DODGE.IO - FUNCTIONS.JS
+console.log("AZ is drawn in the drawPlayer function")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -942,13 +942,10 @@ function drawGameOver() {
 function drawPlayer() {
     ctx.fillStyle = player.color;
     drawCircle(player.x, player.y, player.r);
-}
-
-function drawAZRange() {
     if (player.dodger === "jötunn" && settings.aZ_Range) {
-        if (absoluteZero.passive == "Absolute Zero") ctx.strokeStyle = "rgb(0, 0, 255)";
-        if (absoluteZero.passive == "Glaciate") ctx.strokeStyle = "rgb(0, 127, 255)";
-        if (absoluteZero.passive == "Stagnate") ctx.strokeStyle = "rgb(0, 94, 150)";
+        if (absoluteZero.passive === "Absolute Zero") ctx.strokeStyle = "rgba(0, 127, 255, 0.5)";
+        if (absoluteZero.passive === "Glaciation") ctx.strokeStyle = "rgba(50, 151, 252, 0.5)";
+        if (absoluteZero.passive === "Stagnation") ctx.strokeStyle = "rgba(24, 123, 222, 0.5)";
         ctx.lineWidth = 2;
         drawCircle(player.x, player.y, 175, "stroke");
     }
