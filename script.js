@@ -1,4 +1,4 @@
-console.log("divine --> euphoria")// DODGE.IO - SCRIPT.JS
+console.log("stagnations variable")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -83,12 +83,18 @@ let dash = {
     speed: 0.5,
 };
 
+let freeze = {
+    usable: true,
+    passive: "glaciation",
+    lastEnded: 0,
+}
+
 let shockwave = {
     usable: true,
     activated: false,
     lastEnded: 0,
     radius: 25,
-}
+};
 
 let settings = {
     enemyOutlines: true,
