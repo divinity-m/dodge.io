@@ -1,4 +1,4 @@
-console.log("removed drawAZRange")// DODGE.IO - SCRIPT.JS
+console.log("shockwave.path")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -79,9 +79,9 @@ let player = {
 let dash = {
     usable: true,
     activated: false,
-    lastEnded: 0,
     deccelerating: false,
     speed: 0.5,
+    lastEnded: 0,
 };
 
 let absoluteZero = {
@@ -93,8 +93,9 @@ let absoluteZero = {
 let shockwave = {
     usable: true,
     activated: false,
-    lastEnded: 0,
     radius: 25,
+    path: new Path2D(),
+    lastEnded: 0,
 };
 
 let settings = {
