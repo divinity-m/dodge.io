@@ -1,4 +1,4 @@
-console.log("jolts shockwave applies to dangers");// DODGE.IO - MUSIC.JS
+console.log("Beam Shrink Centered");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -311,8 +311,8 @@ function spawnAndDrawDanger() {
                         })
                     }
                     else if (allDangers[0].type === "beam") {
-                        if (allDangers[0].variant === "vertical") allDangers[0].baseSize = allDangers[0].w;
-                        if (allDangers[0].variant === "horizontal") allDangers[0].baseSize = allDangers[0].h;
+                        if (allDangers[0].variant === "vertical") { allDangers[0].baseSize = allDangers[0].w; allDangers[0].baseX = allDangers[0].x; }
+                        if (allDangers[0].variant === "horizontal") { allDangers[0].baseSize = allDangers[0].h; allDangers[0].baseY = allDangers[0].y; }
                         Object.defineProperty(allDangers[0], "collisionPoints", {
                             get() {
                                 return [[this.x+this.w/2, this.y+this.h/2],
@@ -544,22 +544,43 @@ function musicCollisions() {
                 if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
                     // sets the size reset in motion
                     danger.resetSize = Date.now();
+                    console.log("hit");
                 }
                 ctx.restore();
             })
         }
         if (danger?.resetSize) {
-            if (now - danger.resetSize >= 3000) {
-                ["r", "w", "h"].forEach(unit => {
-                    if (danger?.[unit] && danger?.[unit] !== cnv.width && danger?.[unit] !== cnv.height) {
-                        if (danger[unit] < danger.baseSize-0.01) danger[unit] += danger.baseSize/100;
+            if (now - danger.resetSize > 2500) {
+                ["r", "w", "h", "lineWidth"].forEach(unit => {
+                    if (danger?.[unit]) {
+                        if (danger.variant === "vertical") {
+                            if (unit === "h") return;
+                            // to determine the coordinate
+                            // take the original size of the beam, subtract its new size, then divide that by 2
+                            // add this value to the coordinate
+                            danger.x = danger.baseX + (danger.baseSize - danger.w)/2;
+                            console.log((danger.baseSize - danger.w)/2);
+                        }
+                        if (danger.variant === "horizontal") {
+                            if (unit === "w") return;
+                            danger.y = danger.baseY + (danger.baseSize - danger.h)/2;
+                        }
+                        if (danger[unit] < danger.baseSize-0.0001) danger[unit] += danger.baseSize/100;
                         else danger[unit] = danger.baseSize;
                     }
                 })
             }
-            else {
-                ["r", "w", "h"].forEach(unit => {
-                    if (danger?.[unit] && danger?.[unit] !== cnv.width && danger?.[unit] !== cnv.height) danger[unit] = danger.baseSize/2
+            else if (now - danger.resetSize <= 1000) {
+                ["r", "w", "h", "lineWidth"].forEach(unit => {
+                    if (danger.variant === "vertical") {
+                        if (unit === "h") return;
+                        danger.x = danger.baseX + (danger.baseSize - danger.w)/2;
+                    }
+                    if (danger.variant === "horizontal") {
+                        if (unit === "w") return;
+                        danger.y = danger.baseY + (danger.baseSize - danger.h)/2;
+                    }
+                    if (danger?.[unit]) danger[unit] = danger.baseSize/2;
                 })
             }
         }
