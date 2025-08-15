@@ -747,35 +747,40 @@ function drawDifficultySelection() {
         }
     }
 
-    mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
-    decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
+    mouseOver.limbo = mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
+    decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
     ctx.fillRect(50, 250, 200, 100);
 
-    mouseOver.medium = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
-    decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
+    mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
+    decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
     ctx.fillRect(300, 250, 200, 100);
 
-    mouseOver.hard = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
-    decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
+    mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
+    decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
     ctx.fillRect(550, 250, 200, 100);
 
-    mouseOver.limbo = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
+    mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
     ctx.fillRect(50, 450, 200, 100);
 
-    mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
+    mouseOver.medium = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
     ctx.fillRect(300, 450, 200, 100);
 
-    mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
+    mouseOver.hard = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
     ctx.fillRect(550, 450, 200, 100);
     
     // Text
-    function drawDifficultyText(color, difficultyName, description, x, y) {
+    function drawDifficultyText(color, difficultyName, description, x, y, score = "none") {
         ctx.fillStyle = color;
-        ctx.font = "25px 'Lucida Console'";
+        ctx.font = "23px 'Lucida Console'";
         ctx.fillText(difficultyName, x, y);
+        if (score !== "none") {
+            ctx.textAlign = "right";
+            ctx.fillText(score, x + 180, y);
+        }
+        ctx.textAlign = "left";
         ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, x, y + 50);
     }
@@ -785,21 +790,19 @@ function drawDifficultySelection() {
     ctx.fillStyle = "grey";
     
     ctx.font = "30px Arial";
-    ctx.fillText("ENDLESS LEVELS", cnv.width/2, 220);
-    
-    ctx.font = "30px Arial";
-    ctx.fillText("NORMAL LEVELS", cnv.width/2, 420);
+    ctx.fillText("NORMAL LEVELS", cnv.width/2, 220);
+    ctx.fillText("ENDLESS LEVELS", cnv.width/2, 420);
 
     // levels
     ctx.textAlign = "left";
     
-    drawDifficultyText("rgb(0, 225, 255)", "EASY", "Normal Enemies", 60, 280);
-    drawDifficultyText("rgb(255, 255, 0)", "MEDIUM", "+Decelerating Enemies", 310, 280);
-    drawDifficultyText("rgb(0, 0, 0)", "HARD", "+Homing Enemies", 560, 280);
+    drawDifficultyText("rgb(163, 0, 163)", "LIMBO", "Beams", 60, 280);
+    drawDifficultyText("rgb(0, 0, 0)", "ANDROMEDA", "+Bombs & Rings", 310, 280);
+    drawDifficultyText("rgb(255, 165, 252)", "EUPHORIA", "+Spikes", 560, 280);
     
-    drawDifficultyText("rgb(163, 0, 163)", "LIMBO", "Beams", 60, 480);
-    drawDifficultyText("rgb(0, 0, 0)", "ANDROMEDA", "+Bombs & Rings", 310, 480);
-    drawDifficultyText("rgb(255, 165, 252)", "EUPHORIA", "+Spikes", 560, 480);
+    drawDifficultyText("rgb(0, 225, 255)", "EASY", "Normal Enemies", 60, 480, `${highscore.easy}s`);
+    drawDifficultyText("rgb(255, 255, 0)", "MEDIUM", "+Decelerating Enemies", 310, 480, `${highscore.medium}s`);
+    drawDifficultyText("rgb(0, 0, 0)", "HARD", "+Homing Enemies", 560, 480, `${highscore.hard}s`);
 }
 
 function drawDodgerSelection() {
