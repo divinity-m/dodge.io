@@ -1,4 +1,4 @@
-console.log("disabled euphorias highscore to test if the level is possible");// DODGE.IO - MUSIC.JS
+console.log("absolute zeros effect on dangers");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -447,19 +447,26 @@ function musicCollisions() {
             
             const maxDist = Math.max(distance, slowEnd);
             const factor = Math.min(1, (maxDist - slowEnd) / (slowStart - slowEnd));
-            const slowFactor = 0.8 + 0.2*factor;
+            const spawnFactor = 0.8 + 0.2*factor;
+            const slowFactor = 0.3 + 0.7*factor;
             const colorFactor = 0.9 + 0.1*factor;
-            danger.spawnRate = danger.baseSpawnRate * slowFactor;
-
-            Object.defineProperty(danger, "color", {
-                get() {
-                    return `rgb(${this.colorValue*colorFactor}, ${this.colorValue*colorFactor}, ${this.colorValue})`;
-                }
-            })
+            let slowed = false;
             
-            if (danger?.launched) {
+            if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Stagnation") {
+                danger.spawnRate = danger.baseSpawnRate * spawnFactor;
+                slowed = true;
+            }
+            if (danger?.launched && (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation")) {
                 danger.movex = danger.baseMovex * slowFactor;
                 danger.movey = danger.baseMovex * slowFactor;
+                slowed = true;
+            }
+            if (slowed) {
+                Object.defineProperty(danger, "color", {
+                    get() {
+                    return `rgb(${this.colorValue*colorFactor}, ${this.colorValue*colorFactor}, ${this.colorValue})`;
+                    }
+                })
             }
         }
     })
