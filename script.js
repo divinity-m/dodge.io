@@ -88,6 +88,8 @@ let absoluteZero = {
     usable: true,
     passive: "Absolute Zero",
     lastEnded: 0,
+    slowStart: 175,
+    slowEnd: 75,
 }
 
 let shockwave = {
