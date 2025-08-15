@@ -544,7 +544,6 @@ function musicCollisions() {
                 if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
                     // sets the size reset in motion
                     danger.resetSize = Date.now();
-                    console.log("hit");
                 }
                 ctx.restore();
             })
@@ -559,7 +558,6 @@ function musicCollisions() {
                             // take the original size of the beam, subtract its new size, then divide that by 2
                             // add this value to the coordinate
                             danger.x = danger.baseX + (danger.baseSize - danger.w)/2;
-                            console.log((danger.baseSize - danger.w)/2);
                         }
                         if (danger.variant === "horizontal") {
                             if (unit === "w") return;
