@@ -1,4 +1,4 @@
-console.log("Beam Shrink Centered, lag");// DODGE.IO - MUSIC.JS
+console.log("Invincible Rings");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -272,7 +272,7 @@ function spawnAndDrawDanger() {
                 
                 
                 // collision points
-                if (player.dodger === "jolt") {
+                if (player.dodger === "jolt" && !modifiers?.invincible) {
                     allDangers[0].resetSize = 1;
                     if (allDangers[0].type === "circle" || allDangers[0].type === "spike") {
                         allDangers[0].baseSize = allDangers[0].r;
@@ -535,7 +535,7 @@ function musicCollisions() {
             })
         }
 
-        if (player.dodger === "jolt" && shockwave.activated && shockwave?.path && danger?.collisionPoints) {
+        if (player.dodger === "jolt" && shockwave.activated && shockwave?.path && danger?.collisionPoints && !danger?.invincible) {
             danger.collisionPoints.forEach(point => {
                 ctx.save();
                 ctx.translate(shockwave.x, shockwave.y);
@@ -548,7 +548,7 @@ function musicCollisions() {
                 ctx.restore();
             })
         }
-        if (danger?.resetSize) {
+        if (danger?.resetSize && !danger?.invincible) {
             if (now - danger.resetSize > 2500) {
                 ["r", "w", "h", "lineWidth"].forEach(unit => {
                     if (danger?.[unit]) {
