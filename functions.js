@@ -1,4 +1,4 @@
-console.log("AZ strokeStyle")// DODGE.IO - FUNCTIONS.JS
+console.log("Shockwave-Enemy Precision")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -962,11 +962,11 @@ function drawEnemies() {
 
         if (settings.enemyOutlines) {
             ctx.fillStyle = "black"
-            drawCircle(enemy.x, enemy.y, enemy.radius * 1.11)
+            drawCircle(enemy.x, enemy.y, enemy.r * 1.11)
         }
 
         ctx.fillStyle = enemy.color
-        drawCircle(enemy.x, enemy.y, enemy.radius)
+        drawCircle(enemy.x, enemy.y, enemy.r)
     })
 }
 
@@ -1087,24 +1087,21 @@ function createEnemy() { // Creates an individual enemy with unique attributes
     let oneEnemy = {
         x: (Math.random() * (cnv.width-60))+30,  // between 30 and 770
         y: (Math.random() * (cnv.height-60))+30,  // between 30 and 520
-        radius: (Math.random() * 7.5) + 10,  // between 10 and 17.5
+        r: (Math.random() * 7.5) + 10,  // between 10 and 17.5
         color: "rgb(100, 100, 100)",
         resetRadius: 0,
     }
-    oneEnemy.baseRadius = oneEnemy.radius;
+    oneEnemy.baseRadius = oneEnemy.r;
     
     // Initializes the enemy's ability and other important values based on their ability
     enemyAbilitiesAndStats(oneEnemy);
     
     if (difficulty.level === "easy") oneEnemy.speed = Math.random() + 1; // between 1 and 2
-
     if (difficulty.level === "medium") oneEnemy.speed = Math.random() + 1.25; // between 1.25 and 2.25
-    
     if (difficulty.level === "hard") {
         if (oneEnemy.ability === "homing") oneEnemy.speed = (Math.random() * 0.7) + 1.5; // between 1.5 and 2.2
         else oneEnemy.speed = Math.random() + 1.5; // between 1.5 and 2.5 (as fast as the player)
     }
-    
 
     let dx = player.x - oneEnemy.x;
     let dy = player.y - oneEnemy.y;
@@ -1128,11 +1125,24 @@ function createEnemy() { // Creates an individual enemy with unique attributes
     oneEnemy.baseMoveX = oneEnemy.movex
     oneEnemy.baseMoveY = oneEnemy.movey
 
+    // Initialization for the angle the enemy moves towards (avoids the weird snapping-towards-the-player effect)
+    oneEnemy.facingAngle = Math.atan2(dy, dx);// angle toward the player
 
-    // Initialization foe the angle the enemy moves towards (avoids the weird snapping-towards-the-player effect)
-    const angleToPlayer = Math.atan2(dy, dx); // angle toward the player
-    oneEnemy.facingAngle = angleToPlayer;
-
+    if (player.dodger === "jolt") {
+        Object.defineProperty(oneEnemy, "collisionPoints", {
+            get() {
+                const piOver3X = this.r*Math.cos(Math.PI/3);
+                const piOver3Y = this.r*Math.sin(Math.PI/3);
+                const piOver6X = this.r*Math.cos(Math.PI/6);
+                const piOver6Y = this.r*Math.sin(Math.PI/6);
+                return [[this.x+this.r, this.y], [this.x+piOver6X, this.y+piOver6Y], [this.x+piOver3X, this.y+piOver3Y],
+                        [this.x, this.y+this.r], [this.x-piOver3X, this.y+piOver3Y], [this.x-piOver6X, this.y+piOver6Y],
+                        [this.x-this.r, this.y], [this.x-piOver6X, this.y-piOver6Y], [this.x-piOver3X, this.y-piOver3Y],
+                        [this.x, this.y-this.r], [this.x+piOver3X, this.y-piOver3Y], [this.x+piOver6X, this.y-piOver6Y]];
+            }
+        })
+    }
+    
     return oneEnemy;
 }
 
@@ -1269,7 +1279,7 @@ function moveEnemies() { // Loops through the allEnemies array to move each enem
             // Calculates the distance from the edge of the enemy to the edge of the player, so I subtract the radii
             const slowStart = 175;
             const slowEnd = 75;
-            const realDist = enemyDist - enemy.radius - player.r;
+            const realDist = enemyDist - enemy.r - player.r;
             
             // Limit distance to avoid going below slowEnd
             const maxDist = Math.max(realDist, slowEnd);
@@ -1288,12 +1298,12 @@ function moveEnemies() { // Loops through the allEnemies array to move each enem
         enemy.y += enemy.movey
         
         // Doesn't allow the enemies to leave the map (wall collisions)
-        if (enemy.x - enemy.radius  <= 0 || enemy.x + enemy.radius  >= cnv.width) {
+        if (enemy.x - enemy.r  <= 0 || enemy.x + enemy.r  >= cnv.width) {
             // Left or right wall → reflect across the Y axis
             if (!homingIn) enemy.baseMoveX *= -1;
             enemy.facingAngle = Math.PI - enemy.facingAngle;
         }
-        if (enemy.y - enemy.radius  <= 0 || enemy.y + enemy.radius  >= cnv.height) {
+        if (enemy.y - enemy.r  <= 0 || enemy.y + enemy.r  >= cnv.height) {
             // Top or bottom wall → reflect across the X axis
             if (!homingIn) enemy.baseMoveY *= -1;
             enemy.facingAngle = -enemy.facingAngle;
@@ -1346,7 +1356,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
         const distance = Math.hypot(dx, dy);
         // Gives the player some time to get out of an enemy they dashed onto (0.3s)
         if (!dash.activated && !(now - dash.lastEnded < 300)) {
-            if (distance < player.r + enemy.radius) {
+            if (distance < player.r + enemy.r) {
                 pauseAudio(music.promise, music.var);
                 highscoreColor = "rgb(87, 87, 87)";
                 difficulty.color = "rgb(87, 87, 87)";
@@ -1422,8 +1432,6 @@ function abilities() { // player-specific-abilities
     if (player.dodger === "jolt") {
         // 'Shockwave' launches a beam that shrinks ememies
         if (shockwave.activated) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 1)'
-
             // create the beams path
             const beamPath = new Path2D();
             beamPath.moveTo(0, -shockwave.radius);
@@ -1440,13 +1448,14 @@ function abilities() { // player-specific-abilities
             ctx.fill(beamPath);
 
             // checks for collisions
-            allEnemies.forEach(enemy => {
-                if (ctx.isPointInPath(beamPath, enemy.x, enemy.y)) {
-                    enemy.radius = enemy.baseRadius/2;
-                    if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius/2;
-                    
-                    enemy.resetRadius = Date.now(); // starts the time which an enemy got hit
-                }
+            allEnemies.forEach(enemy => { 
+                enemy.collisionPoints.forEach(point => {
+                    if (ctx.isPointInPath(beamPath, point[0], point[1])) {
+                        enemy.r = enemy.baseRadius/2;
+                        if (enemy?.auraRadius) enemy.auraRadius = enemy.baseAuraRadius/2;
+                        enemy.resetRadius = Date.now(); // starts the time which an enemy got hit
+                    }
+                })
             })
 
             ctx.restore();
@@ -1466,18 +1475,18 @@ function abilities() { // player-specific-abilities
         allEnemies.forEach(enemy => {
             // Restore the radius of enemies after 5 seconds have passed
             if (now - enemy.resetRadius >= 5000) {
-                enemy.radius = enemy.baseRadius;
+                enemy.r = enemy.baseRadius;
                 if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius;
 
                 // prevents no-clipping
-                if (enemy.x - enemy.radius <= 0) enemy.x = enemy.radius + 1;
-                if (enemy.x + enemy.radius >= cnv.width) enemy.x = cnv.width - enemy.radius - 1;
-                if (enemy.y - enemy.radius <= 0) enemy.y = enemy.radius + 1;
-                if (enemy.y + enemy.radius >= cnv.height) enemy.y = cnv.height - enemy.radius - 1;
+                if (enemy.x - enemy.r <= 0) enemy.x = enemy.r + 1;
+                if (enemy.x + enemy.r >= cnv.width) enemy.x = cnv.width - enemy.r - 1;
+                if (enemy.y - enemy.r <= 0) enemy.y = enemy.r + 1;
+                if (enemy.y + enemy.r >= cnv.height) enemy.y = cnv.height - enemy.r - 1;
             }
             // Decrease the radius of enemies under the effect of shockwave
             else {
-                enemy.radius = enemy.baseRadius/2;
+                enemy.r = enemy.baseRadius/2;
                 if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius/2;
             }
         })
