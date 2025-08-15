@@ -1,4 +1,4 @@
-console.log("AZ is drawn in the drawPlayer function")// DODGE.IO - FUNCTIONS.JS
+console.log("AZ strokeStyle")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -943,9 +943,11 @@ function drawPlayer() {
     ctx.fillStyle = player.color;
     drawCircle(player.x, player.y, player.r);
     if (player.dodger === "jötunn" && settings.aZ_Range) {
-        if (absoluteZero.passive === "Absolute Zero") ctx.strokeStyle = "rgba(0, 127, 255, 0.5)";
-        if (absoluteZero.passive === "Glaciation") ctx.strokeStyle = "rgba(50, 151, 252, 0.5)";
-        if (absoluteZero.passive === "Stagnation") ctx.strokeStyle = "rgba(24, 123, 222, 0.5)";
+        if (gameState !== "musicMode") {
+            if (absoluteZero.passive === "Absolute Zero") ctx.strokeStyle = "rgba(0, 127, 255, 0.5)";
+            if (absoluteZero.passive === "Glaciation") ctx.strokeStyle = "rgba(50, 151, 255, 0.5)";
+            if (absoluteZero.passive === "Stagnation") ctx.strokeStyle = "rgba(84, 168, 255, 0.5)";
+        }
         ctx.lineWidth = 2;
         drawCircle(player.x, player.y, 175, "stroke");
     }
