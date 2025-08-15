@@ -1,4 +1,4 @@
-console.log("141.458 euphoria")// DODGE.IO - FUNCTIONS.JS
+console.log("euphoria completed, time for the grateful ending")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -290,7 +290,7 @@ function recordLeftClick() {
                                 [time+1.083, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+1.606, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}]];
                     }
                     function bg16Beat(time = 91.834, difficulty = "easy") {
-                        bg = [[time, "spike"], [time+0.547, "spike"], [time+1.091, "spike"], [time+1.586, "spike"],
+                        let bg = [[time, "spike"], [time+0.547, "spike"], [time+1.091, "spike"], [time+1.586, "spike"],
                                 [time+2.133, "horizontal"], [time+2.637, "horizontal"], [time+3.178, "horizontal"],
                                 [time+3.694, "bomb"], [time+3.942, "bomb"],
                                 [time+4.222, "spike"], [time+4.74, "spike"], [time+5.265, "spike"], [time+5.775, "spike"],
@@ -302,6 +302,30 @@ function recordLeftClick() {
                                     [time+4.167, "bomb", {size: 150, despawnRate: 3}], [time+6.253, "bomb", {size: 150, despawnRate: 3}]);
                         }
                         return bg;
+                    }
+                    function deepSynth(time = 150.313, extras = "none") {
+                        dS = [[time, "vertical", {size: xMid, coords: [xMid/2, 0], spawnRate: 0.3, despawnRate: 3}],
+                              [time+1.029, "horizontal", {size: yMid, coords: [0, yMid/2], spawnRate: 0.3, despawnRate: 3}],
+                              [time+2.359, "bomb", {spawnRate: 0.75, despawnRate: 4}], [time+3.118, "bomb", {spawnRate: 0.75, despawnRate: 4}]];
+                        let duration = 3.995 - 3.137;
+                        if (extras === "leftSpikeWall" || extras === "rightSpikeWall") {
+                            let interval = (duration / 14);
+                            let margin = (cnv.height-(30*14)) / 15; // 650 = (r*2 * 14) + 15n
+                            let xValue;
+                            if (extras === "leftSpikeWall") xValue = 10 * 1.501;
+                            else if (extras === "rightSpikeWall") xValue = cnv.width - 10 * 1.501;
+                            for (let i = 0; i < 14; i++) {
+                                dS.push([time+3.137 + (interval*i), "spike", {size: 10, speed: 5, coords: [xValue, margin*(i+1) + 30*i + 15], spawnRate: 0.5}]);
+                            }
+                        } else if (extras === "encirclingSpikes") {
+                            let interval = (duration / 8);
+                            let intIndex = 0;
+                            ["bl", "lm", "tl", "tm", "tr", "rm", "br", "bm"].forEach(spawn => {
+                                dS.push([time+3.137 + (interval*intIndex), "spike", {size: 30, speed: 4, location: spawn, spawnRate: 0.5}]);
+                                intIndex++;
+                            })
+                        }
+                        return dS;
                     }
                     
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
@@ -331,9 +355,14 @@ function recordLeftClick() {
                                  [74.646, "horizontal", {size: cnv.height/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                                  [85.341, "vertical", {size: 200, coords: ["player"]}], [87.219, "vertical", {size: 200, coords: ["player"]}],
                                  [87.400, "horizontal", {size: 200, coords: ["player"]}], [89.331, "horizontal", {size: 200, coords: ["player"]}],
-                                 [140.914, "bomb", {size: 600, coords: [cnv.width, cnv.height], spawnRate: 1, despawnRate: 5}], // semi circles
-                                 [141.458, "bomb", {size: 600, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
-                             ]
+                                 [140.914, "bomb", {size: 550, coords: [cnv.width, cnv.height], spawnRate: 1, despawnRate: 5}], // semi circles
+                                 [141.458, "bomb", {size: 550, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
+                                 [141.957, "spike", {size: 50, location: "bl", spawnRate: 0.3, despawnRate: 3}], // spike triangle
+                                 [142.482, "spike", {size: 50, location: "tm", spawnRate: 0.3, despawnRate: 3}],
+                                 [142.986, "spike", {size: 50, location: "br", spawnRate: 0.3, despawnRate: 3}],
+                                 [192.047, "Thank"], [193.098, "You"], [194.134, "For"], [195.186, "Playing"], // thanks
+                                 [196.226, "This"], [197.391, "Was"], [198.577, "Dodge"], [199.488, ".io"],
+                             ];
                             };
                     music.timestamps = music.timestamps.concat(lessThan(33.590));
                     music.timestamps = music.timestamps.concat(lessThan(37.760));
@@ -341,15 +370,16 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(lessThan(46.123));
                     let spb = 60/115; // bpm = 115
                     let startBeat = 50.102;
-                    let beats = 29;
+                    let beats = 29; // beam sync to increase difficulty
                     for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) music.timestamps.push([i, "beam", {spawnRate: 0.5}]);
                     music.timestamps = music.timestamps.concat(lessThan(50.814));
                     music.timestamps = music.timestamps.concat(lessThan(54.460));
                     music.timestamps = music.timestamps.concat(lessThan(58.620));
-                    // music.timestamps = music.timestamps.concat(lessThan(62.810)); disincluded
+                    // music.timestamps = music.timestamps.concat(lessThan(62.810)); excluded
+                    // ring spam
                     startBeat = 66.797;
                     beats = 12;
-                    music.timestamps.push([64.749, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 0.325}]); // ring spam to shrink map
+                    music.timestamps.push([64.749, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 0.325}]);
                     for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) music.timestamps.push([i-0.2, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 1}]);
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(66.920));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(69.020));
@@ -375,9 +405,10 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(lessThan(117.032));
                     music.timestamps = music.timestamps.concat(lessThan(121.180));
                     music.timestamps = music.timestamps.concat(lessThan(125.376));
-                    // music.timestamps = music.timestamps.concat(bg16Beat(125.276, "medium")); disincluded
-                    // music.timestamps = music.timestamps.concat(lessThan(129.568)); disincluded
-                    // music.timestamps = music.timestamps.concat(lessThan(133.700)); disincluded
+                    // music.timestamps = music.timestamps.concat(bg16Beat(125.276, "medium")); excluded
+                    // music.timestamps = music.timestamps.concat(lessThan(129.568)); excluded
+                    // music.timestamps = music.timestamps.concat(lessThan(133.700)); excluded
+                    // Walls
                     startBeat = 133.619;
                     beats = 15;
                     let side = 1;
@@ -390,9 +421,34 @@ function recordLeftClick() {
                         music.timestamps.push([i-0.2, coords[side][2], {size: coords[side][3], coords: coords[side], spawnRate: 1, despawnRate: 5,}]);
                     }
                     // 140.914-141.458 
-
-                    console.log("replacement loaded")
+                    music.timestamps = music.timestamps.concat(lessThan(142.062));
+                    // music.timestamps = music.timestamps.concat(lessThan(146.222)); excluded
+                    // Bomb Encircling
+                    startBeat = 146.135;
+                    beats = 3;
+                    let w = 300;
+                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
+                        music.timestamps.push([i, "bomb", {size: w, coords: [0, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        music.timestamps.push([i, "bomb", {size: w, coords: [cnv.width, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        music.timestamps.push([i, "bomb", {size: w, coords: [cnv.width, cnv.height], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        music.timestamps.push([i, "bomb", {size: w, coords: [0, cnv.height], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        w += 80;
+                    }
+                    music.timestamps = music.timestamps.concat(deepSynth(150.313));
+                    music.timestamps = music.timestamps.concat(deepSynth(154.472, "leftSpikeWall"));
+                    music.timestamps = music.timestamps.concat(deepSynth(158.662));
+                    music.timestamps = music.timestamps.concat(deepSynth(162.985, "rightSpikeWall"));
+                    music.timestamps = music.timestamps.concat(deepSynth(167.002));
+                    music.timestamps = music.timestamps.concat(deepSynth(171.190, "encirclingSpikes"));
+                    music.timestamps = music.timestamps.concat(deepSynth(175.353));
+                    music.timestamps = music.timestamps.concat(deepSynth(179.531));
+                    music.timestamps = music.timestamps.concat(deepSynth(183.669));
+                    music.timestamps = music.timestamps.concat(deepSynth(187.874));
+                    // music.timestamps = music.timestamps.concat(deepSynth(192.047)); excluded
+                    // music.timestamps = music.timestamps.concat(deepSynth(196.226)); excluded
                     
+                    
+                    console.log("spike walls");
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                     for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, coords: [xMid, yMid]}]);
                 }
