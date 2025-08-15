@@ -1,4 +1,4 @@
-console.log("Beam Shrink Centered");// DODGE.IO - MUSIC.JS
+console.log("Beam Shrink Centered, lag");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
