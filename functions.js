@@ -360,9 +360,11 @@ function recordLeftClick() {
                                  [141.957, "spike", {size: 50, location: "bl", spawnRate: 0.3, despawnRate: 3}], // spike triangle
                                  [142.482, "spike", {size: 50, location: "tm", spawnRate: 0.3, despawnRate: 3}],
                                  [142.986, "spike", {size: 50, location: "br", spawnRate: 0.3, despawnRate: 3}],
-                                 [192.047, "Thank"], [193.098, "You"], [194.134, "For"], [195.186, "Playing"], // thanks
-                                 [196.226, "This"], [197.391, "Was"], [198.577, "Dodge"], [199.488, ".io"],
-                             ];
+                                 [192.047, "text", {text: "Thank"}], [193.098, "text", {text: "You"}], // thanks
+                                 [194.134, "text", {text: "For"}], [195.186, "text", {text: "Playing"}],
+                                 [196.226, "text", {text: "This"}], [197.391, "text", {text: "Was"}],
+                                 [198.577, "text", {text: "Dodge"}], [199.488, "text", {text: ".io"}],
+                             ],
                             };
                     music.timestamps = music.timestamps.concat(lessThan(33.590));
                     music.timestamps = music.timestamps.concat(lessThan(37.760));
