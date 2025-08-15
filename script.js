@@ -1,4 +1,4 @@
-console.log("stagnations variable")// DODGE.IO - SCRIPT.JS
+console.log("absolutes zero's variable")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -83,9 +83,9 @@ let dash = {
     speed: 0.5,
 };
 
-let freeze = {
+let absoluteZero = {
     usable: true,
-    passive: "Glaciation",
+    passive: "Absolute Zero",
     lastEnded: 0,
 }
 
