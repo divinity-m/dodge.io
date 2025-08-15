@@ -1355,8 +1355,8 @@ function collisions() { // Keeps track of when the player touches any enemy in t
         const dx = player.x - enemy.x;
         const dy = player.y - enemy.y;
         const distance = Math.hypot(dx, dy);
-        // Gives the player some time to get out of an enemy they dashed onto (0.3s)
-        if (!dash.activated && !(now - dash.lastEnded < 300) && !player.invincible) {
+        // Gives the player some time to get out of an enemy they dashed onto (0.25s)
+        if (!dash.activated && now - dash.lastEnded > 250 && !player.invincible) {
             if (distance < player.r + enemy.r) {
                 pauseAudio(music.promise, music.var);
                 highscoreColor = "rgb(87, 87, 87)";
