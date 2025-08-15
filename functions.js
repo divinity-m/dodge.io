@@ -843,7 +843,7 @@ function drawDodgerSelection() {
         ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, dodger.x + 10, dodger.y + 80);
     }
-    function drawAbilityDesc(color, subColor, abilityName, description) {
+    function drawAbilityDesc(bool, color, subColor, abilityName, ...description) {
         
     }
 
@@ -852,7 +852,7 @@ function drawDodgerSelection() {
     mouseOver.evader = mouseX > evader.x && mouseX < evader.x + 200 && mouseY > evader.y && mouseY < evader.y + 100;
     decideFillStyle(mouseOver.evader, "rgb(230, 230, 230)", "rgb(220, 220, 220)");
     ctx.fillRect(evader.x, evader.y, 200, 100);
-    drawDodgerInfo("rgb(255, 255, 255)", "EVADER", "ABILITY: NONE", evader);
+    drawDodgerInfo("rgb(255, 255, 255)", "EVADER", "ABILITY: SKILL", evader);
 
     const jsab = { x: 300, y: 50, };
     mouseOver.jsab = mouseX > jsab.x && mouseX < jsab.x + 200 && mouseY > jsab.y && mouseY < jsab.y + 100;
@@ -872,8 +872,11 @@ function drawDodgerSelection() {
     ctx.fillRect(jolt.x, jolt.y, 200, 100);
     drawDodgerInfo("rgb(255, 255, 0)", "JOLT", "ABILITY: SHOCKWAVE", jolt);
 
-    // Ability Descriptions / 70, 186, 235
-    drawAbilityDesc("rgb(255, 255, 255)", "rgb(230, 230, 230)", "NO ABILITY", "");
+    // Ability Descriptions
+    /*drawAbilityDesc(mouseOver.evader, "rgb(255, 255, 255)", "rgb(230, 230, 230)", "SKILL", "");
+    drawAbilityDesc(mouseOver.jsab, "rgb(255, 0, 0)", "rgb(230, 0, 0)", "DASH", "");
+    drawAbilityDesc(mouseOver.jötunn, "rgb(79, 203, 255)", "rgb(70, 186, 235)", "ABSOLUTE ZERO", "");
+    drawAbilityDesc(mouseOver.jolt, "rgb(255, 255, 0)", "rgb(230, 230, 0)", "SHOCKWAVE", "");*/
 }
 
 function drawGameOver() {
