@@ -1,4 +1,4 @@
-console.log("Dodge.io");// DODGE.IO - MUSIC.JS
+console.log("0 is undefined");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -268,6 +268,7 @@ function spawnAndDrawDanger() {
                 }
                 if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
                 if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
+                else if (modifiers?.despawnRate === 0) allDangers[0].despawnRate = 0;
                 music.timestamps.splice(i, 1);
             }
         }
