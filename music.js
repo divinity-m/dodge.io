@@ -1,4 +1,4 @@
-console.log("absolute zero lasting effect bug");// DODGE.IO - MUSIC.JS
+console.log("jolts shockwave applies to dangers");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -123,7 +123,7 @@ function createBeam(variant="none") {
     }
     if (beam.variant > 0.5) beam.variant = "vertical";
     else beam.variant = "horizontal";
-    if (variant !== "none") beam.variant = variant;
+    if (variant === "vertical" || variant === "horizontal") beam.variant = variant;
     return beam;
 }
 
@@ -138,14 +138,14 @@ function createCircle(variant="none") {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
     }
-    circle.lineWidth = circle.r
+    circle.lineWidth = circle.r;
     if (circle.variant > 0.5) circle.variant = "bomb";
     else circle.variant = "ring";
-    if (variant !== "none") circle.variant = variant;
+    if (variant === "bomb" || variant === "ring") circle.variant = variant;
     return circle;
 }
 
-function createSpike(variant="none") {
+function createSpike() {
     let spike = {
         type: "spike",
         variant: "none",
@@ -174,7 +174,7 @@ function createSpike(variant="none") {
     return spike;
 }
 
-function createText(variant="none") {
+function createText() {
     let text = {
         type: "text",
         variant: "none",
@@ -198,11 +198,8 @@ function spawnAndDrawDanger() {
             const modifiers = music.timestamps[i][2];
             if (music.var.currentTime >= timestamp) {
                 if (dangerType === "beam" || dangerType === "horizontal" || dangerType === "vertical") {
-                    allDangers.unshift(createBeam());
+                    allDangers.unshift(createBeam(dangerType));
                     if (modifiers?.size) { allDangers[0].w = modifiers.size; allDangers[0].h = modifiers.size; }
-                    
-                    if (dangerType === "vertical") allDangers[0].variant = "vertical";
-                    else if (dangerType === "horizontal") allDangers[0].variant = "horizontal";
                     
                     // determines the beams x value based off the timestamp
                     let xMulti = Math.floor(timestamp*100/cnv.width);
@@ -212,12 +209,10 @@ function spawnAndDrawDanger() {
                     let yMulti = Math.floor(timestamp*100/cnv.height);
                     allDangers[0].y = (timestamp*100)-(cnv.height*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
-                    allDangers.unshift(createCircle());
+                    allDangers.unshift(createCircle(dangerType));
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
                     allDangers[0].lineWidth = allDangers[0].r;
-                    
-                    if (dangerType === "bomb") allDangers[0].variant = "bomb";
-                    else if (dangerType === "ring") allDangers[0].variant = "ring";
+                    if (modifiers?.lineWidth) allDangers[0].lineWidth = modifiers.lineWidth;
         
                     // the circle's x and y will mimic the players
                     allDangers[0].x = player.x;
@@ -270,6 +265,66 @@ function spawnAndDrawDanger() {
                 if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
                 else if (modifiers?.despawnRate === 0) allDangers[0].despawnRate = 0;
                 music.timestamps.splice(i, 1);
+
+                // Beam X and Y's
+                if (allDangers[0].variant === "vertical") { allDangers[0].y = 0; allDangers[0].h = cnv.height; }
+                if (allDangers[0].variant === "horizontal") { allDangers[0].x = 0; allDangers[0].w = cnv.width; }
+                
+                
+                // collision points
+                if (player.dodger === "jolt") {
+                    allDangers[0].resetSize = 1;
+                    if (allDangers[0].type === "circle" || allDangers[0].type === "spike") {
+                        allDangers[0].baseSize = allDangers[0].r;
+                        Object.defineProperty(allDangers[0], "collisionPoints", {
+                            get() {
+                                let radius;
+                                if (this.variant === "bomb") radius = this.r;
+                                if (this.variant === "ring") radius = this.r + this.lineWidth/2;
+                                if (this.type === "spike") radius = this.r * 1.5;
+                            
+                                let piOver3X = radius*Math.cos(Math.PI/3);
+                                let piOver3Y = radius*Math.sin(Math.PI/3);
+                                let piOver6X = radius*Math.cos(Math.PI/6);
+                                let piOver6Y = radius*Math.sin(Math.PI/6);
+                                points =  [[this.x, this.y],
+                                    [this.x+radius, this.y], [this.x+piOver6X, this.y+piOver6Y], [this.x+piOver3X, this.y+piOver3Y],
+                                    [this.x, this.y+radius], [this.x-piOver3X, this.y+piOver3Y], [this.x-piOver6X, this.y+piOver6Y],
+                                    [this.x-radius, this.y], [this.x-piOver6X, this.y-piOver6Y], [this.x-piOver3X, this.y-piOver3Y],
+                                    [this.x, this.y-radius], [this.x+piOver3X, this.y-piOver3Y], [this.x+piOver6X, this.y-piOver6Y]];
+                                if (this.variant === "ring") {
+                                    radius = this.r-this.lineWidth/2
+                                    piOver3X = radius*Math.cos(Math.PI/3);
+                                    piOver3Y = radius*Math.sin(Math.PI/3);
+                                    piOver6X = radius*Math.cos(Math.PI/6);
+                                    piOver6Y = radius*Math.sin(Math.PI/6);
+                                    points.push(
+                                        [this.x+radius, this.y], [this.x+piOver6X, this.y+piOver6Y], [this.x+piOver3X, this.y+piOver3Y],
+                                        [this.x, this.y+radius], [this.x-piOver3X, this.y+piOver3Y], [this.x-piOver6X, this.y+piOver6Y],
+                                        [this.x-radius, this.y], [this.x-piOver6X, this.y-piOver6Y], [this.x-piOver3X, this.y-piOver3Y],
+                                        [this.x, this.y-radius], [this.x+piOver3X, this.y-piOver3Y], [this.x+piOver6X, this.y-piOver6Y]);
+                                    
+                                }
+
+                                return points;
+                            }
+                        })
+                    }
+                    else if (allDangers[0].type === "beam") {
+                        if (allDangers[0].variant === "vertical") allDangers[0].baseSize = allDangers[0].w;
+                        if (allDangers[0].variant === "horizontal") allDangers[0].baseSize = allDangers[0].h;
+                        Object.defineProperty(allDangers[0], "collisionPoints", {
+                            get() {
+                                return [[this.x+this.w/2, this.y+this.h/2],
+                                    [this.x, this.y+this.h*0/4], [this.x+this.w/4, this.y+this.h*0/4], [this.x+this.w/2, this.y+this.h*0/4], [this.x+this.w*3/4, this.y+this.h*0/4], [this.x+this.w, this.y+this.h*0/4],
+                                    [this.x, this.y+this.h*1/4], [this.x+this.w/4, this.y+this.h*1/4], [this.x+this.w/2, this.y+this.h*1/4], [this.x+this.w*3/4, this.y+this.h*1/4], [this.x+this.w, this.y+this.h*1/4],
+                                    [this.x, this.y+this.h*2/4], [this.x+this.w/4, this.y+this.h*2/4], [this.x+this.w/2, this.y+this.h*2/4], [this.x+this.w*3/4, this.y+this.h*2/4], [this.x+this.w, this.y+this.h*2/4],
+                                    [this.x, this.y+this.h*3/4], [this.x+this.w/4, this.y+this.h*3/4], [this.x+this.w/2, this.y+this.h*3/4], [this.x+this.w*3/4, this.y+this.h*3/4], [this.x+this.w, this.y+this.h*3/4],
+                                    [this.x, this.y+this.h*4/4], [this.x+this.w/4, this.y+this.h*4/4], [this.x+this.w/2, this.y+this.h*4/4], [this.x+this.w*3/4, this.y+this.h*4/4], [this.x+this.w, this.y+this.h*4/4]]
+                            }
+                        })
+                    }
+                }
             }
         }
     }
@@ -288,12 +343,12 @@ function spawnAndDrawDanger() {
 
         // shape
         if (danger.type === "beam") {
-            if (danger.variant === "vertical") ctx.fillRect(danger.x, 0, danger.w, cnv.height);
-            else if (danger.variant === "horizontal") ctx.fillRect(0, danger.y, cnv.width, danger.h);
+            if (danger.variant === "vertical") ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
+            if (danger.variant === "horizontal") ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
         }
         else if (danger.type === "circle") {
             if (danger.variant === "bomb") drawCircle(danger.x, danger.y, danger.r);
-            else if (danger.variant === "ring") { ctx.lineWidth = danger.lineWidth; drawCircle(danger.x, danger.y, danger.r, "stroke"); }
+            if (danger.variant === "ring") { ctx.lineWidth = danger.lineWidth; drawCircle(danger.x, danger.y, danger.r, "stroke"); }
         }
         else if (danger.type === "spike") {
             drawCircle(danger.x, danger.y, danger.r);
@@ -396,8 +451,8 @@ function spawnAndDrawDanger() {
 
 function musicCollisions() {
     allDangers.forEach(danger => {
-        if (timeLeft > 0 && innerGameState !== "musicModeFail" && danger.colorValue >= 255 &&
-            now-player.hit >= 1500 && !dash.activated && now-dash.lastEnded >= 300) {
+        if (timeLeft > 0 && innerGameState !== "musicModeFail" && danger.colorValue >= 254 &&
+            now-player.hit >= 1500 && !dash.activated && now-dash.lastEnded > 250 && !player.invincible) {
             let distance = Math.hypot(player.x-danger.x, player.y-danger.y);
             if (danger.type === "beam") {
                 if ((danger.variant === "vertical" && player.x+player.r >= danger.x && player.x-player.r <= danger.x+danger.w) ||
@@ -431,6 +486,7 @@ function musicCollisions() {
         if (player.dodger === "jötunn" && danger.type !== "text") {
             let distance = Math.hypot(player.x-danger.x, player.y-danger.y) - player.r;
             
+            // Determines the distance from the edge of the player to the edge of the enemy
             if (danger.variant === "vertical") distance = Math.abs(player.x - (danger.x + danger.w/2)) - danger.w/2 + player.r;
             if (danger.variant === "horizontal") distance = Math.abs(player.y - (danger.y + danger.h/2)) - danger.h/2 + player.r;
             if (danger.variant === "bomb") distance -= danger.r;
@@ -442,14 +498,19 @@ function musicCollisions() {
             if (danger.type === "spike") distance -= danger.r*1.5;
             if (distance < 0) distance = 0;
             
-            const slowStart = 175;
-            const slowEnd = 75;
+            // absoluteZero.slowStart = 175; absoluteZero.slowEnd = 75
+            // limits the lowest possible distance by taking the higher value
+            const maxDist = Math.max(distance, absoluteZero.slowEnd);
             
-            const maxDist = Math.max(distance, slowEnd);
-            const factor = Math.min(1, (maxDist - slowEnd) / (slowStart - slowEnd));
+            // limits the highest posible distance by taking the lower value
+            const factor = Math.min(1, (maxDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd));
+            
+            // xFactor = min + max*(factor between 0 and 1)
             const spawnFactor = 0.8 + 0.2*factor;
             const slowFactor = 0.3 + 0.7*factor;
             const colorFactor = 0.9 + 0.1*factor;
+            
+            // prevents lasting effects after ability swap
             let slowed = false;
             
             if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Stagnation") {
@@ -472,6 +533,35 @@ function musicCollisions() {
                     else return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
                 }
             })
+        }
+
+        if (player.dodger === "jolt" && shockwave.activated && shockwave?.path && danger?.collisionPoints) {
+            danger.collisionPoints.forEach(point => {
+                ctx.save();
+                ctx.translate(shockwave.x, shockwave.y);
+                ctx.rotate(shockwave.facingAngle);
+                // checks each individual collision point to see if the danger was hit by the wave
+                if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
+                    // sets the size reset in motion
+                    danger.resetSize = Date.now();
+                }
+                ctx.restore();
+            })
+        }
+        if (danger?.resetSize) {
+            if (now - danger.resetSize >= 3000) {
+                ["r", "w", "h"].forEach(unit => {
+                    if (danger?.[unit] && danger?.[unit] !== cnv.width && danger?.[unit] !== cnv.height) {
+                        if (danger[unit] < danger.baseSize-0.01) danger[unit] += danger.baseSize/100;
+                        else danger[unit] = danger.baseSize;
+                    }
+                })
+            }
+            else {
+                ["r", "w", "h"].forEach(unit => {
+                    if (danger?.[unit] && danger?.[unit] !== cnv.width && danger?.[unit] !== cnv.height) danger[unit] = danger.baseSize/2
+                })
+            }
         }
     })
     if (player.lives === 0 && innerGameState !== "musicModeFail" && innerGameState !== "mainMenu") {
