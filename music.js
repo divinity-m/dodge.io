@@ -455,19 +455,23 @@ function musicCollisions() {
             if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Stagnation") {
                 danger.spawnRate = danger.baseSpawnRate * spawnFactor;
                 slowed = true;
+            } else danger.spawnRate = danger.baseSpawnRate;
+            if (danger?.launched) {
+                if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") {
+                    danger.movex = danger.baseMovex * slowFactor;
+                    danger.movey = danger.baseMovex * slowFactor;
+                    slowed = true;
+                } else {
+                    danger.movex = danger.baseMovex;
+                    danger.movey = danger.baseMovex;
+                }
             }
-            if (danger?.launched && (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation")) {
-                danger.movex = danger.baseMovex * slowFactor;
-                danger.movey = danger.baseMovex * slowFactor;
-                slowed = true;
-            }
-            if (slowed) {
-                Object.defineProperty(danger, "color", {
-                    get() {
-                    return `rgb(${this.colorValue*colorFactor}, ${this.colorValue*colorFactor}, ${this.colorValue})`;
-                    }
-                })
-            }
+            Object.defineProperty(danger, "color", {
+                get() {
+                    if (slowed) return `rgb(${this.colorValue*colorFactor}, ${this.colorValue*colorFactor}, ${this.colorValue})`;
+                    else return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+                }
+            })
         }
     })
     if (player.lives === 0 && innerGameState !== "musicModeFail" && innerGameState !== "mainMenu") {
