@@ -1,4 +1,4 @@
-console.log("euphoria completed")// DODGE.IO - FUNCTIONS.JS
+console.log("Absolute Zero's functionality")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -28,6 +28,14 @@ function recordKeyDown(event) {
     // Ability controls
     if ((event.code === "KeyQ" || event.code === "KeyJ") && gameState !== "endlessOver") {
         if (player.dodger === "jsab" && dash.usable && !dash.activated) dash.activated = true;
+
+        else if (player.dodger === "jötunn" && absoluteZero.usable) {
+            absoluteZero.usable = false;
+            absoluteZero.lastEnded = Date.now();
+            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
+            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
+            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
+        }
             
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             // activate the shockwave ability and set certain properties
@@ -109,25 +117,28 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        if (mouseOver.enemyOutBtn || mouseOver.disableMMBtn || mouseOver.musicSlider || mouseOver.sfxSlider) {
-            if (mouseOver.enemyOutBtn) {
-                if (settings.enemyOutlines) settings.enemyOutlines = false;
-                else if (!settings.enemyOutlines) settings.enemyOutlines = true;
-            }
-            if (mouseOver.disableMMBtn) {
-                if (settings.disableMM) settings.disableMM = false;
-                else if (!settings.disableMM) {
-                    settings.disableMM = true;
-                    mouseMovementOn = false;
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn"].forEach(setting => {
+            if (mouseOver?.[setting]) {
+                if (mouseOver?.enemyOutBtn) {
+                    if (settings.enemyOutlines) settings.enemyOutlines = false;
+                    else settings.enemyOutlines = true;
                 }
+                if (mouseOver?.disableMMBtn) {
+                    if (settings.disableMM) settings.disableMM = false;
+                    else { settings.disableMM = true; mouseMovementOn = false; }
+                }
+                if (mouseOver?.aZ_RangeBtn) {
+                    if (settings.aZ_Range) settings.aZ_Range = false;
+                    else settings.aZ_Range = true;
+                }
+    
+                // Saves the users settings options
+                userData.settings = settings;
+                localStorage.setItem('localUserData', JSON.stringify(userData));
+    
+                if (!settings.disableMM) mouseMovementOn = previousMM;
             }
-
-            // Saves the users settings options
-            userData.settings = settings;
-            localStorage.setItem('localUserData', JSON.stringify(userData));
-
-            if (!settings.disableMM) mouseMovementOn = previousMM;
-        }
+        })
     }
 
     // Difficulty Choice
@@ -503,6 +514,15 @@ function recordRightClick(event) {
     // Ability Activations
     if (gameState !== "endlessOver") {
         if (player.dodger === "jsab" && dash.usable && !dash.activated) dash.activated = true;
+
+        else if (player.dodger === "jötunn" && absoluteZero.usable) {
+            absoluteZero.usable = false;
+            absoluteZero.lastEnded = Date.now();
+            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
+            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
+            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
+        }
+        
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             shockwave.activated = true;
             shockwave.facingAngle = player.facingAngle;
@@ -674,22 +694,29 @@ function drawSettings() {
         
         // Settings Title Texts
         ctx.fillStyle = "black";
-        ctx.fillText("Enemy Outlines", 50, 50);
+        ctx.fillText("Show Enemy Outlines", 50, 50);
         ctx.fillText("Disable Mouse Movement Activation", 50, 100);
         ctx.fillText("Music Volume", 50, 150);
         ctx.fillText("SFX Volume", 50, 200);
+        ctx.fillText("Show Absolute Zero's Range", 50, 250);
         
         // Enemy Outlines Button
-        mouseOver.enemyOutBtn = mouseX > 170 && mouseX < 190 && mouseY > 35 && mouseY < 55;
+        mouseOver.enemyOutBtn = mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
         if (settings.enemyOutlines) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
-        ctx.fillRect(170, 35, 20, 20);
+        ctx.fillRect(216, 35, 20, 20);
     
         // Disable Mouse Movement Button
-        mouseOver.disableMMBtn = mouseX > 317.5 && mouseX < 337.5 && mouseY > 85 && mouseY < 105;
+        mouseOver.disableMMBtn = mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
         if (settings.disableMM) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
-        ctx.fillRect(317.5, 85, 20, 20);
+        ctx.fillRect(318, 85, 20, 20);
+
+        // Absolute Zero's Range Button
+        mouseOver.aZ_RangeBtn = mouseX > 266 && mouseX < 286 && mouseY > 235 && mouseY < 255;
+        if (settings.aZ_Range) ctx.fillStyle = "lime";
+        else ctx.fillStyle = "red";
+        ctx.fillRect(266, 235, 20, 20);
 
         // Music Volume Slider & SFX Volume Slider (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 155 && mouseX <= 325 && mouseY >= 130 && mouseY <= 160;
@@ -707,7 +734,7 @@ function drawSettings() {
         }
 
         // volume bar outline
-        ctx.strokestyle = "white";
+        ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.roundRect(165, 140, 150, 10, 5);
@@ -848,14 +875,14 @@ function drawDodgerSelection() {
         
         ctx.font = "25px 'Lucida Console'";
         ctx.fillText(dodgerName, dodger.x + 10, dodger.y + 30);
-        ctx.font = "15px 'Lucida Console'";
+        ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, dodger.x + 10, dodger.y + 80);
     }
     
     ctx.textAlign = 'left';
     drawDodgerText("rgb(255, 255, 255)", "EVADER", "ABILITY: NONE", evader);
     drawDodgerText("rgb(255, 0, 0)", "JSAB", "ABILITY: DASH", jsab);
-    drawDodgerText("rgb(79, 203, 255)", "JÖTUNN", "ABILITY: STAGNATION", jötunn);
+    drawDodgerText("rgb(79, 203, 255)", "JÖTUNN", `ABILITY: ABSOLUTE ZERO`, jötunn);
     drawDodgerText("rgb(255, 255, 0)", "JOLT", "ABILITY: SHOCKWAVE", jolt);
 }
 
@@ -915,6 +942,16 @@ function drawGameOver() {
 function drawPlayer() {
     ctx.fillStyle = player.color;
     drawCircle(player.x, player.y, player.r);
+}
+
+function drawAZRange() {
+    if (player.dodger === "jötunn" && settings.aZ_Range) {
+        if (absoluteZero.passive == "Absolute Zero") ctx.strokeStyle = "rgb(0, 0, 255)";
+        if (absoluteZero.passive == "Glaciate") ctx.strokeStyle = "rgb(0, 127, 255)";
+        if (absoluteZero.passive == "Stagnate") ctx.strokeStyle = "rgb(0, 94, 150)";
+        ctx.lineWidth = 2;
+        drawCircle(player.x, player.y, 175, "stroke");
+    }
 }
 
 function drawEnemies() {
@@ -1001,9 +1038,6 @@ function drawText() { // draws the current time, highest time, and enemy count
     // No Abiliy
     if (player.dodger === "evader") ctx.fillText(`Passive: Skill`, textX, 620);
 
-    // Stagnation
-    else if (player.dodger === "jötunn") ctx.fillText(`Passive: Stagnation`, textX, 620);
-
     // Dash
     else if (player.dodger === "jsab") {
         // Dash CD
@@ -1011,12 +1045,26 @@ function drawText() { // draws the current time, highest time, and enemy count
 
         if (now - dash.lastEnded >= 1100) { // 1.1s
             dash.usable = true;
-
             if (lastPressing === "mouse") ctx.fillText(`Active: Dash (RMB)`, textX, 620);
             else if (lastPressing === "kb") ctx.fillText(`Active: Dash (Q/J)`, textX, 620);
         } else {
             dash.usable = false;
-            ctx.fillText(`Active: ${dashCDLeft}s`, textX, 620);
+            ctx.fillText(`Active: Dash (${dashCDLeft}s)`, textX, 620);
+        }
+    }
+
+    // Absolute Zero
+    else if (player.dodger === "jötunn") {
+        // Absolute Zero CD
+        let absoluteZeroCDLeft = ((1000 - (now - absoluteZero.lastEnded)) / 1000).toFixed(3);
+
+        if (now - absoluteZero.lastEnded >= 1000) { // 1s
+            absoluteZero.usable = true;
+            if (lastPressing === "mouse") ctx.fillText(`Passive: ${absoluteZero.passive} (RMB)`, textX, 620);
+            else if (lastPressing === "kb") ctx.fillText(`Passive: ${absoluteZero.passive} (Q/J)`, textX, 620);
+        } else {
+            absoluteZero.usable = false;
+            ctx.fillText(`Passive: ${absoluteZero.passive} (${absoluteZeroCDLeft})`, textX, 620);
         }
     }
 
@@ -1027,12 +1075,11 @@ function drawText() { // draws the current time, highest time, and enemy count
 
         if (now - shockwave.lastEnded >= 2000) { // 2s
             shockwave.usable = true;
-
             if (lastPressing === "mouse") ctx.fillText(`Active: Shockwave (RMB)`, textX, 620);
             else if (lastPressing === "kb") ctx.fillText(`Active: Shockwave (Q/J)`, textX, 620);
         } else {
             shockwave.usable = false;
-            ctx.fillText(`Active: ${shockwaveCDLeft}s`, textX, 620);
+            ctx.fillText(`Active: Shockwave (${shockwaveCDLeft}s)`, textX, 620);
         }
     }
 }
@@ -1218,28 +1265,24 @@ function moveEnemies() { // Loops through the allEnemies array to move each enem
             }
         } 
         
-        if (player.dodger == "jötunn") {
+        if (player.dodger == "jötunn" && (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation")) {
             // Similar to mouse movement mechanics, but theres a limit to how slow the enemies move
             // Calculates the distance from the edge of the enemy to the edge of the player, so I subtract the radii
-            const slowStart = 175 - enemy.radius - player.r;
-            const slowEnd = 75 - enemy.radius - player.r;
+            const slowStart = 175;
+            const slowEnd = 75;
+            const realDist = enemyDist - enemy.radius - player.r;
+            
+            // Limit distance to avoid going below slowEnd
+            const maxDist = Math.max(realDist, slowEnd);
+            // Limit the factor to above going over 1
+            const factor = Math.min(1, (maxDist - slowEnd) / (slowStart - slowEnd));
+            const slowFactor = 0.3 + 0.7 * factor;
 
-            if (enemyDist < slowStart) {
-                // Limit distance to avoid going below slowEnd
-                const maxDist = Math.max(enemyDist, slowEnd);
-                const factor = (maxDist - slowEnd) / (slowStart - slowEnd);
-                const slowFactor = 0.3 + 0.7 * factor;
-
-                enemy.movex = enemy.baseMoveX * slowFactor;
-                enemy.movey = enemy.baseMoveY * slowFactor;
-            } else {
-                enemy.movex = enemy.baseMoveX;
-                enemy.movey = enemy.baseMoveY;
-                enemy.color = enemy.baseColor;
-            }
+            enemy.movex = enemy.baseMoveX * slowFactor;
+            enemy.movey = enemy.baseMoveY * slowFactor;
         } else {
-                enemy.movex = enemy.baseMoveX;
-                enemy.movey = enemy.baseMoveY;
+            enemy.movex = enemy.baseMoveX;
+            enemy.movey = enemy.baseMoveY;
         }
         
         enemy.x += enemy.movex
@@ -1342,35 +1385,39 @@ function abilities() { // player-specific-abilities
             dash.speed *= -1;
             player.speed = 2.5;
 
-            if (player.dodger === "evader") player.color = "white"
-            if (player.dodger === "jsab") player.color = "red"
-            if (player.dodger === "jötunn") player.color ="rgb(79, 203, 255)"
-            if (player.dodger === "jolt") player.color = "yellow"
+            // if the player swaps heroes mid dash
+            if (player.dodger === "evader") player.color = "white";
+            if (player.dodger === "jsab") player.color = "red";
+            if (player.dodger === "jötunn") player.color ="rgb(79, 203, 255)";
+            if (player.dodger === "jolt") player.color = "yellow";
         }
     }
-    // Stagnation's effect changes enemy color based on distance to signify that they're being slowed down
+    // Absolute Zero's effect changes enemy color based on distance to signify that they're being slowed down
     if (player.dodger === "jötunn") {
         allEnemies.forEach(enemy => {
-            const dxEnemy = player.x - enemy.x;
-            const dyEnemy = player.y - enemy.y;
-            const enemyDist = Math.hypot(dxEnemy, dyEnemy);
-
-            if (enemy.ability === "none") {
-                if (enemyDist < 100) enemy.color = "rgb(55, 77, 107)";
-                else if (enemyDist < 125) enemy.color = "rgb(68, 84, 107)";
-                else if (enemyDist < 150) enemy.color = "rgb(81, 91, 105)";
-                else if (enemyDist < 175) enemy.color = "rgb(95, 100, 107)";
-            } else if (enemy.ability === "decelerator") {
-                if (enemyDist < 100) enemy.color = "rgb(210, 0, 0)";
-                else if (enemyDist < 125) enemy.color = "rgb(220, 0, 0)";
-                else if (enemyDist < 150) enemy.color = "rgb(230, 0, 0)";
-                else if (enemyDist < 175) enemy.color = "rgb(240, 0, 0)";
-            } else if (enemy.ability === "homing") {
-                if (enemyDist < 100) enemy.color = "rgb(190, 146, 0)";
-                else if (enemyDist < 125) enemy.color = "rgb(206, 158, 0)";
-                else if (enemyDist < 150) enemy.color = "rgb(216, 166, 0)";
-                else if (enemyDist < 175) enemy.color = "rgb(235, 180, 0)";
-            }
+            if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") {
+                const dxEnemy = player.x - enemy.x;
+                const dyEnemy = player.y - enemy.y;
+                const enemyDist = Math.hypot(dxEnemy, dyEnemy);
+    
+                if (enemy.ability === "none") {
+                    if (enemyDist < 100) enemy.color = "rgb(55, 77, 107)";
+                    else if (enemyDist < 125) enemy.color = "rgb(68, 84, 107)";
+                    else if (enemyDist < 150) enemy.color = "rgb(81, 91, 105)";
+                    else if (enemyDist < 175) enemy.color = "rgb(95, 100, 107)";
+                } else if (enemy.ability === "decelerator") {
+                    if (enemyDist < 100) enemy.color = "rgb(210, 0, 0)";
+                    else if (enemyDist < 125) enemy.color = "rgb(220, 0, 0)";
+                    else if (enemyDist < 150) enemy.color = "rgb(230, 0, 0)";
+                    else if (enemyDist < 175) enemy.color = "rgb(240, 0, 0)";
+                } else if (enemy.ability === "homing") {
+                    if (enemyDist < 100) enemy.color = "rgb(190, 146, 0)";
+                    else if (enemyDist < 125) enemy.color = "rgb(206, 158, 0)";
+                    else if (enemyDist < 150) enemy.color = "rgb(216, 166, 0)";
+                    else if (enemyDist < 175) enemy.color = "rgb(235, 180, 0)";
+                }
+                if (enemyDist >= 175) enemy.color = enemy.baseColor;
+            } else enemy.color = enemy.baseColor;
         })
     }
     if (player.dodger === "jolt") {
