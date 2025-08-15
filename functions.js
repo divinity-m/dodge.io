@@ -106,6 +106,7 @@ function recordLeftClick() {
         }
         // Plays 'A New Start' when users are redirected back to the Main Menu
         if (gameState === "endlessOver") {
+            allEnemies = [];
             music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
             music.var.currentTime = 0;
             music.promise = music.var.play();
@@ -1475,8 +1476,12 @@ function abilities() { // player-specific-abilities
         allEnemies.forEach(enemy => {
             // Restore the radius of enemies after 5 seconds have passed
             if (now - enemy.resetRadius >= 5000) {
-                enemy.r = enemy.baseRadius;
-                if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius;
+                if (enemy.r < enemy.baseRadius-0.01) enemy.r += enemy.baseRadius/100;
+                else enemy.r = enemy.baseRadius
+                if (enemy.ability === "decelerator") {
+                    if (enemy.auraRadius < enemy.baseAuraRadius-0.01) enemy.auraRadius += enemy.baseAuraRadius/100;
+                    else enemy.auraRadius = enemy.baseAuraRadius;
+                }
 
                 // prevents no-clipping
                 if (enemy.x - enemy.r <= 0) enemy.x = enemy.r + 1;
