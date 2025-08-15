@@ -1,4 +1,4 @@
-console.log("aZ_RangeBtn")// DODGE.IO - SCRIPT.JS
+console.log("drawAZRange")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -317,6 +317,7 @@ function draw() {
     if (gameState === "startScreen") {
         loopAudio();
         abilities();
+        drawAZRange();
         drawText();
         drawStartScreen();
         
@@ -330,6 +331,7 @@ function draw() {
     }
     else if (gameState === "endlessMode") {
         loopAudio();
+        drawAZRange();
         drawText();
         drawEnemies();
         drawPlayer();
@@ -343,12 +345,14 @@ function draw() {
         collisions();
     }
     else if (gameState === "endlessOver") {
+        drawAZRange();
         drawText();
         drawGameOver();
         drawEnemies();
         drawPlayer();
     }
     else if (gameState === "musicMode") {
+        drawAZRange();
         spawnAndDrawDanger();
         drawText();
         drawEndLevel();
