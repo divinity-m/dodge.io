@@ -1,4 +1,4 @@
-console.log("modifiers bug");// DODGE.IO - MUSIC.JS
+console.log("text");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -124,7 +124,6 @@ function createBeam(variant="none") {
     if (beam.variant > 0.5) beam.variant = "vertical";
     else beam.variant = "horizontal";
     if (variant !== "none") beam.variant = variant;
-    allDangers.unshift(beam);
     return beam;
 }
 
@@ -143,7 +142,6 @@ function createCircle(variant="none") {
     if (circle.variant > 0.5) circle.variant = "bomb";
     else circle.variant = "ring";
     if (variant !== "none") circle.variant = variant;
-    allDangers.unshift(circle);
     return circle;
 }
 
@@ -173,9 +171,22 @@ function createSpike(variant="none") {
     const radiusSpace = spike.r * 1.501;
     spike.x = Math.random()*(cnv.width-(radiusSpace*2)) + radiusSpace;
     spike.y = Math.random()*(cnv.height-(radiusSpace*2)) + radiusSpace;
-    if (variant !== "none") spike.variant = variant;
-    allDangers.unshift(spike);
     return spike;
+}
+
+function createText(variant="none") {
+    let text = {
+        type: "text",
+        variant: "none",
+        x: 0, y: 0,
+        text: "placeholder", textAlign: "left",
+        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
+        colorValue: 185,
+        get color() {
+            return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+        },
+    }
+    return text;
 }
 
 function spawnAndDrawDanger() {
@@ -187,7 +198,7 @@ function spawnAndDrawDanger() {
             const modifiers = music.timestamps[i][2];
             if (music.var.currentTime >= timestamp) {
                 if (dangerType === "beam" || dangerType === "horizontal" || dangerType === "vertical") {
-                    createBeam();
+                    allDangers.unshift(createBeam());
                     if (modifiers?.size) { allDangers[0].w = modifiers.size; allDangers[0].h = modifiers.size; }
                     
                     if (dangerType === "vertical") allDangers[0].variant = "vertical";
@@ -201,7 +212,7 @@ function spawnAndDrawDanger() {
                     let yMulti = Math.floor(timestamp*100/cnv.height);
                     allDangers[0].y = (timestamp*100)-(cnv.height*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
-                    createCircle();
+                    allDangers.unshift(createCircle());
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
                     allDangers[0].lineWidth = allDangers[0].r;
                     
@@ -212,7 +223,7 @@ function spawnAndDrawDanger() {
                     allDangers[0].x = player.x;
                     allDangers[0].y = player.y;
                 } else if (dangerType === "spike") {
-                    createSpike();
+                    allDangers.unshift(createSpike());
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
                     const radiusSpace = allDangers[0].r * 1.501;
                     
@@ -242,6 +253,10 @@ function spawnAndDrawDanger() {
                             }
                         })
                     }
+                } else if (dangerType === "text") {
+                    allDangers.unshift(createText());
+                    if (modifiers?.text) allDangers[0].text = modifiers.text;
+                    if (modifiers?.textAlign) allDangers[0].textAlign = modifiers.textAlign;
                 }
                 if (modifiers?.coords) {
                     if (modifiers.coords[0] === "player") {
@@ -252,7 +267,6 @@ function spawnAndDrawDanger() {
                 }
                 if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
                 if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
-                
                 music.timestamps.splice(i, 1);
             }
         }
@@ -272,21 +286,12 @@ function spawnAndDrawDanger() {
 
         // shape
         if (danger.type === "beam") {
-            if (danger.variant === "vertical") {
-                ctx.fillRect(danger.x, 0, danger.w, cnv.height);
-            }
-            else if (danger.variant === "horizontal") {
-                ctx.fillRect(0, danger.y, cnv.width, danger.h);
-            }
+            if (danger.variant === "vertical") ctx.fillRect(danger.x, 0, danger.w, cnv.height);
+            else if (danger.variant === "horizontal") ctx.fillRect(0, danger.y, cnv.width, danger.h);
         }
         else if (danger.type === "circle") {
-            if (danger.variant === "bomb") {
-                drawCircle(danger.x, danger.y, danger.r);
-            }
-            else if (danger.variant === "ring") {
-                ctx.lineWidth = danger.lineWidth;
-                drawCircle(danger.x, danger.y, danger.r, "stroke");
-            }
+            if (danger.variant === "bomb") drawCircle(danger.x, danger.y, danger.r);
+            else if (danger.variant === "ring") { ctx.lineWidth = danger.lineWidth; drawCircle(danger.x, danger.y, danger.r, "stroke"); }
         }
         else if (danger.type === "spike") {
             drawCircle(danger.x, danger.y, danger.r);
@@ -318,25 +323,21 @@ function spawnAndDrawDanger() {
                 ctx.lineTo(danger.r/w, danger.r/w);
                 ctx.fill();
             }
-  
             ctx.save();
             ctx.translate(danger.x, danger.y);
             ctx.rotate(danger.rotate);
             draw4Spikes();
             ctx.restore();
-            
             ctx.save();
             ctx.translate(danger.x, danger.y);
             ctx.rotate((Math.PI/3)+danger.rotate);
             draw4Spikes();
             ctx.restore();
-
             ctx.save();
             ctx.translate(danger.x, danger.y);
             ctx.rotate((Math.PI/6)+danger.rotate);
             draw4Spikes();
-            ctx.restore();
-            
+            ctx.restore();   
             danger.rotate += Math.PI/100;
             
             if (danger.colorValue >= 255 && !danger.launched) {
@@ -361,6 +362,11 @@ function spawnAndDrawDanger() {
                 danger.x += danger.movex;
                 danger.y += danger.movey;
             }
+        }
+        else if (danger.type === "text") {
+            ctx.textAlign = danger.textAlign;
+            ctx.font = "50px Verdana";
+            ctx.fillText(danger.text, danger.x, danger.y);
         }
     })
     // Danger Rearranging
@@ -407,7 +413,7 @@ function musicCollisions() {
             }
         }
 
-        if (player.dodger === "jötunn") {
+        if (player.dodger === "jötunn" && danger.type !== "text") {
             let distance = Math.hypot(player.x-danger.x, player.y-danger.y) - player.r;
             
             if (danger.variant === "vertical") distance = Math.abs(player.x - (danger.x + danger.w/2)) - danger.w/2 + player.r;
