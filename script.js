@@ -1,4 +1,4 @@
-console.log("settings absolute zero")// DODGE.IO - SCRIPT.JS
+console.log("aZ_RangeBtn")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -49,7 +49,7 @@ let mouseOver = {
     disableMMBtn: false,
     musicSlider: false,
     sfxSlider: false,
-    absoluteZeroRangeBtn: false,
+    aZ_RangeBtn: false,
 };
 
 let mouseX;
@@ -102,7 +102,7 @@ let settings = {
     disableMM: false,
     musicSliderX: 240,
     sfxSliderX: 240,
-    absoluteZeroRange: true,
+    aZ_Range: true,
 };
 
 let allEnemies = [];
@@ -205,8 +205,8 @@ if (localData) {
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score]) hs[score] = userData.highscore[score];
         })
-        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, absoluteZeroRange: true};
-        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "absoluteZeroRange"].forEach(setting => {
+        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true};
+        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range"].forEach(setting => {
             if (userData?.settings?.[setting]) s[setting] = userData.settings[setting];
         })
                 
@@ -215,7 +215,7 @@ if (localData) {
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria,},
                     settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX,
-                               sfxSliderX: s.sfxSliderX, absoluteZeroRange: s.absoluteZeroRange}};
+                               sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range}};
         // updates the current data to the locally saved data
         player = userData.player;
         highscore = userData.highscore;
