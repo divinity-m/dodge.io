@@ -317,7 +317,6 @@ function draw() {
     if (gameState === "startScreen") {
         loopAudio();
         abilities();
-        drawAZRange();
         drawText();
         drawStartScreen();
         
@@ -331,10 +330,9 @@ function draw() {
     }
     else if (gameState === "endlessMode") {
         loopAudio();
-        drawAZRange();
         drawText();
-        drawEnemies();
         drawPlayer();
+        drawEnemies();
         
         keyboardControls();
         mouseMovement();
@@ -345,14 +343,12 @@ function draw() {
         collisions();
     }
     else if (gameState === "endlessOver") {
-        drawAZRange();
         drawText();
         drawGameOver();
-        drawEnemies();
         drawPlayer();
+        drawEnemies();
     }
     else if (gameState === "musicMode") {
-        drawAZRange();
         spawnAndDrawDanger();
         drawText();
         drawEndLevel();
