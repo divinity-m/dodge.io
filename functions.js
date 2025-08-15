@@ -43,20 +43,8 @@ function recordKeyDown(event) {
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
             shockwave.y = player.y;
-
-            if (lastPressing === "mouse") {
-                // distance between the beam and cursor
-                shockwave.dx = mouseX - shockwave.x;
-                shockwave.dy = mouseY - shockwave.y;
-                shockwave.dist = Math.hypot(shockwave.dx, shockwave.dy)
-                
-                shockwave.movex = (shockwave.dx/shockwave.dist) * 7;
-                shockwave.movey = (shockwave.dy/shockwave.dist) * 7;
-            }
-            if (lastPressing === "kb") {
-                shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
-                shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
-            }
+            shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
+            shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
         }
     }
 }
