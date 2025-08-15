@@ -74,6 +74,7 @@ let player = {
     color: "rgb(255, 255, 255)",
     subColor: "rgb(230, 230, 230)",
     facingAngle: 0,
+    invincible: false,
 };
 
 let dash = {
