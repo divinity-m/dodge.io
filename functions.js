@@ -1430,27 +1430,27 @@ function abilities() { // player-specific-abilities
         })
     }
     if (player.dodger === "jolt") {
-        // 'Shockwave' launches a beam that shrinks ememies
+        // 'Shockwave' launches a wave that shrinks ememies
         if (shockwave.activated) {
-            // create the beams path
-            const beamPath = new Path2D();
-            beamPath.moveTo(0, -shockwave.radius);
-            beamPath.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
-            beamPath.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
+            // create the shockwaves path
+            shockwave.path = new Path2D();
+            shockwave.path.moveTo(0, -shockwave.radius);
+            shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
+            shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
 
             // save and transform the canvas
             ctx.save();
             ctx.translate(shockwave.x, shockwave.y);
             ctx.rotate(shockwave.facingAngle);
 
-            // draw the beam
+            // draw the shockwave
             ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
-            ctx.fill(beamPath);
+            ctx.fill(shockwave.path);
 
             // checks for collisions
             allEnemies.forEach(enemy => { 
                 enemy.collisionPoints.forEach(point => {
-                    if (ctx.isPointInPath(beamPath, point[0], point[1])) {
+                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
                         enemy.r = enemy.baseRadius/2;
                         if (enemy?.auraRadius) enemy.auraRadius = enemy.baseAuraRadius/2;
                         enemy.resetRadius = Date.now(); // starts the time which an enemy got hit
