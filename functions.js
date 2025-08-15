@@ -1,4 +1,4 @@
-console.log("invincible modifier")// DODGE.IO - FUNCTIONS.JS
+console.log("UI improvements")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -572,14 +572,17 @@ function drawStartScreen() {
         }
 
         ctx.fillStyle = playGrad;
-        ctx.fillRect(playBtn.x, playBtn.y, playBtn.w, playBtn.h)
-        ctx.lineWidth = 1;
+        ctx.fillRect(playBtn.x, playBtn.y, playBtn.w, playBtn.h);
+        
         ctx.strokeStyle = playGrad2;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(playBtn.x, playBtn.y, playBtn.w, playBtn.h);
         ctx.beginPath()
         ctx.moveTo(playBtn.x, playBtn.yh)
         ctx.lineTo(playBtn.xw, playBtn.y)
         ctx.stroke()
-
+        
+        ctx.lineWidth = 1.5;
         ctx.font = '30px Arial';
         ctx.textAlign = 'center';
         let greenBtnColors = ['lime', 'white'];
@@ -631,14 +634,17 @@ function drawStartScreen() {
         }
 
         ctx.fillStyle = selectorGrad;
-        ctx.fillRect(selectorBtn.x, selectorBtn.y, selectorBtn.w, selectorBtn.h)
-        ctx.lineWidth = 1;
+        ctx.fillRect(selectorBtn.x, selectorBtn.y, selectorBtn.w, selectorBtn.h);
+        
         ctx.strokeStyle = selectorGrad2;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(selectorBtn.x, selectorBtn.y, selectorBtn.w, selectorBtn.h);
         ctx.beginPath()
         ctx.moveTo(selectorBtn.x, selectorBtn.yh)
         ctx.lineTo(selectorBtn.xw, selectorBtn.y)
         ctx.stroke()
 
+        ctx.lineWidth = 1.5;
         ctx.font = '30px Arial';
         ctx.textAlign = 'center';
         let greyBtnColors = ['grey', 'white'];
@@ -652,7 +658,7 @@ function drawStartScreen() {
             ctx.strokeText('Dodger', selectorBtn.x + 70, selectorBtn.y + 30);
         
             ctx.strokeStyle = greyBtnColors[1];
-            ctx.strokeText('Selector', selectorBtn.x + 220, selectorBtn.y + 85);
+            ctx.strokeText('Selection', selectorBtn.x + 220, selectorBtn.y + 85);
         } else if (innerGameState === "selectDodger") {
             ctx.strokeStyle = greyBtnColors[0];
             ctx.strokeText('Back To', selectorBtn.x + 70, selectorBtn.y + 30);
@@ -751,7 +757,7 @@ function drawSettings() {
 }
 
 function drawDifficultySelection() {
-    // BackGrounds
+    // Nested functions cuz fuck doing this shit over and over again
     function decideFillStyle(bool, lightColor, darkColor) {
         if (bool) {
             ctx.fillStyle = lightColor;
@@ -759,46 +765,26 @@ function drawDifficultySelection() {
             ctx.fillStyle = darkColor;
         }
     }
-
-    mouseOver.limbo = mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
-    decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
-    ctx.fillRect(50, 250, 200, 100);
-
-    mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
-    decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
-    ctx.fillRect(300, 250, 200, 100);
-
-    mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
-    decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
-    ctx.fillRect(550, 250, 200, 100);
-
-    mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
-    ctx.fillRect(50, 450, 200, 100);
-
-    mouseOver.medium = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
-    ctx.fillRect(300, 450, 200, 100);
-
-    mouseOver.hard = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
-    ctx.fillRect(550, 450, 200, 100);
-    
-    // Text
-    function drawDifficultyText(color, difficultyName, description, x, y, score = "none") {
+    function drawDifficultyInfo(color, difficultyName, description, x, y, score = "none") {
+        // Level Name
         ctx.fillStyle = color;
+        ctx.textAlign = "left";
         ctx.font = "23px 'Lucida Console'";
         ctx.fillText(difficultyName, x, y);
+
+        // Level Score
         if (score !== "none") {
             ctx.textAlign = "right";
             ctx.fillText(score, x + 180, y);
         }
+
+        // Level Description
         ctx.textAlign = "left";
         ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, x, y + 50);
     }
     
-    // titles
+    // Titles
     ctx.textAlign = "center";
     ctx.fillStyle = "grey";
     
@@ -806,20 +792,40 @@ function drawDifficultySelection() {
     ctx.fillText("NORMAL LEVELS", cnv.width/2, 220);
     ctx.fillText("ENDLESS LEVELS", cnv.width/2, 420);
 
-    // levels
-    ctx.textAlign = "left";
-    
-    drawDifficultyText("rgb(163, 0, 163)", "LIMBO", "Beams", 60, 280);
-    drawDifficultyText("rgb(0, 0, 0)", "ANDROMEDA", "+Bombs & Rings", 310, 280);
-    drawDifficultyText("rgb(255, 165, 252)", "EUPHORIA", "+Spikes", 560, 280);
-    
-    drawDifficultyText("rgb(0, 225, 255)", "EASY", "Normal Enemies", 60, 480, `${highscore.easy}s`);
-    drawDifficultyText("rgb(255, 255, 0)", "MEDIUM", "+Decelerating Enemies", 310, 480, `${highscore.medium}s`);
-    drawDifficultyText("rgb(0, 0, 0)", "HARD", "+Homing Enemies", 560, 480, `${highscore.hard}s`);
+    // Levels
+    mouseOver.limbo = mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
+    decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
+    ctx.fillRect(50, 250, 200, 100);
+    drawDifficultyInfo("rgb(163, 0, 163)", "LIMBO", "Beams", 60, 280);
+
+    mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
+    decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
+    ctx.fillRect(300, 250, 200, 100);
+    drawDifficultyInfo("rgb(0, 0, 0)", "ANDROMEDA", "+Bombs & Rings", 310, 280);
+
+    mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
+    decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
+    ctx.fillRect(550, 250, 200, 100);
+    drawDifficultyInfo("rgb(255, 165, 252)", "EUPHORIA", "+Spikes", 560, 280);
+
+    mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
+    ctx.fillRect(50, 450, 200, 100);
+    drawDifficultyInfo("rgb(0, 225, 255)", "EASY", "Normal Enemies", 60, 480, `${highscore.easy}s`);
+
+    mouseOver.medium = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
+    ctx.fillRect(300, 450, 200, 100);
+    drawDifficultyInfo("rgb(255, 255, 0)", "MEDIUM", "+Decelerating Enemies", 310, 480, `${highscore.medium}s`);
+
+    mouseOver.hard = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
+    decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
+    ctx.fillRect(550, 450, 200, 100);
+    drawDifficultyInfo("rgb(0, 0, 0)", "HARD", "+Homing Enemies", 560, 480, `${highscore.hard}s`);
 }
 
 function drawDodgerSelection() {
-    // Inner function to make life easier
+    // Nested functions to make life easier
     function decideFillStyle(bool, color1, color2) {
         if (bool) {
             ctx.fillStyle = color1;
@@ -827,49 +833,47 @@ function drawDodgerSelection() {
             ctx.fillStyle = color2;
         }
     }
-
-    // Coordinates
-    const evader = { x: 50, y: 50, };
-    mouseOver.evader = mouseX > evader.x && mouseX < evader.x + 200 && mouseY > evader.y && mouseY < evader.y + 100;
-
-    const jsab = { x: 300, y: 50, };
-    mouseOver.jsab = mouseX > jsab.x && mouseX < jsab.x + 200 && mouseY > jsab.y && mouseY < jsab.y + 100;
-
-    const jötunn = { x: 550, y: 50, };
-    mouseOver.jötunn = mouseX > jötunn.x && mouseX < jötunn.x + 200 && mouseY > jötunn.y && mouseY < jötunn.y + 100;
-
-    const jolt = { x: 300, y: 200, };
-    mouseOver.jolt = mouseX > jolt.x && mouseX < jolt.x + 200 && mouseY > jolt.y && mouseY < jolt.y + 100;
-    
-    // Backgrounds
-    decideFillStyle(mouseOver.evader, "rgb(230, 230, 230)", "rgb(220, 220, 220)");
-    ctx.fillRect(evader.x, evader.y, 200, 100);
-    
-    decideFillStyle(mouseOver.jsab, "rgb(220, 0, 0)", "rgb(200, 0, 0)");
-    ctx.fillRect(jsab.x, jsab.y, 200, 100);
-   
-    decideFillStyle(mouseOver.jötunn, "rgb(70, 175, 219)", "rgb(65, 166, 209)");
-    ctx.fillRect(jötunn.x, jötunn.y, 200, 100);
-    
-    decideFillStyle(mouseOver.jolt, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
-    ctx.fillRect(jolt.x, jolt.y, 200, 100);
-
-    // Text
-    function drawDodgerText(color, dodgerName, description, dodger) {
+    function drawDodgerInfo(color, dodgerName, description, dodger) {
         ctx.fillStyle = color;
         drawCircle(dodger.x + 170, dodger.y + 20)
         
+        ctx.textAlign = "left";
         ctx.font = "25px 'Lucida Console'";
         ctx.fillText(dodgerName, dodger.x + 10, dodger.y + 30);
         ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, dodger.x + 10, dodger.y + 80);
     }
-    
-    ctx.textAlign = 'left';
-    drawDodgerText("rgb(255, 255, 255)", "EVADER", "ABILITY: NONE", evader);
-    drawDodgerText("rgb(255, 0, 0)", "JSAB", "ABILITY: DASH", jsab);
-    drawDodgerText("rgb(79, 203, 255)", "JÖTUNN", `ABILITY: ABSOLUTE ZERO`, jötunn);
-    drawDodgerText("rgb(255, 255, 0)", "JOLT", "ABILITY: SHOCKWAVE", jolt);
+    function drawAbilityDesc(color, subColor, abilityName, description) {
+        
+    }
+
+    // Dodgers
+    const evader = { x: 50, y: 50, };
+    mouseOver.evader = mouseX > evader.x && mouseX < evader.x + 200 && mouseY > evader.y && mouseY < evader.y + 100;
+    decideFillStyle(mouseOver.evader, "rgb(230, 230, 230)", "rgb(220, 220, 220)");
+    ctx.fillRect(evader.x, evader.y, 200, 100);
+    drawDodgerInfo("rgb(255, 255, 255)", "EVADER", "ABILITY: NONE", evader);
+
+    const jsab = { x: 300, y: 50, };
+    mouseOver.jsab = mouseX > jsab.x && mouseX < jsab.x + 200 && mouseY > jsab.y && mouseY < jsab.y + 100;
+    decideFillStyle(mouseOver.jsab, "rgb(220, 0, 0)", "rgb(200, 0, 0)");
+    ctx.fillRect(jsab.x, jsab.y, 200, 100);
+    drawDodgerInfo("rgb(255, 0, 0)", "JSAB", "ABILITY: DASH", jsab);
+
+    const jötunn = { x: 550, y: 50, };
+    mouseOver.jötunn = mouseX > jötunn.x && mouseX < jötunn.x + 200 && mouseY > jötunn.y && mouseY < jötunn.y + 100;
+    decideFillStyle(mouseOver.jötunn, "rgb(70, 175, 219)", "rgb(65, 166, 209)");
+    ctx.fillRect(jötunn.x, jötunn.y, 200, 100);
+    drawDodgerInfo("rgb(79, 203, 255)", "JÖTUNN", `ABILITY: ABSOLUTE ZERO`, jötunn);
+
+    const jolt = { x: 300, y: 200, };
+    mouseOver.jolt = mouseX > jolt.x && mouseX < jolt.x + 200 && mouseY > jolt.y && mouseY < jolt.y + 100;
+    decideFillStyle(mouseOver.jolt, "rgb(220, 220, 0)", "rgb(210, 210, 0)");
+    ctx.fillRect(jolt.x, jolt.y, 200, 100);
+    drawDodgerInfo("rgb(255, 255, 0)", "JOLT", "ABILITY: SHOCKWAVE", jolt);
+
+    // Ability Descriptions / 70, 186, 235
+    drawAbilityDesc("rgb(255, 255, 255)", "rgb(230, 230, 230)", "NO ABILITY", "");
 }
 
 function drawGameOver() {
@@ -893,17 +897,17 @@ function drawGameOver() {
     }
 
     ctx.fillStyle = grad;
-    ctx.fillRect(250, 50, 300, 100)
+    ctx.fillRect(250, 50, 300, 100);
 
-    ctx.lineWidth = 1;
     ctx.strokeStyle = grad2;
-    ctx.beginPath()
-    ctx.moveTo(250, 150)
-    ctx.lineTo(550, 50)
-    ctx.stroke()
-
-
-    // Text
+    ctx.lineWidth = 3;
+    ctx.strokeRect(250, 50, 300, 100);
+    ctx.beginPath();
+    ctx.moveTo(250, 150);
+    ctx.lineTo(550, 50);
+    ctx.stroke();
+    
+    ctx.lineWidth = 1.5;
     ctx.font = '30px Arial';
     ctx.textAlign = 'center';
 
