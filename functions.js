@@ -1,4 +1,4 @@
-console.log("euphoria completed, time for the grateful ending")// DODGE.IO - FUNCTIONS.JS
+console.log("euphoria completed")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -327,7 +327,6 @@ function recordLeftClick() {
                         }
                         return dS;
                     }
-                    
                     music = {var: divine, name: "Divine", artist: "SOTAREKO",
                              color: "rgb(223, 255, 156)", subColor: "rgb(224, 255, 232)", textColor: "rgb(255, 165, 252)",
                              timestamps: [
@@ -360,10 +359,14 @@ function recordLeftClick() {
                                  [141.957, "spike", {size: 50, location: "bl", spawnRate: 0.3, despawnRate: 3}], // spike triangle
                                  [142.482, "spike", {size: 50, location: "tm", spawnRate: 0.3, despawnRate: 3}],
                                  [142.986, "spike", {size: 50, location: "br", spawnRate: 0.3, despawnRate: 3}],
-                                 [192.047, "text", {text: "Thank"}], [193.098, "text", {text: "You"}], // thanks
-                                 [194.134, "text", {text: "For"}], [195.186, "text", {text: "Playing"}],
-                                 [196.226, "text", {text: "This"}], [197.391, "text", {text: "Was"}],
-                                 [198.577, "text", {text: "Dodge"}], [199.488, "text", {text: ".io"}],
+                                 [192.047, "text", {text: "Thank", coords: [265, 100], despawnRate: 0.2}], // thanks
+                                 [193.098, "text", {text: "You", coords: [440, 100], despawnRate: 0.3}],
+                                 [194.134, "text", {text: "For", coords: [260, 175], despawnRate: 0.2}],
+                                 [195.186, "text", {text: "Playing", coords: [360, 175], despawnRate: 0.3}],
+                                 [196.226, "text", {text: "This", coords: [285, 100], despawnRate: 0.2}],
+                                 [197.391, "text", {text: "Was", coords: [400, 100], despawnRate: 0.3}],
+                                 [198.577, "text", {text: "Dodge", coords: [280, 175], despawnRate: 0}],
+                                 [199.300, "text", {text: ".io", coords: [443, 175], despawnRate: 0}],
                              ],
                             };
                     music.timestamps = music.timestamps.concat(lessThan(33.590));
