@@ -201,8 +201,8 @@ if (localData) {
             if (!(data in userData)) userData[data] = eval(data);
         });
         
-        let p = {dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)"};
-        ["dodger", "color", "subColor"].forEach(attribute => {
+        let p = {dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)", invincible: false};
+        ["dodger", "color", "subColor", "invincible"].forEach(attribute => {
             if (userData?.player?.[attribute]) p[attribute] = userData.player[attribute];
         })
         let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0};
@@ -215,9 +215,9 @@ if (localData) {
         })
                 
         userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, slowed: 1, dodger: p.dodger,
-                                color: p.color, subColor: p.subColor, facingAngle: 0,},
+                                color: p.color, subColor: p.subColor, facingAngle: 0, invincible: p.invincible},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
-                                limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria,},
+                                limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
                     settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX,
                                sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range}};
         // updates the current data to the locally saved data
