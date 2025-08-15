@@ -384,7 +384,7 @@ function recordLeftClick() {
                     // ring spam
                     startBeat = 66.797;
                     beats = 12;
-                    music.timestamps.push([64.749, "ring", {size: 450, coords: [xMid, yMid], spawnRate: 0.325}]);
+                    music.timestamps.push([64.749, "ring", {size: 450, invincible: true, coords: [xMid, yMid], spawnRate: 0.325}]);
                     for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) music.timestamps.push([i-0.2, "ring", {size: 450, invincible: true, coords: [xMid, yMid], spawnRate: 1}]);
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(66.920));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(69.020));
