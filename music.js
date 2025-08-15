@@ -1,4 +1,4 @@
-console.log("absolute zeros effect on dangers");// DODGE.IO - MUSIC.JS
+console.log("absolute zero lasting effect bug");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
