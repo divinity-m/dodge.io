@@ -1,4 +1,4 @@
-console.log("absolutes zero's variable")// DODGE.IO - SCRIPT.JS
+console.log("settings absolute zero")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
