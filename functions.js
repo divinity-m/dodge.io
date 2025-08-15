@@ -463,9 +463,6 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(deepSynth(187.874));
                     // music.timestamps = music.timestamps.concat(deepSynth(192.047)); excluded
                     // music.timestamps = music.timestamps.concat(deepSynth(196.226)); excluded
-                    
-                    
-                    console.log("spike walls");
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                     for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, coords: [xMid, yMid]}]);
                 }
