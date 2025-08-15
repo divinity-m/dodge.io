@@ -85,7 +85,7 @@ let dash = {
 
 let freeze = {
     usable: true,
-    passive: "glaciation",
+    passive: "Glaciation",
     lastEnded: 0,
 }
 
