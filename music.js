@@ -1,4 +1,4 @@
-console.log("reset amplify");// DODGE.IO - MUSIC.JS
+console.log("reset amplify, danger stun");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -275,9 +275,9 @@ function spawnAndDrawDanger() {
                 
                 // collision points
                 if (player.dodger === "jolt" && !modifiers?.invincible) {
-                    allDangers[0].resetSize = 1;
+                    allDangers[0].reset = 1;
                     if (allDangers[0].type === "circle" || allDangers[0].type === "spike") {
-                        allDangers[0].baseSize = allDangers[0].r;
+                        allDangers[0].baseUnit = allDangers[0].r;
                         Object.defineProperty(allDangers[0], "collisionPoints", {
                             get() {
                                 let radius;
@@ -313,8 +313,8 @@ function spawnAndDrawDanger() {
                         })
                     }
                     else if (allDangers[0].type === "beam") {
-                        if (allDangers[0].variant === "vertical") { allDangers[0].baseSize = allDangers[0].w; allDangers[0].baseX = allDangers[0].x; }
-                        if (allDangers[0].variant === "horizontal") { allDangers[0].baseSize = allDangers[0].h; allDangers[0].baseY = allDangers[0].y; }
+                        if (allDangers[0].variant === "vertical") { allDangers[0].baseUnit = allDangers[0].w; allDangers[0].baseX = allDangers[0].x; }
+                        if (allDangers[0].variant === "horizontal") { allDangers[0].baseUnit = allDangers[0].h; allDangers[0].baseY = allDangers[0].y; }
                         Object.defineProperty(allDangers[0], "collisionPoints", {
                             get() {
                                 return [[this.x+this.w/2, this.y+this.h/2],
@@ -532,42 +532,48 @@ function musicCollisions() {
                 // checks each individual collision point to see if the danger was hit by the wave
                 if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
                     // sets the size reset in motion
-                    danger.resetSize = Date.now();
+                    danger.reset = Date.now();
                 }
                 ctx.restore();
             })
         }
-        if (danger?.resetSize && !danger?.invincible) {
-            if (now - danger.resetSize > 2500) {
-                ["r", "w", "h", "lineWidth"].forEach(unit => {
+        if (danger?.reset && !danger?.invincible) {
+            if (now - danger.reset > 2500) {
+                ["r", "w", "h", "lineWidth", "movex", "movey"].forEach(unit => {
                     if (danger?.[unit]) {
                         if (danger.variant === "vertical") {
                             if (unit === "h") return;
                             // to determine the coordinate
                             // take the original size of the beam, subtract its new size, then divide that by 2
                             // add this value to the coordinate
-                            danger.x = danger.baseX + (danger.baseSize - danger.w)/2;
+                            danger.x = danger.baseX + (danger.baseUnit - danger.w)/2;
                         }
                         if (danger.variant === "horizontal") {
                             if (unit === "w") return;
-                            danger.y = danger.baseY + (danger.baseSize - danger.h)/2;
+                            danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                         }
-                        if (danger[unit] < danger.baseSize-0.0001) danger[unit] += danger.baseSize/100;
-                        else danger[unit] = danger.baseSize;
+                        if (danger[unit] < danger.baseUnit-0.0001) danger[unit] += danger.baseUnit/100;
+                        else danger[unit] = danger.baseUnit;
+                        if (danger?.movex && danger?.movex < danger?.baseMovex-0.0001) danger.movex += danger.baseMovex/100;
+                        else if (danger?.movex) danger.movex = danger.baseMovex;
+                        if (danger?.movey && danger?.movey < danger?.baseMovey-0.0001) danger.movey += danger.baseMovey/100;
+                        else if (danger?.movey) danger.movey = danger.baseMovey;
                     }
                 })
             }
-            else if (now - danger.resetSize <= 1000) {
-                ["r", "w", "h", "lineWidth"].forEach(unit => {
+            else if (now - danger.reset <= 1000) {
+                ["r", "w", "h", "lineWidth", "movex", "movey"].forEach(unit => {
                     if (danger.variant === "vertical") {
                         if (unit === "h") return;
-                        danger.x = danger.baseX + (danger.baseSize - danger.w)/2;
+                        danger.x = danger.baseX + (danger.baseUnit - danger.w)/2;
                     }
                     if (danger.variant === "horizontal") {
                         if (unit === "w") return;
-                        danger.y = danger.baseY + (danger.baseSize - danger.h)/2;
+                        danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                     }
-                    if (danger?.[unit]) danger[unit] = danger.baseSize/2;
+                    if (danger?.[unit]) danger[unit] = danger.baseUnit/2;
+                    if (danger?.movex) danger.movex = danger.baseMovex/2;
+                    if (danger?.movey) danger.movey = danger.baseMovey/2;
                 })
             }
         }
