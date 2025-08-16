@@ -1,4 +1,4 @@
-console.log("White Dodge.io");// DODGE.IO - MUSIC.JS
+console.log("scores unlocked");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -41,7 +41,7 @@ function drawEndLevel() {
         let percentage = Math.floor(music.var.currentTime / music.var.duration * 100);
         if (music.name === "Alarm 9") highscore.limbo = percentage;
         if (music.name === "Astral Projection") highscore.andromeda = percentage;
-        //if (music.name === "Divine") highscore.euphoria = percentage;
+        if (music.name === "Divine") highscore.euphoria = percentage;
 
         // Rect Variables
         let exitX = 150;
