@@ -1,4 +1,4 @@
-console.log("UI improvements")// DODGE.IO - FUNCTIONS.JS
+console.log("dodger descriptions")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
