@@ -1,4 +1,4 @@
-console.log("Crescendo added, time for Amplify")// DODGE.IO - FUNCTIONS.JS
+console.log("Amplify complete, now jolts stun");// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -95,6 +95,7 @@ function recordLeftClick() {
         // Plays 'A New Start' when users are redirected back to the Main Menu
         if (gameState === "endlessOver") {
             allEnemies = [];
+            amplify.reset();
             music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
             music.var.currentTime = 0;
             music.promise = music.var.play();
@@ -490,7 +491,7 @@ function recordLeftClick() {
                 player.color = "rgb(0, 0, 0)";
                 player.subColor = "rgb(40, 40, 40)";
             }
-
+            amplify.reset();
             mouseMovementOn = previousMM;
             // saves the players values to the local storage to keep track of the players dodger
             userData.player = player;
@@ -847,7 +848,7 @@ function drawDifficultySelection() {
     mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
     decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
     ctx.fillRect(50, 450, 200, 100);
-    drawDifficultyInfo(60, 480, "rgb(0, 225, 255)", "EASY", highscore.easy, "Enemies", "Normals");
+    drawDifficultyInfo(60, 480, "rgb(0, 225, 255)", "EASY", `${highscore.easy}s`, "Enemies", "Normals");
 
     mouseOver.medium = mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
     decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
@@ -959,7 +960,8 @@ function drawDodgerSelection() {
     drawAbilityDesc(mouseOver.crescendo, /*highscore.hard >= 60*/true, "rgba(20, 20, 20, 0.9)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
                     "Crescendos harness the sound waves of their environment to augment their cores.",
                     "These dodgers, as if adapting to the rhythm, accelerate with the music, continually",
-                    "modifying their cores until they outpace the waves themselves.");
+                    "modifying their cores until they outpace the waves themselves.",
+                    "Top Speed: 10");
     drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
@@ -1165,7 +1167,7 @@ function drawText() { // draws the current time, highest time, and enemy count
     }
 
     // Amplify
-    else if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify (${player.speed})`, textX, 620);
+    else if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify (${player.baseSpeed.toFixed(1)})`, textX, 620);
 }
 
 function createEnemy() { // Creates an individual enemy with unique attributes
@@ -1270,7 +1272,7 @@ function keyboardControls() {
     if (keyboardMovementOn){
         lastPressing = "kb";
         if (!dash.activated){
-            player.speed = 2.5 * shiftPressed * player.slowed;
+            player.speed = player.baseSpeed * shiftPressed * player.slowed;
         }
 
         player.x += dxKB * player.speed;
@@ -1296,14 +1298,14 @@ function mouseMovement() {
     if (mouseMovementOn && !keyboardMovementOn) {
         lastPressing = "mouse";
         if (!dash.activated) {
-            player.speed = 2.5 * shiftPressed * player.slowed;
+            player.speed = player.baseSpeed * shiftPressed * player.slowed;
         }
 
         const slowPlayerStart = player.r + 40;
         let slowPlayerFactor;
         
         if (distance < slowPlayerStart) {
-            const factor = (distance) / (slowPlayerStart); // 0 -> 1
+            const factor = distance / slowPlayerStart; // 0 -> 1
             slowPlayerFactor = 0.3 + 0.7 * factor; // Transition from 0.3x speed to 1x speed
             player.x += (dxMouse / distance) * player.speed * slowPlayerFactor;
             player.y += (dyMouse / distance) * player.speed * slowPlayerFactor;
@@ -1426,8 +1428,11 @@ function restartEndless() { // Resets certain variables once the play button is 
     currentTime = 0;
     enemySpawnPeriod = 3000;
     lastSpawn = 0;
+    
     dash.lastEnded = 0;
     shockwave.lastEnded = 0;
+    amplify.reset();
+    
     innerGameState = "inEndless";
     gameState = "endlessMode"
 }
@@ -1460,7 +1465,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
 
 // ABILITIES
 function abilities() { // player-specific-abilities
-    // 'Dash' gives the player a powerful but short-lived burst of speed
+    // Dash gives the player a powerful but short-lived burst of speed
     if (dash.activated){
         player.color = "rgb(255, 72, 72)";
         player.speed += dash.speed;
@@ -1469,8 +1474,8 @@ function abilities() { // player-specific-abilities
             dash.speed *= -1;
             player.speed += dash.speed;
         }
-        if (player.speed <= 2.5 && dash.deccelerating) {
-            player.speed = 2.5;
+        if (player.speed <= player.baseSpeed && dash.deccelerating) {
+            player.speed = player.baseSpeed;
             dash.activated = false;
             dash.deccelerating = false;
             dash.speed *= -1;
@@ -1498,7 +1503,7 @@ function abilities() { // player-specific-abilities
                     if (enemyDist < slowRadii[0]) enemy.color = "rgb(55, 77, 107)";
                     else if (enemyDist < slowRadii[1]) enemy.color = "rgb(68, 84, 107)";
                     else if (enemyDist < slowRadii[2]) enemy.color = "rgb(81, 91, 105)";
-                    else if (enemyDist < slowRadii[3]) { enemy.color = "rgb(95, 100, 107)"; console.log(enemyDist) }
+                    else if (enemyDist < slowRadii[3]) enemy.color = "rgb(95, 100, 107)";
                 } else if (enemy.ability === "decelerator") { // baseColor = "rgb(255, 0, 0)";
                     if (enemyDist < slowRadii[0]) enemy.color = "rgb(195, 0, 60)";
                     else if (enemyDist < slowRadii[1]) enemy.color = "rgb(210, 0, 45)";
@@ -1514,7 +1519,7 @@ function abilities() { // player-specific-abilities
             } else enemy.color = enemy.baseColor;
         })
     }
-    // 'Shockwave' launches an electromagnetic pulse that stuns and shrinks adversaries
+    // Shockwave launches an electromagnetic pulse that stuns and shrinks adversaries
     if (player.dodger === "jolt") {
         if (shockwave.activated) {
             // create the shockwaves path
@@ -1579,6 +1584,21 @@ function abilities() { // player-specific-abilities
                 if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius/2;
             }
         })
+    }
+    // Amplify accelerates the player over time
+    if (player.dodger === "crescendo") {
+        if (gameState === "musicMode") {
+            amplify.speed = music.var.currentTime/music.var.duration * 10;
+            player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
+        } else {
+            amplify.accel = 1/music.var.duration*10;
+            if (now - amplify.accelRate > 1000) { // 0.05 units/s
+                console.log(amplify.speed);
+                amplify.speed += amplify.accel;
+                amplify.accelRate = Date.now();
+            }
+            player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
+        }
     }
 }
            
