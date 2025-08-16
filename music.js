@@ -80,6 +80,7 @@ function drawEndLevel() {
             ctx.fillText(`Exiting In`, 250, cnv.height/2 - 25);
             ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 250, cnv.height/2 + 25);
             if (now - startTime >= 3000) {
+                amplify.reset();
                 music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
                 music.var.currentTime = 0;
                 music.promise = music.var.play();
