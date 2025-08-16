@@ -1,4 +1,4 @@
-console.log("Invincible Rings");// DODGE.IO - MUSIC.JS
+console.log("White Dodge.io");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -421,19 +421,6 @@ function spawnAndDrawDanger() {
             }
         }
         else if (danger.type === "text") {
-            if (danger.text === "Dodge") {
-                Object.defineProperty(danger, "color", {
-                    get() {
-                        return `rgb(185, 185, ${this.colorValue})`;
-                    }
-                })
-            } else if (danger.text === ".io") {
-                Object.defineProperty(danger, "color", {
-                    get() {
-                        return `rgb(${this.colorValue}, 185, 185)`;
-                    }
-                })
-            }
             ctx.textAlign = danger.textAlign;
             ctx.font = danger.font;
             ctx.fillText(danger.text, danger.x, danger.y);
