@@ -1,4 +1,4 @@
-console.log("scores unlocked");// DODGE.IO - MUSIC.JS
+console.log("reset amplify");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
