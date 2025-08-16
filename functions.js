@@ -1,4 +1,4 @@
-console.log("dodger descriptions, work on dash & shockwave cd, beat euphoria, add percentages, add locked dodgers")// DODGE.IO - FUNCTIONS.JS
+console.log("beat euphoria, add percentages, add locked dodgers, add Aethos")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -27,7 +27,7 @@ function recordKeyDown(event) {
 
     // Ability controls
     if ((event.code === "KeyQ" || event.code === "KeyJ") && gameState !== "endlessOver") {
-        if (player.dodger === "j-sab" && dash.usable && !dash.activated) {dash.activated = true; dash.duration = Date.now();} // dash duration
+        if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
 
         else if (player.dodger === "jötunn" && absoluteZero.usable) {
             absoluteZero.usable = false;
@@ -45,7 +45,6 @@ function recordKeyDown(event) {
             shockwave.y = player.y;
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
-            shockwave.duration = Date.now();
         }
     }
 }
@@ -515,19 +514,8 @@ function recordRightClick(event) {
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
             shockwave.y = player.y;
-            
-            if (lastPressing === "mouse") {
-                shockwave.dx = mouseX - player.x;
-                shockwave.dy = mouseY - player.y;
-                shockwave.dist = Math.hypot(shockwave.dx, shockwave.dy)
-                
-                shockwave.movex = (shockwave.dx/shockwave.dist) * 7;
-                shockwave.movey = (shockwave.dy/shockwave.dist) * 7;
-            }
-            if (lastPressing === "kb") {
-                shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
-                shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
-            }
+            shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
+            shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
         }
     }
 }
@@ -840,7 +828,7 @@ function drawDodgerSelection() {
         drawCircle(dodger.x + 170, dodger.y + 20)
         
         ctx.textAlign = "left";
-        ctx.font = "25px 'Lucida Console'";
+        ctx.font = "bold 25px 'Lucida Console'";
         ctx.fillText(dodgerName, dodger.x + 10, dodger.y + 30);
         ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, dodger.x + 10, dodger.y + 80);
@@ -850,6 +838,7 @@ function drawDodgerSelection() {
             ctx.fillStyle = color;
             ctx.strokeStyle = subColor;
             ctx.fillRect(50, 275, 700, 175); // lower dodger cards, yBottom = 250
+            ctx.lineWidth = 4;
             ctx.strokeRect(50, 275, 700, 175); // dodger selector btn, y = 475
 
             ctx.fillStyle = textColor;
@@ -888,28 +877,30 @@ function drawDodgerSelection() {
     ctx.fillRect(j_sab.x, j_sab.y, 200, 100);
     drawDodgerInfo("rgb(255, 0, 0)", "J-SAB", "ABILITY: DASH", j_sab);
 
-    // Dodger which progressively gets stronger over time.
+    // Aethos, a Dodger which progressively gets stronger over time.
 
     // Ability Descriptions
     drawAbilityDesc(mouseOver.evader, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.7)", "rgba(200, 200, 200, 0.7)", "SKILL",
-                    "Evaders have no unique abilities or traits; they rely only on their skill to weave past",
-                    "their adversaries.");
+                    "Evaders have no unique abilities or traits; they rely on only their skill to weave past",
+                    "their adversaries.",
+                    "Base Speed: 2.5");
     drawAbilityDesc(mouseOver.jolt, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.7)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
-                    "Jolts summon shockwaves at will—shrinking any unfortnate soul stricken by the blast.",
+                    "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
+                    "unfortunate soul stricken by the electrictrically infused blast.",
                     "Shrink Reduction: 50% | Shrink Duration: Danger - 2.5s, Enemy - 5s",
-                    "Shockwave Duration: 1s | Shockwave Cooldown: 2s");
+                    "Shockwave Duration: 0.7s | Shockwave Cooldown: 2s");
     drawAbilityDesc(mouseOver.jötunn, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
                     "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
-                    "temperature, decelerate the speeds and spawnrates of nearby adversaries.",
-                    "Glaciate affects speed. Stagnate affects spawnrate. Absolute Zero freezes both.",
-                    "Speed Reduction: 0% - 70% | Spawnrate Reduction: 0% - 20% | Swap CoolDown: 1s");
+                    "temperature decelerate the speeds and spawn-rates of nearby adversaries.",
+                    "Glaciate affects speed. Stagnate affects spawn-rate. Absolute Zero freezes both.",
+                    "Speed Reduction: 0% - 70% | Spawn-rate Reduction: 0% - 20% | Swap Cooldown: 1s");
     drawAbilityDesc(mouseOver.j_sab, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
                     "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
-                    "Dash Acceleration: 0.5 | Dash Top Speed: 10.5",
-                    "Dash Duration: 0.25s | Post-Invinciblility Duration: 0.25s | Dash Cooldown: 2s");
+                    "Top Speed: 10 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
+                    "Dash Cooldown: 2s");
 }
 
 function drawGameOver() {
@@ -1403,23 +1394,19 @@ function collisions() { // Keeps track of when the player touches any enemy in t
 function abilities() { // player-specific-abilities
     // 'Dash' gives the player a powerful but short-lived burst of speed
     if (dash.activated){
-        player.speed += dash.speed;
         player.color = "rgb(255, 72, 72)";
-        
+        player.speed += dash.speed;
         if (player.speed > 10) {
-            console.log(player.speed)
             dash.deccelerating = true;
             dash.speed *= -1;
             player.speed += dash.speed;
         }
         if (player.speed <= 2.5 && dash.deccelerating) {
+            player.speed = 2.5;
             dash.activated = false;
             dash.deccelerating = false;
-            dash.lastEnded = Date.now();
-            console.log(now - dash.duration); // dash's duration
-            
             dash.speed *= -1;
-            player.speed = 2.5;
+            dash.lastEnded = Date.now();
 
             // if the player swaps heroes mid dash
             if (player.dodger === "evader") player.color = "white";
@@ -1458,8 +1445,8 @@ function abilities() { // player-specific-abilities
             } else enemy.color = enemy.baseColor;
         })
     }
+    // 'Shockwave' launches an electromagnetic pulse that stuns and shrinks adversaries
     if (player.dodger === "jolt") {
-        // 'Shockwave' launches a wave that shrinks ememies
         if (shockwave.activated) {
             // create the shockwaves path
             shockwave.path = new Path2D();
@@ -1496,7 +1483,6 @@ function abilities() { // player-specific-abilities
 
             // once the radius is greater than 200, end the entire ability
             if (shockwave.radius >= 200) {
-                console.log(now - shockwave.duration) // shockwave's duration
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
