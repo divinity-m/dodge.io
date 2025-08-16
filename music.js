@@ -13,6 +13,7 @@ function restartMusicMode() {
     timeLeft = (music.var.duration - music.var.currentTime).toFixed(2);
     dash.lastEnded = 0;
     shockwave.lastEnded = 0;
+    amplify.reset();
     innerGameState = 'inMusicMode';
     gameState = "musicMode";
 }
