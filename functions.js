@@ -1,4 +1,4 @@
-console.log("dodger descriptions")// DODGE.IO - FUNCTIONS.JS
+console.log("dodger descriptions, work on dash & shockwave cd, beat euphoria, add percentages, add locked dodgers")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
