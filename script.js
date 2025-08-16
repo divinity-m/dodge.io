@@ -1,4 +1,4 @@
-console.log("mouseover.crescendo")// DODGE.IO - SCRIPT.JS
+console.log("amplify")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -101,6 +101,18 @@ let shockwave = {
     path: new Path2D(),
     lastEnded: 0,
 };
+
+let amplify = {
+    baseSpeed: 2.5,
+    speed: 0,
+    accel: 0,
+    limit: 10,
+    accelRate: 0,
+    reset: function () {
+        this.speed = 0;
+        this.accel = 0;
+    },
+}
 
 let settings = {
     enemyOutlines: true,
