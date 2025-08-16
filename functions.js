@@ -212,7 +212,7 @@ function recordLeftClick() {
                         [time+13.140, "ring"], [time+13.610, "ring"], [time+14.077, "ring"], [time+14.547, "ring"], [time+14.780, "ring"],
                         ];
                             // in-betweens
-                        for (let i = 0; i < DBU.length; i++) {
+                        for (let i = 0; i < DBU.length; i+=3) {
                             if (i < 15) DBU.push([DBU[i][0]+0.242, "horizontal"], [DBU[i][0]+0.356, "vertical"]);
                             else if (i < 39) DBU.push([DBU[i][0], "horizontal"], [DBU[i][0], "vertical"]);
                         }
@@ -354,8 +354,8 @@ function recordLeftClick() {
                                  [74.646, "horizontal", {size: cnv.height/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                                  [85.341, "vertical", {size: 200, coords: ["player"]}], [87.219, "vertical", {size: 200, coords: ["player"]}],
                                  [87.400, "horizontal", {size: 200, coords: ["player"]}], [89.331, "horizontal", {size: 200, coords: ["player"]}],
-                                 [140.914, "bomb", {size: 550, coords: [cnv.width, cnv.height], spawnRate: 1, despawnRate: 5}], // semi circles
-                                 [141.458, "bomb", {size: 550, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
+                                 [140.914, "bomb", {size: 500, coords: [cnv.width, cnv.height], spawnRate: 1, despawnRate: 5}], // 2 corner semi circles
+                                 [141.458, "bomb", {size: 500, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                                  [141.957, "spike", {size: 50, location: "bl", spawnRate: 0.3, despawnRate: 3}], // spike triangle
                                  [142.482, "spike", {size: 50, location: "tm", spawnRate: 0.3, despawnRate: 3}],
                                  [142.986, "spike", {size: 50, location: "br", spawnRate: 0.3, despawnRate: 3}],
@@ -390,12 +390,13 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(69.020));
                     music.timestamps = music.timestamps.concat(heyAh_heyHi(71.120));
                     // 73.081-74.646 4 half-walls
+                    // 4 corner circles
                     startBeat = 75.250;
                     beats = 16;
                     let corner = 1;
                     let coords = {1:[0, 0], 2:[cnv.width, 0], 3:[cnv.width, cnv.height], 4:[0, cnv.height]};
                     for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
-                        music.timestamps.push([i-0.2, "bomb", {size: 250, coords: coords[corner], spawnRate: 1}]);
+                        music.timestamps.push([i-0.2, "bomb", {size: 300, coords: coords[corner], spawnRate: 1}]);
                         corner++;
                         if (corner > 4) corner = 1;
                     }
