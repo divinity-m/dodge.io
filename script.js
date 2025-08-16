@@ -82,7 +82,6 @@ let dash = {
     activated: false,
     deccelerating: false,
     speed: 0.5,
-    duration: 0,
     lastEnded: 0,
 };
 
@@ -99,7 +98,6 @@ let shockwave = {
     activated: false,
     radius: 25,
     path: new Path2D(),
-    duration: 0,
     lastEnded: 0,
 };
 
