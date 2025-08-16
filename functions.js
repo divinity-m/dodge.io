@@ -1,4 +1,4 @@
-console.log("Andromeda is possible, beat euphoria, add percentages, add locked dodgers, add Aethos")// DODGE.IO - FUNCTIONS.JS
+console.log("Euphoria is possible add percentages, add locked dodgers, add Aethos")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -283,7 +283,7 @@ function recordLeftClick() {
                                   // 2.095, 2.47
                                   [time+2.00, "bomb", {size: 150}], [time+2.375, "bomb", {size: 180}],
                                   // 3.06, 3.538
-                                  [time+1.900, "spike", {size: 22.5, spawnRate: 0.6}], [time+2.275, "spike", {size: 22.5, spawnRate: 0.6}]];
+                                  [time+1.900, "spike", {size: 22.5, location: "tl", spawnRate: 0.6}], [time+2.275, "spike", {size: 22.5, location: "tr", spawnRate: 0.6}]];
                     }
                     function heyAh_heyHi(time = 66.920) {
                         return [[time, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+0.18, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}],
@@ -297,7 +297,7 @@ function recordLeftClick() {
                                 [time+6.307, "horizontal", {despawnRate: 3}], [time+6.826, "horizontal", {despawnRate: 3}], [time+7.336, "horizontal", {despawnRate: 3}]];
                         if (difficulty !== "easy") {
                             bg.push([time+1.036, "ring"], [time+3.096, "ring"], [time+5.175, "ring"], [time+7.246, "ring"]);
-                            if (difficulty === "hard") { for (let i = 0; i < 16; i++) bg.push([bg[i][0]+0.231, "vertical"]); }
+                            if (difficulty === "hard") { for (let i = 0; i < 16; i+=2) bg.push([bg[i][0]+0.231, "vertical"]); }
                             bg.push([time, "bomb", {size: 150, despawnRate: 3}], [time+2.07, "bomb", {size: 150, despawnRate: 3}],
                                     [time+4.167, "bomb", {size: 150, despawnRate: 3}], [time+6.253, "bomb", {size: 150, despawnRate: 3}]);
                         }
@@ -306,7 +306,7 @@ function recordLeftClick() {
                     function deepSynth(time = 150.313, extras = "none") {
                         dS = [[time, "vertical", {size: xMid, coords: [xMid/2, 0], spawnRate: 0.3, despawnRate: 3}],
                               [time+1.029, "horizontal", {size: yMid, coords: [0, yMid/2], spawnRate: 0.3, despawnRate: 3}],
-                              [time+2.359, "bomb", {spawnRate: 0.75, despawnRate: 4}], [time+3.118, "bomb", {spawnRate: 0.75, despawnRate: 4}]];
+                              [time+2.359, "bomb", {spawnRate: 0.7, despawnRate: 4}], [time+3.118, "bomb", {spawnRate: 0.7, despawnRate: 4}]];
                         let duration = 3.995 - 3.137;
                         if (extras === "leftSpikeWall" || extras === "rightSpikeWall") {
                             let interval = (duration / 14);
@@ -321,7 +321,7 @@ function recordLeftClick() {
                             let interval = (duration / 8);
                             let intIndex = 0;
                             ["bl", "lm", "tl", "tm", "tr", "rm", "br", "bm"].forEach(spawn => {
-                                dS.push([time+3.137 + (interval*intIndex), "spike", {size: 30, speed: 4, location: spawn, spawnRate: 0.5}]);
+                                dS.push([time+3.137 + (interval*intIndex), "spike", {size: 25, speed: 3.5, location: spawn, spawnRate: 0.5}]);
                                 intIndex++;
                             })
                         }
@@ -414,7 +414,7 @@ function recordLeftClick() {
                     // music.timestamps = music.timestamps.concat(bg16Beat(125.276, "medium")); excluded
                     // music.timestamps = music.timestamps.concat(lessThan(129.568)); excluded
                     // music.timestamps = music.timestamps.concat(lessThan(133.700)); excluded
-                    // Walls
+                    // 4 Walls spam
                     startBeat = 133.619;
                     beats = 15;
                     let side = 1;
@@ -426,7 +426,7 @@ function recordLeftClick() {
                         if (side > 4) side = 1;
                         music.timestamps.push([i-0.2, coords[side][2], {size: coords[side][3], coords: coords[side], spawnRate: 1, despawnRate: 5,}]);
                     }
-                    // 140.914-141.458 
+                    // 140.914-141.458 2 corner circles
                     music.timestamps = music.timestamps.concat(lessThan(142.062));
                     // music.timestamps = music.timestamps.concat(lessThan(146.222)); excluded
                     // Bomb Encircling
