@@ -82,15 +82,16 @@ let dash = {
     activated: false,
     deccelerating: false,
     speed: 0.5,
+    duration: 0,
     lastEnded: 0,
 };
 
 let absoluteZero = {
     usable: true,
     passive: "Absolute Zero",
-    lastEnded: 0,
     slowStart: 273.15,
     slowEnd: 75,
+    lastEnded: 0,
 }
 
 let shockwave = {
@@ -98,6 +99,7 @@ let shockwave = {
     activated: false,
     radius: 25,
     path: new Path2D(),
+    duration: 0,
     lastEnded: 0,
 };
 
