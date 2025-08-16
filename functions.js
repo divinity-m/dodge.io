@@ -1,4 +1,4 @@
-console.log("beat euphoria, add percentages, add locked dodgers, add Aethos")// DODGE.IO - FUNCTIONS.JS
+console.log("Andromeda is possible, beat euphoria, add percentages, add locked dodgers, add Aethos")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
