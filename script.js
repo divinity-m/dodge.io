@@ -89,7 +89,7 @@ let absoluteZero = {
     usable: true,
     passive: "Absolute Zero",
     lastEnded: 0,
-    slowStart: 175,
+    slowStart: 273.15,
     slowEnd: 75,
 }
 
