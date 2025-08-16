@@ -1,4 +1,4 @@
-console.log("baseSpeed")// DODGE.IO - SCRIPT.JS
+console.log("save baseSpeed")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -228,7 +228,7 @@ if (localData) {
             if (userData?.settings?.[setting]) s[setting] = userData.settings[setting];
         })
                 
-        userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, slowed: 1, dodger: p.dodger,
+        userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, baseSpeed: 2.5, slowed: 1, dodger: p.dodger,
                                 color: p.color, subColor: p.subColor, facingAngle: 0, invincible: p.invincible},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
