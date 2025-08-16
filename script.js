@@ -1,4 +1,4 @@
-console.log("absoluteZero.slowStart")// DODGE.IO - SCRIPT.JS
+console.log("duration")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
