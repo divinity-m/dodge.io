@@ -1,4 +1,4 @@
-console.log("Euphoria is possible add percentages, add locked dodgers, add Aethos")// DODGE.IO - FUNCTIONS.JS
+console.log("Crescendo added, time for Amplify")// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -376,7 +376,7 @@ function recordLeftClick() {
                     let spb = 60/115; // bpm = 115
                     let startBeat = 50.102;
                     let beats = 29; // beam sync to increase difficulty
-                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) music.timestamps.push([i, "beam", {spawnRate: 0.5}]);
+                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) music.timestamps.push([i, "beam", {despawnRate: 3}]);
                     music.timestamps = music.timestamps.concat(lessThan(50.814));
                     music.timestamps = music.timestamps.concat(lessThan(54.460));
                     music.timestamps = music.timestamps.concat(lessThan(58.620));
@@ -464,26 +464,31 @@ function recordLeftClick() {
     
     // Hero Choice
     else if (innerGameState === "selectDodger") {
-        if (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt) {
+        if (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo) {
             if (mouseOver.evader) {
                 player.dodger = "evader";
                 player.color = "rgb(255, 255, 255)";
                 player.subColor = "rgb(230, 230, 230)";
             }
-            else if (mouseOver.j_sab) {
+            else if (mouseOver.j_sab && highscore.andromeda === 100) {
                 player.dodger = "j-sab";
                 player.color = "rgb(255, 0, 0)";
                 player.subColor = "rgb(230, 0, 0)";
             }
-            else if (mouseOver.jötunn) {
+            else if (mouseOver.jötunn && highscore.limbo === 100) {
                 player.dodger = "jötunn";
                 player.color = "rgb(79, 203, 255)";
                 player.subColor = "rgb(70, 186, 235)";
             }
-            else if (mouseOver.jolt) {
+            else if (mouseOver.jolt && highscore.medium >= 30) {
                 player.dodger = "jolt";
                 player.color = "rgb(255, 255, 0)";
                 player.subColor = "rgb(230, 230, 0)";
+            }
+            else if (mouseOver.crescendo && /*highscore.hard >= 60*/true) {
+                player.dodger = "crescendo";
+                player.color = "rgb(0, 0, 0)";
+                player.subColor = "rgb(40, 40, 40)";
             }
 
             mouseMovementOn = previousMM;
@@ -774,6 +779,43 @@ function drawDifficultySelection() {
         ctx.fillText(`${adversary}:  ${description[0]}`, x, y + 25);
         if (description[1]) ctx.fillText(description[1], x, y + 50);
     }
+    function drawPercentCompleted(x, y, color, percent) {
+        ctx.strokeStyle = "rgb(255, 255, 255)";
+        ctx.lineWidth = 2;
+        if (percent === 100) ctx.strokeStyle = color;
+
+        // 50 + 200 + 50 = 300 || 1/6 + 2/3 + 1/6 = 1
+        let left = Math.min(1/6*100, percent) * 3; // 1/6
+        let middle = Math.max(Math.min(5/6*100-1/6*100, percent-1/6*100), 0) * 3; // 1/6 + 2/3
+        let right = Math.max(percent-(5/6*100), 0) * 3; // 1/6 + 2/3 + 1/6
+        
+        ctx.beginPath();
+        ctx.moveTo(x, y+50);
+        ctx.lineTo(x, y+50-left);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y+50);
+        ctx.lineTo(x, y+50+left);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + middle, y)
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y+100);
+        ctx.lineTo(x + middle, y+100)
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(x+200, y);
+        ctx.lineTo(x+200, y+right)
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x+200, y+100);
+        ctx.lineTo(x+200, y+100-right)
+        ctx.stroke();
+    }
     
     // Titles
     ctx.textAlign = "center";
@@ -788,16 +830,19 @@ function drawDifficultySelection() {
     decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
     ctx.fillRect(50, 250, 200, 100);
     drawDifficultyInfo(60, 280, "rgb(163, 0, 163)", "LIMBO", `none`, "Dangers", "Beams");
+    drawPercentCompleted(50, 250, "rgb(163, 0, 163)", highscore.limbo);
 
     mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
     ctx.fillRect(300, 250, 200, 100);
     drawDifficultyInfo(310, 280, "rgb(0, 0, 0)", "ANDROMEDA", `none`, "Dangers", "Beams  Bombs", "Rings");
+    drawPercentCompleted(300, 250, "rgb(0, 0, 0)", highscore.andromeda);
 
     mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
     ctx.fillRect(550, 250, 200, 100);
     drawDifficultyInfo(560, 280, "rgb(255, 165, 252)", "EUPHORIA", `none`, "Dangers", "Beams  Bombs", "Rings  Spikes");
+    drawPercentCompleted(550, 250, "rgb(255, 165, 252)", highscore.euphoria);
 
     mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
     decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
@@ -826,21 +871,21 @@ function drawDodgerSelection() {
     }
     function drawDodgerInfo(color, dodgerName, description, dodger) {
         ctx.fillStyle = color;
-        drawCircle(dodger.x + 170, dodger.y + 20)
+        drawCircle(dodger.x + 170, dodger.y + 22);
         
         ctx.textAlign = "left";
-        ctx.font = "bold 25px 'Lucida Console'";
+        ctx.font = "bold 22px 'Lucida Console'";
         ctx.fillText(dodgerName, dodger.x + 10, dodger.y + 30);
         ctx.font = "14px 'Lucida Console'";
         ctx.fillText(description, dodger.x + 10, dodger.y + 80);
     }
-    function drawAbilityDesc(bool, color, subColor, textColor, abilityName, ...description) {
-        if (bool) {
-            ctx.fillStyle = color;
-            ctx.strokeStyle = subColor;
-            ctx.fillRect(50, 275, 700, 175); // lower dodger cards, yBottom = 250
-            ctx.lineWidth = 4;
-            ctx.strokeRect(50, 275, 700, 175); // dodger selector btn, y = 475
+    function drawAbilityDesc(mouseOver, unlocked, bgColor, lockedColor, textColor, abilityName, ...description) {
+        if (mouseOver) {
+            ctx.fillStyle = bgColor;
+            ctx.strokeStyle = textColor;
+            ctx.fillRect(50, 275, 700, 175);
+            ctx.lineWidth = 5;
+            ctx.strokeRect(50, 275, 700, 175);
 
             ctx.fillStyle = textColor;
             ctx.textAlign = "center";
@@ -850,27 +895,43 @@ function drawDodgerSelection() {
             ctx.textAlign = "left";
             ctx.font = "17.5px Arial";
             for (let i = 0; i < description.length; i++) ctx.fillText(description[i], 70, 335 + i*25);
+
+            if (!unlocked) {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+                ctx.fillRect(50, 275, 700, 175);
+                ctx.strokeStyle = lockedColor;
+                ctx.lineWidth = 2;
+                ctx.textAlign = "center";
+                ctx.font = "bold 70px Arial";
+                ctx.strokeText("LOCKED", cnv.width/2, 387);
+            }
         }
     }
 
     // Dodgers
-    const evader = { x: 175, y: 25, };
+    const evader = { x: 50, y: 25, };
     mouseOver.evader = mouseX > evader.x && mouseX < evader.x + 200 && mouseY > evader.y && mouseY < evader.y + 100;
     decideFillStyle(mouseOver.evader, "rgb(230, 230, 230)", "rgb(220, 220, 220)");
     ctx.fillRect(evader.x, evader.y, 200, 100);
     drawDodgerInfo("rgb(255, 255, 255)", "EVADER", "ABILITY: SKILL", evader);
 
-    const jolt = { x: 425, y: 25, };
+    const jolt = { x: 300, y: 25, };
     mouseOver.jolt = mouseX > jolt.x && mouseX < jolt.x + 200 && mouseY > jolt.y && mouseY < jolt.y + 100;
     decideFillStyle(mouseOver.jolt, "rgb(220, 220, 0)", "rgb(210, 210, 0)");
     ctx.fillRect(jolt.x, jolt.y, 200, 100);
     drawDodgerInfo("rgb(255, 255, 0)", "JOLT", "ABILITY: SHOCKWAVE", jolt);
     
-    const jötunn = { x: 175, y: 150, };
+    const jötunn = { x: 550, y: 25, };
     mouseOver.jötunn = mouseX > jötunn.x && mouseX < jötunn.x + 200 && mouseY > jötunn.y && mouseY < jötunn.y + 100;
     decideFillStyle(mouseOver.jötunn, "rgb(70, 175, 219)", "rgb(65, 166, 209)");
     ctx.fillRect(jötunn.x, jötunn.y, 200, 100);
     drawDodgerInfo("rgb(79, 203, 255)", "JÖTUNN", `ABILITY: ABSOLUTE ZERO`, jötunn);
+    
+    const crescendo = { x: 175, y: 150, };
+    mouseOver.crescendo = mouseX > crescendo.x && mouseX < crescendo.x + 200 && mouseY > crescendo.y && mouseY < crescendo.y + 100;
+    decideFillStyle(mouseOver.crescendo, "rgb(20, 20, 20)", "rgb(30, 30, 30)");
+    ctx.fillRect(crescendo.x, crescendo.y, 200, 100);
+    drawDodgerInfo("rgb(0, 0, 0)", "CRESCENDO", `ABILITY: AMPLIFY`, crescendo);
     
     const j_sab = { x: 425, y: 150, };
     mouseOver.j_sab = mouseX > j_sab.x && mouseX < j_sab.x + 200 && mouseY > j_sab.y && mouseY < j_sab.y + 100;
@@ -878,25 +939,28 @@ function drawDodgerSelection() {
     ctx.fillRect(j_sab.x, j_sab.y, 200, 100);
     drawDodgerInfo("rgb(255, 0, 0)", "J-SAB", "ABILITY: DASH", j_sab);
 
-    // Aethos, a Dodger which progressively gets stronger over time.
 
     // Ability Descriptions
-    drawAbilityDesc(mouseOver.evader, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.7)", "rgba(200, 200, 200, 0.7)", "SKILL",
-                    "Evaders have no unique abilities or traits; they rely on only their skill to weave past",
-                    "their adversaries.",
+    drawAbilityDesc(mouseOver.evader, true, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.7)", "rgba(200, 200, 200, 0.7)", "SKILL",
+                    "Evaders have no unique abilities or traits; they rely solely on familiarity with their",
+                    "adversaries to weave past offensive attacks.",
                     "Base Speed: 2.5");
-    drawAbilityDesc(mouseOver.jolt, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.7)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
+    drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.7)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
-                    "unfortunate soul stricken by the electrictrically infused blast.",
-                    "Shrink Reduction: 50% | Shrink Duration: Danger - 2.5s, Enemy - 5s",
+                    "unfortunate soul stricken by the electrically infused pluse.",
+                    "Shrink Reduction: 50% | Shrink & Stun Duration: Danger - 2.5s, Enemy - 5s",
                     "Shockwave Duration: 0.7s | Shockwave Cooldown: 2s");
-    drawAbilityDesc(mouseOver.jötunn, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
+    drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
                     "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
                     "temperature decelerate the speeds and spawn-rates of nearby adversaries.",
                     "Glaciate affects speed. Stagnate affects spawn-rate. Absolute Zero freezes both.",
                     "Speed Reduction: 0% - 70% | Spawn-rate Reduction: 0% - 20% | Swap Cooldown: 1s");
-    drawAbilityDesc(mouseOver.j_sab, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
+    drawAbilityDesc(mouseOver.crescendo, /*highscore.hard >= 60*/true, "rgba(20, 20, 20, 0.9)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
+                    "Crescendos harness the sound waves of their environment to augment their cores.",
+                    "These dodgers, as if adapting to the rhythm, accelerate with the music, continually",
+                    "modifying their cores until they outpace the waves themselves.");
+    drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
                     "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
@@ -1099,6 +1163,9 @@ function drawText() { // draws the current time, highest time, and enemy count
             ctx.fillText(`Active: Shockwave (${shockwaveCDLeft}s)`, textX, 620);
         }
     }
+
+    // Amplify
+    else if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify (${player.speed})`, textX, 620);
 }
 
 function createEnemy() { // Creates an individual enemy with unique attributes
@@ -1414,6 +1481,7 @@ function abilities() { // player-specific-abilities
             if (player.dodger === "j-sab") player.color = "red";
             if (player.dodger === "jötunn") player.color ="rgb(79, 203, 255)";
             if (player.dodger === "jolt") player.color = "yellow";
+            if (player.dodger === "crescendo") player.color = "black";
         }
     }
     // Absolute Zero's effect changes enemy color based on distance to signify that they're being slowed down
