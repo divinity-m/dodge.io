@@ -34,7 +34,7 @@ let mouseOver = {
     restart: false,
 
     evader: false,
-    jsab: false,
+    j_sab: false,
     jötunn: false,
     jolt: false,
 
