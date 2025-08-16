@@ -1,4 +1,4 @@
-console.log("reset amplify, danger stun");// DODGE.IO - MUSIC.JS
+console.log("reset amplify, danger stun, typo");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -411,8 +411,8 @@ function spawnAndDrawDanger() {
                 // left and right aim
                 else if ( (danger.x < danger.r*1.502 && player.x < danger.r*1.501) ||
                      (danger.x > cnv.width-danger.r*1.502 && player.x > cnv.width-danger.r*1.501) ) danger.movex = 0;;
-                danger.baseMovex = danger.movex;
-                danger.baseMovey = danger.movey;
+                danger.baseMoveX = danger.movex;
+                danger.baseMoveY = danger.movey;
                 danger.facingAngle = Math.atan2(dx, dy);
                 danger.launched = true;
             }
@@ -508,12 +508,12 @@ function musicCollisions() {
             } else danger.spawnRate = danger.baseSpawnRate;
             if (danger?.launched) {
                 if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") {
-                    danger.movex = danger.baseMovex * slowFactor;
-                    danger.movey = danger.baseMovex * slowFactor;
+                    danger.movex = danger.baseMoveX * slowFactor;
+                    danger.movey = danger.baseMoveY * slowFactor;
                     slowed = true;
                 } else {
-                    danger.movex = danger.baseMovex;
-                    danger.movey = danger.baseMovex;
+                    danger.movex = danger.baseMoveX;
+                    danger.movey = danger.baseMoveY;
                 }
             }
             Object.defineProperty(danger, "color", {
@@ -554,10 +554,10 @@ function musicCollisions() {
                         }
                         if (danger[unit] < danger.baseUnit-0.0001) danger[unit] += danger.baseUnit/100;
                         else danger[unit] = danger.baseUnit;
-                        if (danger?.movex && danger?.movex < danger?.baseMovex-0.0001) danger.movex += danger.baseMovex/100;
-                        else if (danger?.movex) danger.movex = danger.baseMovex;
-                        if (danger?.movey && danger?.movey < danger?.baseMovey-0.0001) danger.movey += danger.baseMovey/100;
-                        else if (danger?.movey) danger.movey = danger.baseMovey;
+                        if (danger?.movex && danger?.movex < danger?.baseMoveX-0.0001) danger.movex += danger.baseMoveX/100;
+                        else if (danger?.movex) danger.movex = danger.baseMoveX;
+                        if (danger?.movey && danger?.movey < danger?.baseMoveY-0.0001) danger.movey += danger.baseMoveY/100;
+                        else if (danger?.movey) danger.movey = danger.baseMoveY;
                     }
                 })
             }
@@ -572,8 +572,8 @@ function musicCollisions() {
                         danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                     }
                     if (danger?.[unit]) danger[unit] = danger.baseUnit/2;
-                    if (danger?.movex) danger.movex = danger.baseMovex/2;
-                    if (danger?.movey) danger.movey = danger.baseMovey/2;
+                    if (danger?.movex) danger.movex = danger.baseMoveX/2;
+                    if (danger?.movey) danger.movey = danger.baseMoveY/2;
                 })
             }
         }
