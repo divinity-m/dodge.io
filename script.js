@@ -1,4 +1,4 @@
-console.log("duration")// DODGE.IO - SCRIPT.JS
+console.log("mouseover.crescendo")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -37,7 +37,7 @@ let mouseOver = {
     j_sab: false,
     jötunn: false,
     jolt: false,
-    aethos: false,
+    crescendo: false,
 
     easy: false,
     medium: false,
