@@ -1,4 +1,4 @@
-console.log("amplify")// DODGE.IO - SCRIPT.JS
+console.log("baseSpeed")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -70,6 +70,7 @@ let player = {
     y: cnv.height/2,
     r: 15,
     speed: 2.5,
+    baseSpeed: 2.5,
     slowed: 1,
     dodger: "evader",
     color: "rgb(255, 255, 255)",
