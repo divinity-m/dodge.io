@@ -554,12 +554,9 @@ function drawCircle(x = 0, y = 0, r = 12.5, type = "fill") {
     else if (type === "stroke") ctx.stroke();
 }
 
-function decideFillStyle(bool, color1, color2) { 
-    if (bool) {
-        ctx.fillStyle = color1;
-    } else {
-        ctx.fillStyle = color2;
-    }
+function decideFillStyle(bool, color1, color2) {
+    if (bool) ctx.fillStyle = color1;
+    else ctx.fillStyle = color2;
 }
 
 function drawStartScreen() {
@@ -1287,10 +1284,7 @@ function spawnEnemyPeriodically() {
         allEnemies.push(createEnemy());  
 
         // filter and re-order the array just like in the restartEndless() function (prevents inconsistent overlapping)
-        allEnemies = [
-            ...allEnemies.filter(enemy => enemy.ability === "decelerator"),
-            ...allEnemies.filter(enemy => enemy.ability !== "decelerator")
-        ]
+        allEnemies = [...allEnemies.filter(enemy => enemy.ability === "decelerator"), ...allEnemies.filter(enemy => enemy.ability !== "decelerator")]
         
         lastSpawn = Date.now();
 
@@ -1318,7 +1312,7 @@ function keyboardControls() {
     }
     
     // Moves the player with the keyboard
-    if (keyboardMovementOn){
+    if (keyboardMovementOn) {
         lastPressing = "kb";
         if (!dash.activated){
             player.speed = player.baseSpeed * shiftPressed * player.slowed;
@@ -1420,15 +1414,11 @@ function restartEndless() { // Resets certain variables once the play button is 
     startAmount = 10;
     if (difficulty.level === "medium") startAmount = 15;
     if (difficulty.level === "hard") startAmount = 20;
-    for(let i = 1; i < startAmount; i++) {
-        allEnemies.push(createEnemy());
-    }
+    for(let i = 1; i < startAmount; i++) allEnemies.push(createEnemy());
+    
     // Re-order the allEnemies array to draw the enemies with the auras (decelerator enemies) first
     // this prevents inconsistent overlapping when they're drawn
-    allEnemies = [
-        ...allEnemies.filter(enemy => enemy.ability === "decelerator"),
-        ...allEnemies.filter(enemy => enemy.ability !== "decelerator")
-    ]
+    allEnemies = [...allEnemies.filter(enemy => enemy.ability === "decelerator"), ...allEnemies.filter(enemy => enemy.ability !== "decelerator")]
 
     musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
     sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
@@ -1453,12 +1443,10 @@ function restartEndless() { // Resets certain variables once the play button is 
 function collisions() { // Keeps track of when the player touches any enemy in the allEnemies array
     let underAura = 0;
     allEnemies.forEach(enemy => {
-        const dx = player.x - enemy.x;
-        const dy = player.y - enemy.y;
-        const distance = Math.hypot(dx, dy);
+        const enemyDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
         // Gives the player some time to get out of an enemy they dashed onto (0.25s)
         if (!dash.activated && now - dash.lastEnded > 250 && !player.invincible) {
-            if (distance < player.r + enemy.r) {
+            if (enemyDist < player.r + enemy.r) {
                 pauseAudio(music.promise, music.var);
                 highscoreColor = "rgb(87, 87, 87)";
                 difficulty.color = "rgb(87, 87, 87)";
@@ -1469,7 +1457,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
             }
         }
         if (gameState === "endlessOver") underAura = 0;
-        else if (enemy.ability === "decelerator" && distance < player.r + enemy.auraRadius) underAura++;
+        else if (enemy.ability === "decelerator" && enemyDist < player.r + enemy.auraRadius) underAura++;
     });
     
     player.slowed = 1 - (underAura/10)
