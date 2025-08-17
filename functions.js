@@ -37,6 +37,7 @@ function recordKeyDown(event) {
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             // activate the shockwave ability and set certain properties
             shockwave.activated = true;
+            shockwave.used = shockwave.active;
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
             shockwave.y = player.y;
@@ -76,6 +77,7 @@ function recordRightClick(event) {
         
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             shockwave.activated = true;
+            shockwave.used = shockwave.active;
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
             shockwave.y = player.y;
@@ -1510,8 +1512,8 @@ function abilities() { // player-specific abilities
         if (shockwave.activated) {
             // create the shockwaves path
             shockwave.path = new Path2D();
-            if (shockwave.active === "Shockwave") shockwave.path.arc(0, 0, shockwave.radius, Math.PI*2, 0);
-            else if (shockwave.active === "Shockray") {
+            if (shockwave.used === "Shockwave") shockwave.path.arc(0, 0, shockwave.radius, Math.PI*2, 0);
+            else if (shockwave.used === "Shockray") {
                 shockwave.path.moveTo(0, -shockwave.radius);
                 shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
                 shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
@@ -1523,8 +1525,8 @@ function abilities() { // player-specific abilities
             ctx.rotate(shockwave.facingAngle);
 
             // draw the shockwave
-            if (shockwave.active === "Shockwave") ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
-            else if (shockwave.active === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
+            if (shockwave.used === "Shockwave") ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+            else if (shockwave.used === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
             ctx.fill(shockwave.path);
 
             // checks for collisions
@@ -1540,16 +1542,17 @@ function abilities() { // player-specific abilities
 
             // increase the radius of the beam and move it every frame
             shockwave.radius *= 1.018;
-            shockwave.x += shockwave.movex;
-            shockwave.y += shockwave.movey;
+            // if (shockwave.used === "Shockwave") { shockwave.x = player.x; shockwave.y = player.y; } // makes shockwave move with the player
+            if (shockwave.used === "Shockray") { shockwave.x += shockwave.movex; shockwave.y += shockwave.movey; }
 
             // once the radius is greater than 250, end the entire ability
-            if (shockwave.radius > 250) {
+            if ((shockwave.radius > 800 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
-                if (shockwave.active === "Shockwave") { shockwave.cd = 7000; shockwave.effect = 0.75; }
-                else if (shockwave.active === "Shockray") { shockwave.cd = 3000; shockwave.effect = 0.5; }
+                if (shockwave.used === "Shockwave") { shockwave.cd = 7000; shockwave.effect = 0.75; }
+                else if (shockwave.used === "Shockray") { shockwave.cd = 3000; shockwave.effect = 0.5; }
+                console.log(shockwave.used)
             }
         }
         allEnemies.forEach(enemy => {
