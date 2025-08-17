@@ -1,4 +1,4 @@
-console.log("Amplify complete, now jolts stun");// DODGE.IO - FUNCTIONS.JS
+console.log("Amplify complete, now jolts stun, typo");// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -470,28 +470,31 @@ function recordLeftClick() {
                 player.dodger = "evader";
                 player.color = "rgb(255, 255, 255)";
                 player.subColor = "rgb(230, 230, 230)";
+                amplify.reset();
             }
             else if (mouseOver.j_sab && highscore.andromeda === 100) {
                 player.dodger = "j-sab";
                 player.color = "rgb(255, 0, 0)";
                 player.subColor = "rgb(230, 0, 0)";
+                amplify.reset();
             }
             else if (mouseOver.jötunn && highscore.limbo === 100) {
                 player.dodger = "jötunn";
                 player.color = "rgb(79, 203, 255)";
                 player.subColor = "rgb(70, 186, 235)";
+                amplify.reset();
             }
             else if (mouseOver.jolt && highscore.medium >= 30) {
                 player.dodger = "jolt";
                 player.color = "rgb(255, 255, 0)";
                 player.subColor = "rgb(230, 230, 0)";
+                amplify.reset();
             }
             else if (mouseOver.crescendo && /*highscore.hard >= 60*/true) {
                 player.dodger = "crescendo";
                 player.color = "rgb(0, 0, 0)";
                 player.subColor = "rgb(40, 40, 40)";
             }
-            amplify.reset();
             mouseMovementOn = previousMM;
             // saves the players values to the local storage to keep track of the players dodger
             userData.player = player;
@@ -949,7 +952,7 @@ function drawDodgerSelection() {
     drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.7)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
                     "unfortunate soul stricken by the electrically infused pluse.",
-                    "Shrink Reduction: 50% | Shrink & Stun Duration: Danger - 2.5s, Enemy - 5s",
+                    "Shrink & Stun Reduction: 50% | Shrink & Stun Duration: Danger - 2.5s, Enemy - 5s",
                     "Shockwave Duration: 0.7s | Shockwave Cooldown: 2s");
     drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
@@ -1176,7 +1179,7 @@ function createEnemy() { // Creates an individual enemy with unique attributes
         y: (Math.random() * (cnv.height-60))+30,  // between 30 and 520
         r: (Math.random() * 7.5) + 10,  // between 10 and 17.5
         color: "rgb(100, 100, 100)",
-        resetRadius: 0,
+        reset: 0, // for jolts
     }
     oneEnemy.baseRadius = oneEnemy.r;
     
@@ -1189,6 +1192,7 @@ function createEnemy() { // Creates an individual enemy with unique attributes
         if (oneEnemy.ability === "homing") oneEnemy.speed = (Math.random() * 0.7) + 1.5; // between 1.5 and 2.2
         else oneEnemy.speed = Math.random() + 1.5; // between 1.5 and 2.5 (as fast as the player)
     }
+    oneEnemy.baseSpeed = oneEnemy.speed;
 
     let dx = player.x - oneEnemy.x;
     let dy = player.y - oneEnemy.y;
@@ -1203,17 +1207,16 @@ function createEnemy() { // Creates an individual enemy with unique attributes
         dy = player.y - oneEnemy.y;
         distFromPlayer = Math.hypot(dx, dy);
     }
-
+    // Initialization for the angle the enemy moves towards (avoids the weird snapping-towards-the-player effect)
+    oneEnemy.facingAngle = Math.atan2(dy, dx); // angle toward the player
+    
     // used to make the enemy move toward the player once it spanws
-    oneEnemy.movex = (dx / distFromPlayer) * oneEnemy.speed;
-    oneEnemy.movey = (dy / distFromPlayer) * oneEnemy.speed;
+    oneEnemy.movex = Math.cos(oneEnemy.facingAngle) * oneEnemy.speed;
+    oneEnemy.movey = Math.sin(oneEnemy.facingAngle) * oneEnemy.speed;
 
     // Using base values to extend the possibility of what can be done to the enemies speed
-    oneEnemy.baseMoveX = oneEnemy.movex
-    oneEnemy.baseMoveY = oneEnemy.movey
-
-    // Initialization for the angle the enemy moves towards (avoids the weird snapping-towards-the-player effect)
-    oneEnemy.facingAngle = Math.atan2(dy, dx);// angle toward the player
+    oneEnemy.baseMoveX = oneEnemy.movex;
+    oneEnemy.baseMoveY = oneEnemy.movey;
 
     if (player.dodger === "jolt") {
         Object.defineProperty(oneEnemy, "collisionPoints", {
@@ -1278,9 +1281,11 @@ function keyboardControls() {
         player.x += dxKB * player.speed;
         player.y += dyKB * player.speed;
 
-        // Doesn't allow the player to leave the map (wall collisions)
-        if (player.x - player.r  <= 0 || player.x + player.r  >= cnv.width) player.x -= dxKB * player.speed;
-        if (player.y - player.r  <= 0 || player.y + player.r  >= cnv.height) player.y -= dyKB * player.speed;
+        // Anti-no-clip (wall collisions)
+        if (player.x - player.r  < 0) player.x = player.r;
+        if (player.x + player.r  > cnv.width) player.x = cnv.width - player.r;
+        if (player.y - player.r  < 0) player.y = player.r; 
+        if (player.y + player.r  > cnv.height) player.y = cnv.height - player.r;
     }
     
     // Determines the angle the player is facing
@@ -1314,15 +1319,11 @@ function mouseMovement() {
             player.y += (dyMouse / distance) * player.speed;
         }
 
-        // Doesn't allow the player to leave the map (wall collisions)
-        if (player.x - player.r  <= 0 || player.x + player.r  >= cnv.width) {
-            if (distance < slowPlayerStart) player.x -= (dxMouse / distance) * player.speed * slowPlayerFactor;
-            else player.x -= (dxMouse / distance) * player.speed;
-        }
-        if (player.y - player.r  <= 0 || player.y + player.r  >= cnv.height) {
-            if (distance < slowPlayerStart) player.y -= (dyMouse / distance) * player.speed * slowPlayerFactor;
-            else player.y -= (dyMouse / distance) * player.speed;
-        }
+        // Anti-no-clip (wall collisions)
+        if (player.x - player.r  < 0) player.x = player.r;
+        if (player.x + player.r  > cnv.width) player.x = cnv.width - player.r;
+        if (player.y - player.r  < 0) player.y = player.r; 
+        if (player.y + player.r  > cnv.height) player.y = cnv.height - player.r;
     }
     
     // Determines the angle the player is facing
@@ -1338,62 +1339,86 @@ function moveEnemies() { // Loops through the allEnemies array to move each enem
         const enemyDist = Math.hypot(dxEnemy, dyEnemy);
         let homingIn = false;
 
-        // Homing enemies move toward the player (if the player is close enough)
-        if (enemy.ability === "homing")  {
-            if (enemyDist <= enemy.detectionRadius) {
-                const angleToPlayer = Math.atan2(dyEnemy, dxEnemy); // Target angle
-
-                // Calculate shortest angular difference
-                let angleDiff = angleToPlayer - enemy.facingAngle;
-
-                // Normalize to [-PI, PI] for shortest rotation direction
-                angleDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
-
-                const turnSpeed = 0.01; // radians per frame
-                enemy.facingAngle += Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), turnSpeed);
-
-                // Move forward in direction of facingAngle — speed stays constant
-                enemy.baseMoveX = Math.cos(enemy.facingAngle) * enemy.speed;
-                enemy.baseMoveY = Math.sin(enemy.facingAngle) * enemy.speed;
-
-                // Set homingIn to true so they bounce off the walls correctly
-                homingIn = true;
+        if (player.dodger === "jolt") {
+            if (now - enemy.reset >= 5000) { // speed up enemies once the reset timer is over
+                if (enemy.speed < enemy.baseSpeed-0.0001) enemy.speed += enemy.baseSpeed/100;
+                else enemy.speed = enemy.baseSpeed;
             }
-        } 
+            else { // half enemy speed while the reset timer is ongoing
+                enemy.speed = enemy.baseSpeed/2;
+                enemy.speed = enemy.baseSpeed/2;
+            }
+        }
         
-        if (player.dodger == "jötunn" && (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation")) {
-            // Similar to mouse movement mechanics, but theres a limit to how slow the enemies move
-            // Calculates the distance from the edge of the enemy to the edge of the player, so I subtract the radii
-            // absoluteZero.slowStart = 175; absoluteZero.slowEnd = 75
-            const realDist = enemyDist - enemy.r - player.r;
-            
-            // Limit distance to avoid going below slowEnd
-            const maxDist = Math.max(realDist, absoluteZero.slowEnd);
-            // Limit the factor to above going over 1
-            const factor = Math.min(1, (maxDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd));
-            const slowFactor = 0.3 + 0.7 * factor;
+        // Homing enemies move toward the player (if the player is close enough)
+        if (enemy.ability === "homing" && enemyDist < enemy.detectionRadius)  {
+            const angleToPlayer = Math.atan2(dyEnemy, dxEnemy); // Target angle
 
-            enemy.movex = enemy.baseMoveX * slowFactor;
-            enemy.movey = enemy.baseMoveY * slowFactor;
+            // Calculate shortest angular difference
+            let angleDiff = angleToPlayer - enemy.facingAngle;
+
+            // Normalize to [-PI, PI] for shortest rotation direction
+            angleDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+
+            const turnSpeed = 0.01; // radians per frame
+            enemy.facingAngle += Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), turnSpeed);
+
+            // Move forward in direction of facingAngle — speed stays constant
+            enemy.baseMoveX = Math.cos(enemy.facingAngle) * enemy.speed;
+            enemy.baseMoveY = Math.sin(enemy.facingAngle) * enemy.speed;
+
+            // Set homingIn to true so they bounce off the walls correctly
+            homingIn = true;
+        } else {
+            enemy.baseMoveX = Math.cos(enemy.facingAngle) * enemy.speed;
+            enemy.baseMoveY = Math.sin(enemy.facingAngle) * enemy.speed;
+        }
+        
+        if (player.dodger === "jötunn") {
+            if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") {
+                // Similar to mouse movement mechanics, but theres a limit to how slow the enemies move
+                // Calculates the distance from the edge of the enemy to the edge of the player, so I subtract the radii
+                // absoluteZero.slowStart = 175; absoluteZero.slowEnd = 75
+                const realDist = enemyDist - enemy.r - player.r;
+                
+                // Limit distance to avoid going below slowEnd
+                const maxDist = Math.max(realDist, absoluteZero.slowEnd);
+                // Limit the factor to above going over 1
+                const factor = Math.min(1, (maxDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd));
+                const slowFactor = 0.3 + 0.7 * factor;
+    
+                enemy.movex = enemy.baseMoveX * slowFactor;
+                enemy.movey = enemy.baseMoveY * slowFactor;
+            } else {
+                enemy.movex = enemy.baseMoveX;
+                enemy.movey = enemy.baseMoveY;
+            }
         } else {
             enemy.movex = enemy.baseMoveX;
             enemy.movey = enemy.baseMoveY;
         }
         
-        enemy.x += enemy.movex
-        enemy.y += enemy.movey
+        enemy.x += enemy.movex;
+        enemy.y += enemy.movey;
         
-        // Doesn't allow the enemies to leave the map (wall collisions)
-        if (enemy.x - enemy.r  <= 0 || enemy.x + enemy.r  >= cnv.width) {
-            // Left or right wall → reflect across the Y axis
-            if (!homingIn) enemy.baseMoveX *= -1;
+        // Anti-no-clip (wall collisions)
+        if (enemy.x - enemy.r < 0) {
+            enemy.x = enemy.r;
             enemy.facingAngle = Math.PI - enemy.facingAngle;
         }
-        if (enemy.y - enemy.r  <= 0 || enemy.y + enemy.r  >= cnv.height) {
-            // Top or bottom wall → reflect across the X axis
-            if (!homingIn) enemy.baseMoveY *= -1;
+        if (enemy.x + enemy.r > cnv.width) {
+            enemy.x = cnv.width - enemy.r;
+            enemy.facingAngle = Math.PI - enemy.facingAngle;
+        }
+        if (enemy.y - enemy.r < 0) {
+            enemy.y = enemy.r;
             enemy.facingAngle = -enemy.facingAngle;
         }
+        if (enemy.y + enemy.r > cnv.height) {
+            enemy.y = cnv.height - enemy.r;
+            enemy.facingAngle = -enemy.facingAngle;
+        }
+        
         // Normalize the angle with the ever reliable Math.atan2()
         enemy.facingAngle = Math.atan2(Math.sin(enemy.facingAngle), Math.cos(enemy.facingAngle));
     })
@@ -1464,7 +1489,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
 }
 
 // ABILITIES
-function abilities() { // player-specific-abilities
+function abilities() { // player-specific abilities
     // Dash gives the player a powerful but short-lived burst of speed
     if (dash.activated){
         player.color = "rgb(255, 72, 72)";
@@ -1496,9 +1521,9 @@ function abilities() { // player-specific-abilities
                 const dxEnemy = player.x - enemy.x;
                 const dyEnemy = player.y - enemy.y;
                 const enemyDist = Math.hypot(dxEnemy, dyEnemy);
+                
                 const addend = (absoluteZero.slowStart - absoluteZero.slowEnd)/3;
                 const slowRadii = [absoluteZero.slowEnd, absoluteZero.slowEnd+addend, absoluteZero.slowEnd+addend*2, absoluteZero.slowStart];
-    
                 if (enemy.ability === "none") { // baseColor = "rgb(100, 100, 100)";
                     if (enemyDist < slowRadii[0]) enemy.color = "rgb(55, 77, 107)";
                     else if (enemyDist < slowRadii[1]) enemy.color = "rgb(68, 84, 107)";
@@ -1516,7 +1541,9 @@ function abilities() { // player-specific-abilities
                     else if (enemyDist < slowRadii[3]) enemy.color = "rgb(235, 180, 15)";
                 }
                 if (enemyDist >= 175) enemy.color = enemy.baseColor;
-            } else enemy.color = enemy.baseColor;
+            } else {
+                enemy.color = enemy.baseColor;
+            }
         })
     }
     // Shockwave launches an electromagnetic pulse that stuns and shrinks adversaries
@@ -1541,9 +1568,7 @@ function abilities() { // player-specific-abilities
             allEnemies.forEach(enemy => { 
                 enemy.collisionPoints.forEach(point => {
                     if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
-                        enemy.r = enemy.baseRadius/2;
-                        if (enemy?.auraRadius) enemy.auraRadius = enemy.baseAuraRadius/2;
-                        enemy.resetRadius = Date.now(); // starts the time which an enemy got hit
+                        enemy.reset = Date.now(); // starts the time which an enemy got hit
                     }
                 })
             })
@@ -1551,12 +1576,12 @@ function abilities() { // player-specific-abilities
             ctx.restore();
 
             // increase the radius of the beam and move it every frame
-            shockwave.radius *= 1.025;
+            shockwave.radius *= 1.018;
             shockwave.x += shockwave.movex;
             shockwave.y += shockwave.movey;
 
-            // once the radius is greater than 200, end the entire ability
-            if (shockwave.radius >= 200) {
+            // once the radius is greater than 250, end the entire ability
+            if (shockwave.radius > 250) {
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
@@ -1564,19 +1589,13 @@ function abilities() { // player-specific-abilities
         }
         allEnemies.forEach(enemy => {
             // Restore the radius of enemies after 5 seconds have passed
-            if (now - enemy.resetRadius >= 5000) {
-                if (enemy.r < enemy.baseRadius-0.01) enemy.r += enemy.baseRadius/100;
-                else enemy.r = enemy.baseRadius
+            if (now - enemy.reset >= 5000) {
+                if (enemy.r < enemy.baseRadius-0.0001) enemy.r += enemy.baseRadius/100;
+                else enemy.r = enemy.baseRadius;
                 if (enemy.ability === "decelerator") {
                     if (enemy.auraRadius < enemy.baseAuraRadius-0.01) enemy.auraRadius += enemy.baseAuraRadius/100;
                     else enemy.auraRadius = enemy.baseAuraRadius;
                 }
-
-                // prevents no-clipping
-                if (enemy.x - enemy.r <= 0) enemy.x = enemy.r + 1;
-                if (enemy.x + enemy.r >= cnv.width) enemy.x = cnv.width - enemy.r - 1;
-                if (enemy.y - enemy.r <= 0) enemy.y = enemy.r + 1;
-                if (enemy.y + enemy.r >= cnv.height) enemy.y = cnv.height - enemy.r - 1;
             }
             // Decrease the radius of enemies under the effect of shockwave
             else {
