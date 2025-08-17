@@ -1,4 +1,9 @@
 console.log("shockwave or shockray");// DODGE.IO - FUNCTIONS.JS
+function sayHi() {
+    console.log("hello world");
+}
+sayHi();
+
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
