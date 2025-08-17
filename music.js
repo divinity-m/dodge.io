@@ -1,4 +1,4 @@
-console.log("jotunns effect on dangers");// DODGE.IO - MUSIC.JS
+console.log("shockwave and shockray hits dangers");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -611,8 +611,8 @@ function musicCollisions() {
                             if (unit === "w") return;
                             danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                         }
-                        if (danger?.[unit]) danger[unit] = danger.baseUnit/2;
-                        if (danger?.speed) danger.speed = danger.baseSpeed/2;
+                        if (danger?.[unit]) danger[unit] = danger.baseUnit*shockwave.effect;
+                        if (danger?.speed) danger.speed = danger.baseSpeed*shockwave.effect;
                     })
                 }
             }
