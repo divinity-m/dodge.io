@@ -1,4 +1,4 @@
-console.log("save baseSpeed")// DODGE.IO - SCRIPT.JS
+console.log("Date.now()")// DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
 
@@ -112,6 +112,7 @@ let amplify = {
     reset: function () {
         this.speed = 0;
         this.accel = 0;
+        this.accelRate = Date.now();
     },
 }
 
