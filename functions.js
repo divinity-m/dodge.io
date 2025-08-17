@@ -1,4 +1,4 @@
-console.log("shockwave or shockray");// DODGE.IO - FUNCTIONS.JS
+console.log("invulnurable enemies");// DODGE.IO - FUNCTIONS.JS
 function sayHi() {
     console.log("hello world");
 }
@@ -499,7 +499,7 @@ function recordLeftClick() {
                     // music.timestamps = music.timestamps.concat(deepSynth(192.047)); excluded
                     // music.timestamps = music.timestamps.concat(deepSynth(196.226)); excluded
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
-                    for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, coords: [xMid, yMid]}]);
+                    for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, invincible: true, coords: [xMid, yMid]}]);
                 }
                 music.backUpTS = [...music.timestamps];
                 mouseMovementOn = previousMM;
@@ -970,7 +970,7 @@ function drawDodgerSelection() {
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
                     "unfortunate soul stricken by the electrically infused pluse.",
                     "Shockwave Effect Reduction: 25% | Shockray Effect Reduction: 50%",
-                    "Shockray Effect Duration: Danger - 2.5s, Enemy - 5s",
+                    "Shockray Effect Duration: Danger - 2.93s, Enemy - 5.43s",
                     "Duration: 0.7s | Cooldown: 2s");
     drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
@@ -982,7 +982,7 @@ function drawDodgerSelection() {
                     "Crescendos harness the sound waves of their environment to augment their cores.",
                     "These dodgers, as if adapting to the rhythm, accelerate with the music, continually",
                     "modifying their cores until they outpace the waves themselves.",
-                    "Top Speed: 10");
+                    "Top Speed: 8");
     drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
@@ -1222,6 +1222,7 @@ function createEnemy() { // Creates an individual enemy with unique attributes
         y: (Math.random() * (cnv.height-60))+30,  // between 30 and 520
         r: (Math.random() * 7.5) + 10,  // between 10 and 17.5
         color: "rgb(100, 100, 100)",
+        vulnerable: "None",
         reset: 0, // for jolts
     }
     enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // also for jolts
@@ -1532,8 +1533,10 @@ function abilities() { // player-specific abilities
             // checks for collisions
             allEnemies.forEach(enemy => { 
                 enemy.collisionPoints.forEach(point => {
-                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
+                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])
+                       && (enemy.vulnerable === shockwave.used || enemy.vulnerable === "None")) {
                         enemy.reset = Date.now(); // starts the time which an enemy got hit
+                        enemy.vulnerable = shockwave.used;
                     }
                 })
             })
@@ -1542,16 +1545,23 @@ function abilities() { // player-specific abilities
 
             // increase the radius of the beam and move it every frame
             shockwave.radius *= 1.018;
-            // if (shockwave.used === "Shockwave") { shockwave.x = player.x; shockwave.y = player.y; } // makes shockwave move with the player
-            if (shockwave.used === "Shockray") { shockwave.x += shockwave.movex; shockwave.y += shockwave.movey; }
-
+            if (shockwave.used === "Shockwave") {
+                /* shockwave.x = player.x;
+                shockwave.y = player.y; */
+                shockwave.cd = 7000;
+                shockwave.effect = 0.75;
+            }
+            else if (shockwave.used === "Shockray") {
+                shockwave.x += shockwave.movex;
+                shockwave.y += shockwave.movey;
+                shockwave.cd = 3000;
+                shockwave.effect = 0.5;
+            }
             // once the radius is greater than 250, end the entire ability
             if ((shockwave.radius > 800 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
-                if (shockwave.used === "Shockwave") { shockwave.cd = 7000; shockwave.effect = 0.75; }
-                else if (shockwave.used === "Shockray") { shockwave.cd = 3000; shockwave.effect = 0.5; }
                 console.log(shockwave.used)
             }
         }
@@ -1559,11 +1569,11 @@ function abilities() { // player-specific abilities
             // Restore the stats of enemies after 5 seconds have passed
             if (now - enemy.reset >= 5000) {
                 if (enemy.r < enemy.baseRadius-0.0001) enemy.r += enemy.baseRadius/100;
-                else enemy.r = enemy.baseRadius;
+                else { enemy.r = enemy.baseRadius; enemy.vulnerable = "None"; }
                 if (enemy.speed < enemy.baseSpeed-0.0001) enemy.speed += enemy.baseSpeed/100;
                 else enemy.speed = enemy.baseSpeed;
                 if (enemy.ability === "decelerator") {
-                    if (enemy.auraRadius < enemy.baseAuraRadius-0.01) enemy.auraRadius += enemy.baseAuraRadius/100;
+                    if (enemy.auraRadius < enemy.baseAuraRadius-0.0001) enemy.auraRadius += enemy.baseAuraRadius/100;
                     else enemy.auraRadius = enemy.baseAuraRadius;
                 }
             }
@@ -1577,12 +1587,12 @@ function abilities() { // player-specific abilities
     }
     // Amplify accelerates the player over time
     if (player.dodger === "crescendo") {
-        if (gameState === "musicMode") {
-            amplify.speed = music.var.currentTime/music.var.duration * 10;
+        if (gameState === "musicMode") { // reach your peak speed 78.57%~ into a song
+            amplify.speed = music.var.currentTime/music.var.duration * 7;
             player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
         } else {
-            amplify.accel = 1/music.var.duration*10;
-            if (now - amplify.accelRate > 1000) { // 0.05 units/s
+            amplify.accel = 1/music.var.duration * 7; // 98.197 is the duration of interstellar
+            if (now - amplify.accelRate > 1000) {
                 amplify.speed += amplify.accel;
                 amplify.accelRate = Date.now();
             }
