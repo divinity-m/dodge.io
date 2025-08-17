@@ -1,4 +1,4 @@
-console.log("Amplify complete, now jolts stun, typo");// DODGE.IO - FUNCTIONS.JS
+console.log("jolts stun shows, do jotunns later");// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -1043,17 +1043,24 @@ function drawPlayer() {
 function drawEnemies() {
     allEnemies.forEach(enemy => {
         if (enemy.ability == "decelerator") {
-            ctx.fillStyle = "rgba(177, 88, 88, 0.47)"
+            ctx.fillStyle = "rgba(177, 88, 88, 0.47)";
             drawCircle(enemy.x, enemy.y, enemy.auraRadius);
         }
 
         if (settings.enemyOutlines) {
-            ctx.fillStyle = "black"
+            let cv = 100 - enemy.cValue*100; // jolts effect on enemy outlines
+            ctx.fillStyle = `rgb(${cv}, ${cv}, 0)`;
             drawCircle(enemy.x, enemy.y, enemy.r * 1.11)
         }
 
-        ctx.fillStyle = enemy.color
-        drawCircle(enemy.x, enemy.y, enemy.r)
+        ctx.fillStyle = enemy.color;
+        drawCircle(enemy.x, enemy.y, enemy.r);
+
+        // shows jolts effect
+        enemy.cValue = Math.min(1, (now-enemy.reset)/5000); // clamped between 0 and 1;
+        let av = 0.8 - enemy.cValue*0.8;
+        ctx.fillStyle = `rgba(200, 200, 0, ${av})`;
+        drawCircle(enemy.x, enemy.y, enemy.r);
     })
 }
 
@@ -1174,52 +1181,53 @@ function drawText() { // draws the current time, highest time, and enemy count
 }
 
 function createEnemy() { // Creates an individual enemy with unique attributes
-    let oneEnemy = {
+    let enemy = {
         x: (Math.random() * (cnv.width-60))+30,  // between 30 and 770
         y: (Math.random() * (cnv.height-60))+30,  // between 30 and 520
         r: (Math.random() * 7.5) + 10,  // between 10 and 17.5
         color: "rgb(100, 100, 100)",
         reset: 0, // for jolts
     }
-    oneEnemy.baseRadius = oneEnemy.r;
+    enemy.cValue = Math.min(1, (now-enemy.reset)/5000); // also for jolts
+    enemy.baseRadius = enemy.r;
     
     // Initializes the enemy's ability and other important values based on their ability
-    enemyAbilitiesAndStats(oneEnemy);
+    enemyAbilitiesAndStats(enemy);
     
-    if (difficulty.level === "easy") oneEnemy.speed = Math.random() + 1; // between 1 and 2
-    if (difficulty.level === "medium") oneEnemy.speed = Math.random() + 1.25; // between 1.25 and 2.25
+    if (difficulty.level === "easy") enemy.speed = Math.random() + 1; // between 1 and 2
+    if (difficulty.level === "medium") enemy.speed = Math.random() + 1.25; // between 1.25 and 2.25
     if (difficulty.level === "hard") {
-        if (oneEnemy.ability === "homing") oneEnemy.speed = (Math.random() * 0.7) + 1.5; // between 1.5 and 2.2
-        else oneEnemy.speed = Math.random() + 1.5; // between 1.5 and 2.5 (as fast as the player)
+        if (enemy.ability === "homing") enemy.speed = (Math.random() * 0.7) + 1.5; // between 1.5 and 2.2
+        else enemy.speed = Math.random() + 1.5; // between 1.5 and 2.5 (as fast as the player)
     }
-    oneEnemy.baseSpeed = oneEnemy.speed;
+    enemy.baseSpeed = enemy.speed;
 
-    let dx = player.x - oneEnemy.x;
-    let dy = player.y - oneEnemy.y;
+    let dx = player.x - enemy.x;
+    let dy = player.y - enemy.y;
     let distFromPlayer = Math.hypot(dx, dy);
 
     // used to prevent the enemy from spawning too close to the player
     while(distFromPlayer < 300) {
-        oneEnemy.x = (Math.random() * (cnv.width-60))+30;
-        oneEnemy.y = (Math.random() * (cnv.height-60))+30;
+        enemy.x = (Math.random() * (cnv.width-60))+30;
+        enemy.y = (Math.random() * (cnv.height-60))+30;
 
-        dx = player.x - oneEnemy.x;
-        dy = player.y - oneEnemy.y;
+        dx = player.x - enemy.x;
+        dy = player.y - enemy.y;
         distFromPlayer = Math.hypot(dx, dy);
     }
     // Initialization for the angle the enemy moves towards (avoids the weird snapping-towards-the-player effect)
-    oneEnemy.facingAngle = Math.atan2(dy, dx); // angle toward the player
+    enemy.facingAngle = Math.atan2(dy, dx); // angle toward the player
     
     // used to make the enemy move toward the player once it spanws
-    oneEnemy.movex = Math.cos(oneEnemy.facingAngle) * oneEnemy.speed;
-    oneEnemy.movey = Math.sin(oneEnemy.facingAngle) * oneEnemy.speed;
+    enemy.movex = Math.cos(enemy.facingAngle) * enemy.speed;
+    enemy.movey = Math.sin(enemy.facingAngle) * enemy.speed;
 
     // Using base values to extend the possibility of what can be done to the enemies speed
-    oneEnemy.baseMoveX = oneEnemy.movex;
-    oneEnemy.baseMoveY = oneEnemy.movey;
+    enemy.baseMoveX = enemy.movex;
+    enemy.baseMoveY = enemy.movey;
 
     if (player.dodger === "jolt") {
-        Object.defineProperty(oneEnemy, "collisionPoints", {
+        Object.defineProperty(enemy, "collisionPoints", {
             get() {
                 const piOver3X = this.r*Math.cos(Math.PI/3);
                 const piOver3Y = this.r*Math.sin(Math.PI/3);
@@ -1233,7 +1241,7 @@ function createEnemy() { // Creates an individual enemy with unique attributes
         })
     }
     
-    return oneEnemy;
+    return enemy;
 }
 
 function spawnEnemyPeriodically() {
@@ -1612,7 +1620,6 @@ function abilities() { // player-specific abilities
         } else {
             amplify.accel = 1/music.var.duration*10;
             if (now - amplify.accelRate > 1000) { // 0.05 units/s
-                console.log(amplify.speed);
                 amplify.speed += amplify.accel;
                 amplify.accelRate = Date.now();
             }
