@@ -1,4 +1,4 @@
-console.log("jolts effect on dangers, do jotunns later");// DODGE.IO - MUSIC.JS
+console.log("jotunns effect on dangers");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -126,6 +126,13 @@ function createBeam(variant="none") {
         get swcv () { // for jolt
             return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
         },
+        distance: 0,
+        get azcv () { // for jötunn
+            const clampDist = Math.min(Math.max(absoluteZero.slowEnd, this.distance), absoluteZero.slowStart);
+            let cv = (clampDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd);
+            if (player.dodger !== "jötunn" || absoluteZero.passive === "Glaciation") cv = 1;
+            return 0.3 - 0.3 * cv;
+        },
     }
     if (beam.variant > 0.5) beam.variant = "vertical";
     else beam.variant = "horizontal";
@@ -146,6 +153,13 @@ function createCircle(variant="none") {
         reset: 0,
         get swcv () { // for jolt
             return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
+        },
+        distance: 0,
+        get azcv () { // for jötunn
+            const clampDist = Math.min(Math.max(absoluteZero.slowEnd, this.distance), absoluteZero.slowStart);
+            let cv = (clampDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd);
+            if (player.dodger !== "jötunn" || absoluteZero.passive === "Glaciation") cv = 1;
+            return 0.3 - 0.3 * cv;
         },
     }
     circle.lineWidth = circle.r;
@@ -178,6 +192,13 @@ function createSpike() {
         reset: 0,
         get swcv () { // for jolt
             return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
+        },
+        distance: 0,
+        get azcv () { // for jötunn
+            const clampDist = Math.min(Math.max(absoluteZero.slowEnd, this.distance), absoluteZero.slowStart);
+            let cv = (clampDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd);
+            if (player.dodger !== "jötunn") cv = 1;
+            return 0.3 - 0.3 * cv;
         },
     }
     spike.speed = spike.baseSpeed;
@@ -349,24 +370,31 @@ function spawnAndDrawDanger() {
             )
            ) danger.colorValue += danger.spawnRate;
         if (danger.colorValue > 185 && (danger?.despawn || danger?.reachedWall)) danger.colorValue -= danger.despawnRate;
-        let joltEffectColor = `rgb(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
+        let joltEffectColor = `rgba(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
+        let jötunnEffectColor = `rgba(80, ${198+danger.colorValue/10}, ${229+danger.colorValue/10}, ${danger.azcv})`;
+
+        function joltOrJötunnFillStyle() {
+            if (player.dodger === "jolt") return joltEffectColor;
+            else if (player.dodger === "jötunn") return jötunnEffectColor;
+            else return "rgba(255, 255, 255, 0)";
+        }
         
         // shape
         if (danger.type === "beam") {
             ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
-            ctx.fillStyle = joltEffectColor;
+            ctx.fillStyle = joltOrJötunnFillStyle();
             ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
         }
         else if (danger.type === "circle") {
             if (danger.variant === "bomb") {
                 drawCircle(danger.x, danger.y, danger.r);
-                ctx.fillStyle = joltEffectColor;
+                ctx.fillStyle = joltOrJötunnFillStyle();
                 drawCircle(danger.x, danger.y, danger.r);
             }
             if (danger.variant === "ring") {
                 ctx.lineWidth = danger.lineWidth;
                 drawCircle(danger.x, danger.y, danger.r, "stroke");
-                ctx.strokeStyle = joltEffectColor;
+                ctx.strokeStyle = joltOrJötunnFillStyle();
                 drawCircle(danger.x, danger.y, danger.r, "stroke");
             }
         }
@@ -418,7 +446,7 @@ function spawnAndDrawDanger() {
                 ctx.restore();
             }
             drawSpike();
-            ctx.fillStyle = joltEffectColor;
+            ctx.fillStyle = joltOrJötunnFillStyle();
             drawSpike();
             danger.rotate += Math.PI/100;
             
@@ -516,6 +544,7 @@ function musicCollisions() {
                 }
             if (danger.type === "spike") distance -= danger.r*1.5;
             if (distance < 0) distance = 0;
+            danger.distance = distance;
             
             // limits the lowest possible distance by taking the higher value
             const maxDist = Math.max(distance, absoluteZero.slowEnd);
@@ -526,34 +555,17 @@ function musicCollisions() {
             // xFactor = min + max*(factor between 0 and 1)
             const spawnFactor = 0.8 + 0.2*factor;
             const slowFactor = 0.3 + 0.7*factor;
-            const colorFactor = 0.9 + 0.1*factor;
-            
-            // prevents lasting effects after ability swap
-            let slowed = false;
             
             if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Stagnation") {
                 danger.spawnRate = danger.baseSpawnRate * spawnFactor;
-                slowed = true;
             } else danger.spawnRate = danger.baseSpawnRate;
-            if (danger?.launched) {
-                if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") {
-                    danger.movex = danger.baseMoveX * slowFactor;
-                    danger.movey = danger.baseMoveY * slowFactor;
-                    slowed = true;
-                } else {
-                    danger.movex = danger.baseMoveX;
-                    danger.movey = danger.baseMoveY;
-                }
+            if (danger.type === "spike") {
+                if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") danger.speed = danger.baseSpeed * slowFactor;
+                else danger.speed = danger.baseSpeed;
             }
-            Object.defineProperty(danger, "color", {
-                get() {
-                    if (slowed) return `rgb(${this.colorValue*colorFactor}, ${this.colorValue*colorFactor}, ${this.colorValue})`;
-                    else return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
-                }
-            })
         }
 
-        if (player.dodger === "jolt") {
+        if (player.dodger === "jolt" && danger.type !== "text") {
             if (shockwave.activated && shockwave?.path && danger?.collisionPoints && !danger?.invincible) {
                 danger.collisionPoints.forEach(point => {
                     ctx.save();
@@ -567,42 +579,42 @@ function musicCollisions() {
                     ctx.restore();
                 })
             }
-        }
-        if (danger?.reset && !danger?.invincible) {
-            if (now - danger.reset > 2500) {
-                ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
-                    if (danger?.[unit]) {
+            if (danger?.reset && !danger?.invincible) {
+                if (now - danger.reset > 2500) {
+                    ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
+                        if (danger?.[unit]) {
+                            if (danger.variant === "vertical") {
+                                if (unit === "h") return;
+                                // to determine the coordinate
+                                // take the original size of the beam, subtract its new size, then divide that by 2
+                                // add this value to the coordinate
+                                danger.x = danger.baseX + (danger.baseUnit - danger.w)/2;
+                            }
+                            if (danger.variant === "horizontal") {
+                                if (unit === "w") return;
+                                danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
+                            }
+                            if (danger[unit] < danger.baseUnit-0.0001) danger[unit] += danger.baseUnit/100;
+                            else danger[unit] = danger.baseUnit;
+                            if (danger?.speed && danger?.speed < danger?.baseSpeed-0.0001) danger.speed += danger.baseSpeed/100;
+                            else if (danger?.speed) danger.speed = danger.baseSpeed;
+                        }
+                    })
+                }
+                else if (now - danger.reset <= 1000) {
+                    ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
                         if (danger.variant === "vertical") {
                             if (unit === "h") return;
-                            // to determine the coordinate
-                            // take the original size of the beam, subtract its new size, then divide that by 2
-                            // add this value to the coordinate
                             danger.x = danger.baseX + (danger.baseUnit - danger.w)/2;
                         }
                         if (danger.variant === "horizontal") {
                             if (unit === "w") return;
                             danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                         }
-                        if (danger[unit] < danger.baseUnit-0.0001) danger[unit] += danger.baseUnit/100;
-                        else danger[unit] = danger.baseUnit;
-                        if (danger?.speed && danger?.speed < danger?.baseSpeed-0.0001) danger.speed += danger.baseSpeed/100;
-                        else if (danger?.speed) danger.speed = danger.baseSpeed;
-                    }
-                })
-            }
-            else if (now - danger.reset <= 1000) {
-                ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
-                    if (danger.variant === "vertical") {
-                        if (unit === "h") return;
-                        danger.x = danger.baseX + (danger.baseUnit - danger.w)/2;
-                    }
-                    if (danger.variant === "horizontal") {
-                        if (unit === "w") return;
-                        danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
-                    }
-                    if (danger?.[unit]) danger[unit] = danger.baseUnit/2;
-                    if (danger?.speed) danger.speed = danger.baseSpeed/2;
-                })
+                        if (danger?.[unit]) danger[unit] = danger.baseUnit/2;
+                        if (danger?.speed) danger.speed = danger.baseSpeed/2;
+                    })
+                }
             }
         }
     })
