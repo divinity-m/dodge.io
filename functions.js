@@ -1,4 +1,4 @@
-console.log("typo");// DODGE.IO - FUNCTIONS.JS
+console.log("shockwave or shockray");// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -28,14 +28,6 @@ function recordKeyDown(event) {
     // Ability controls
     if ((event.code === "KeyQ" || event.code === "KeyJ") && gameState !== "endlessOver") {
         if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
-
-        else if (player.dodger === "jötunn" && absoluteZero.usable) {
-            absoluteZero.usable = false;
-            absoluteZero.lastEnded = Date.now();
-            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
-            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
-            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
-        }
             
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             // activate the shockwave ability and set certain properties
@@ -46,6 +38,16 @@ function recordKeyDown(event) {
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
         }
+    } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
+        if (player.dodger === "jötunn" && absoluteZero.usable) {
+            absoluteZero.usable = false;
+            absoluteZero.lastEnded = Date.now();
+            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
+            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
+            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
+        }
+        if (player.dodger === "jolt" && shockwave.active === "Shockwave") shockwave.active = "Shockray";
+        else if (player.dodger === "jolt" && shockwave.active === "Shockray") shockwave.active = "Shockwave";
     }
 }
 
@@ -57,6 +59,42 @@ function recordKeyUp(event) {
     if (event.code === "KeyD" || event.code === "ArrowRight") dPressed = false;
     if (event.code === "ShiftLeft" || event.code === "ShiftRight") shiftPressed = 1;
     if (!wPressed && !aPressed && !sPressed && !dPressed) keyboardMovementOn = false;
+}
+
+function recordRightClick(event) {
+    event.preventDefault();
+    if (loadingScreen(true)) return;
+
+    // Ability Activations
+    if (gameState !== "endlessOver") {
+        if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
+        
+        else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
+            shockwave.activated = true;
+            shockwave.facingAngle = player.facingAngle;
+            shockwave.x = player.x;
+            shockwave.y = player.y;
+            shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
+            shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
+        }
+    }
+}
+
+function recordMiddleClick() {
+    event.preventDefault();
+    if (loadingScreen(true)) return;
+
+    if (gameState !== "endlessOver") {
+        if (player.dodger === "jötunn" && absoluteZero.usable) {
+            absoluteZero.usable = false;
+            absoluteZero.lastEnded = Date.now();
+            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
+            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
+            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
+        }
+    }
+    if (player.dodger === "jolt" && shockwave.active === "Shockwave") shockwave.active = "Shockray";
+    else if (player.dodger === "jolt" && shockwave.active === "Shockray") shockwave.active = "Shockwave";
 }
 
 function recordLeftClick() {
@@ -503,33 +541,6 @@ function recordLeftClick() {
     }
 }
 
-function recordRightClick(event) {
-    event.preventDefault();
-    if (loadingScreen(true)) return;
-
-    // Ability Activations
-    if (gameState !== "endlessOver") {
-        if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
-
-        else if (player.dodger === "jötunn" && absoluteZero.usable) {
-            absoluteZero.usable = false;
-            absoluteZero.lastEnded = Date.now();
-            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
-            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
-            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
-        }
-        
-        else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
-            shockwave.activated = true;
-            shockwave.facingAngle = player.facingAngle;
-            shockwave.x = player.x;
-            shockwave.y = player.y;
-            shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
-            shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
-        }
-    }
-}
-
 // FUNCTIONS THAT DRAWS STUFF TO THE SCREEN
 function drawCircle(x = 0, y = 0, r = 12.5, type = "fill") {
     ctx.beginPath()
@@ -954,8 +965,9 @@ function drawDodgerSelection() {
     drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.7)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
                     "unfortunate soul stricken by the electrically infused pluse.",
-                    "Shrink & Stun Reduction: 50% | Shrink & Stun Duration: Danger - 2.5s, Enemy - 5s",
-                    "Shockwave Duration: 0.7s | Shockwave Cooldown: 2s");
+                    "Shockwave Effect Reduction: 25% | Shockray Effect Reduction: 50%",
+                    "Shockray Effect Duration: Danger - 2.5s, Enemy - 5s",
+                    "Duration: 0.7s | Cooldown: 2s");
     drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
                     "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
@@ -1147,6 +1159,10 @@ function drawText() { // draws the current time, highest time, and enemy count
     if (gameState === "endlessMode" || gameState === "endlessOver") textX = 200
     else textX = cnv.width/2
 
+    let controls;
+    if (lastPressing === "mouse") controls = ["RMB", "MMB"];
+    else if (lastPressing === "kb") controls = ["Q/J", "E/K"];
+
     // No Abiliy
     if (player.dodger === "evader") ctx.fillText(`Passive: Skill`, textX, 620);
 
@@ -1157,8 +1173,7 @@ function drawText() { // draws the current time, highest time, and enemy count
 
         if (now - dash.lastEnded >= 1100) { // 1.1s
             dash.usable = true;
-            if (lastPressing === "mouse") ctx.fillText(`Active: Dash (RMB)`, textX, 620);
-            else if (lastPressing === "kb") ctx.fillText(`Active: Dash (Q/J)`, textX, 620);
+            ctx.fillText(`Active: Dash (${controls[0]})`, textX, 620);
         } else {
             dash.usable = false;
             ctx.fillText(`Active: Dash (${dashCDLeft}s)`, textX, 620);
@@ -1172,26 +1187,24 @@ function drawText() { // draws the current time, highest time, and enemy count
 
         if (now - absoluteZero.lastEnded >= 1000) { // 1s
             absoluteZero.usable = true;
-            if (lastPressing === "mouse") ctx.fillText(`Passive: ${absoluteZero.passive} (RMB)`, textX, 620);
-            else if (lastPressing === "kb") ctx.fillText(`Passive: ${absoluteZero.passive} (Q/J)`, textX, 620);
+            ctx.fillText(`Passive: ${absoluteZero.passive} | Swap (${controls[1]})`, textX, 620);
         } else {
             absoluteZero.usable = false;
-            ctx.fillText(`Passive: ${absoluteZero.passive} (${absoluteZeroCDLeft})`, textX, 620);
+            ctx.fillText(`Passive: ${absoluteZero.passive} | Swap (${absoluteZeroCDLeft})`, textX, 620);
         }
     }
 
     // Shockwave
     else if (player.dodger === "jolt") {
         // Shockwave CD
-        let shockwaveCDLeft = ((2000 - (now - shockwave.lastEnded)) / 1000).toFixed(2);
+        let shockwaveCDLeft = ((shockwave.cd - (now - shockwave.lastEnded)) / 1000).toFixed(2);
 
-        if (now - shockwave.lastEnded >= 2000) { // 2s
+        if (now - shockwave.lastEnded >= shockwave.cd) { // 3s or 7s
             shockwave.usable = true;
-            if (lastPressing === "mouse") ctx.fillText(`Active: Shockwave (RMB)`, textX, 620);
-            else if (lastPressing === "kb") ctx.fillText(`Active: Shockwave (Q/J)`, textX, 620);
+            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1])`, textX, 620);
         } else {
             shockwave.usable = false;
-            ctx.fillText(`Active: Shockwave (${shockwaveCDLeft}s)`, textX, 620);
+            ctx.fillText(`Active: ${shockwave.active} (${shockwaveCDLeft}s) | Swap (${controls[1]})`, textX, 620);
         }
     }
 
@@ -1504,9 +1517,12 @@ function abilities() { // player-specific abilities
         if (shockwave.activated) {
             // create the shockwaves path
             shockwave.path = new Path2D();
-            shockwave.path.moveTo(0, -shockwave.radius);
-            shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
-            shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
+            if (shockwave.active === "Shockwave") shockwave.path.arc(0, 0, shockwave.radius, Math.PI*2, 0);
+            else if (shockwave.active === "Shockray") {
+                shockwave.path.moveTo(0, -shockwave.radius);
+                shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
+                shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
+            }
 
             // save and transform the canvas
             ctx.save();
@@ -1514,7 +1530,8 @@ function abilities() { // player-specific abilities
             ctx.rotate(shockwave.facingAngle);
 
             // draw the shockwave
-            ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
+            if (shockwave.active === "Shockwave") ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+            else if (shockwave.active === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
             ctx.fill(shockwave.path);
 
             // checks for collisions
@@ -1538,6 +1555,8 @@ function abilities() { // player-specific abilities
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
+                if (shockwave.active === "Shockwave") { shockwave.cd = 7000; shockwave.effect = 0.75; }
+                else if (shockwave.active === "Shockray") { shockwave.cd = 3000; shockwave.effect = 0.5; }
             }
         }
         allEnemies.forEach(enemy => {
@@ -1554,10 +1573,9 @@ function abilities() { // player-specific abilities
             }
             // Decrease the stats of enemies under the effect of shockwave
             else {
-                enemy.r = enemy.baseRadius/2;
-                enemy.speed = enemy.baseSpeed/2;
-                enemy.speed = enemy.baseSpeed/2;
-                if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius/2;
+                enemy.r = enemy.baseRadius*shockwave.effect;
+                enemy.speed = enemy.baseSpeed*shockwave.effect;
+                if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius*shockwave.effect;
             }
         })
     }
