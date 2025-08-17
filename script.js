@@ -27,6 +27,11 @@ document.addEventListener("touchcancel", () => {mouseDown = false});
 
 document.addEventListener("click", recordLeftClick);
 document.addEventListener("contextmenu", recordRightClick);
+document.addEventListener("auxclick", (event) => {
+    if (event.button === 1) {
+        recordMiddleClick();
+    }
+});
 let mouseOver = {
     play: false,
     settings: false,
@@ -102,6 +107,8 @@ let shockwave = {
     radius: 25,
     path: new Path2D(),
     lastEnded: 0,
+    cd: 7000,
+    effect: 0.75,
 };
 
 let amplify = {
