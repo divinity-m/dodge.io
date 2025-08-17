@@ -1,4 +1,4 @@
-console.log("jolts stun shows, do jotunns later");// DODGE.IO - FUNCTIONS.JS
+console.log("decideFillStyle bug, draw jotunns effect");// DODGE.IO - FUNCTIONS.JS
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
@@ -490,7 +490,7 @@ function recordLeftClick() {
                 player.subColor = "rgb(230, 230, 0)";
                 amplify.reset();
             }
-            else if (mouseOver.crescendo && /*highscore.hard >= 60*/true) {
+            else if (mouseOver.crescendo && highscore.hard >= 60) {
                 player.dodger = "crescendo";
                 player.color = "rgb(0, 0, 0)";
                 player.subColor = "rgb(40, 40, 40)";
@@ -531,11 +531,19 @@ function recordRightClick(event) {
 }
 
 // FUNCTIONS THAT DRAWS STUFF TO THE SCREEN
-function drawCircle(x, y, r = 12.5, type = "fill") {
+function drawCircle(x = 0, y = 0, r = 12.5, type = "fill") {
     ctx.beginPath()
     ctx.arc(x, y, r, Math.PI * 2, 0)
     if (type === "fill") ctx.fill();
     else if (type === "stroke") ctx.stroke();
+}
+
+function decideFillStyle(bool, color1, color2) { 
+    if (bool) {
+        ctx.fillStyle = color1;
+    } else {
+        ctx.fillStyle = color2;
+    }
 }
 
 function drawStartScreen() {
@@ -757,13 +765,6 @@ function drawSettings() {
 
 function drawDifficultySelection() {
     // Nested functions cuz fuck doing this shit over and over again
-    function decideFillStyle(bool, lightColor, darkColor) {
-        if (bool) {
-            ctx.fillStyle = lightColor;
-        } else {
-            ctx.fillStyle = darkColor;
-        }
-    }
     function drawDifficultyInfo(x, y, color, difficultyName, score = "none", adversary, ...description) {
         // Level Name
         ctx.fillStyle = color;
@@ -866,22 +867,32 @@ function drawDifficultySelection() {
 
 function drawDodgerSelection() {
     // Nested functions to make life easier
-    function decideFillStyle(bool, color1, color2) {
-        if (bool) {
-            ctx.fillStyle = color1;
-        } else {
-            ctx.fillStyle = color2;
-        }
-    }
-    function drawDodgerInfo(color, dodgerName, description, dodger) {
-        ctx.fillStyle = color;
+    function drawDodgerCard(mouseOver, unlocked, dodger, dodgerName, abilityName, requirement, ...colors) {
+        // Rectangle
+        decideFillStyle(mouseOver, colors[0], colors[1]);
+        ctx.fillRect(dodger.x, dodger.y, 200, 100);
+
+        // Circle
+        ctx.fillStyle = colors[2];
         drawCircle(dodger.x + 170, dodger.y + 22);
-        
+
+        // Text
         ctx.textAlign = "left";
         ctx.font = "bold 22px 'Lucida Console'";
         ctx.fillText(dodgerName, dodger.x + 10, dodger.y + 30);
         ctx.font = "14px 'Lucida Console'";
-        ctx.fillText(description, dodger.x + 10, dodger.y + 80);
+        ctx.fillText(`ABILITY: ${abilityName}`, dodger.x + 10, dodger.y + 80);
+
+        // Locked
+        if (!unlocked) {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            ctx.fillRect(dodger.x, dodger.y, 200, 100);
+            ctx.strokeStyle = colors[2];
+            ctx.lineWidth = 2;
+            ctx.textAlign = "center";
+            ctx.font = "bold 15px Arial";
+            ctx.strokeText(requirement, dodger.x + 100, dodger.y + 50);
+        }
     }
     function drawAbilityDesc(mouseOver, unlocked, bgColor, lockedColor, textColor, abilityName, ...description) {
         if (mouseOver) {
@@ -915,33 +926,23 @@ function drawDodgerSelection() {
     // Dodgers
     const evader = { x: 50, y: 25, };
     mouseOver.evader = mouseX > evader.x && mouseX < evader.x + 200 && mouseY > evader.y && mouseY < evader.y + 100;
-    decideFillStyle(mouseOver.evader, "rgb(230, 230, 230)", "rgb(220, 220, 220)");
-    ctx.fillRect(evader.x, evader.y, 200, 100);
-    drawDodgerInfo("rgb(255, 255, 255)", "EVADER", "ABILITY: SKILL", evader);
+    drawDodgerCard(mouseOver.evader, true, evader, "EVADER", "SKILL", "NONE", "rgb(230, 230, 230)", "rgb(220, 220, 220)", "white");
 
     const jolt = { x: 300, y: 25, };
     mouseOver.jolt = mouseX > jolt.x && mouseX < jolt.x + 200 && mouseY > jolt.y && mouseY < jolt.y + 100;
-    decideFillStyle(mouseOver.jolt, "rgb(220, 220, 0)", "rgb(210, 210, 0)");
-    ctx.fillRect(jolt.x, jolt.y, 200, 100);
-    drawDodgerInfo("rgb(255, 255, 0)", "JOLT", "ABILITY: SHOCKWAVE", jolt);
+    drawDodgerCard(mouseOver.jolt, highscore.medium >= 30, jolt, "JOLT", "SHOCKWAVE", "MEDIUM 30S", "rgb(220, 220, 0)", "rgb(210, 210, 0)", "yellow");
     
     const jötunn = { x: 550, y: 25, };
     mouseOver.jötunn = mouseX > jötunn.x && mouseX < jötunn.x + 200 && mouseY > jötunn.y && mouseY < jötunn.y + 100;
-    decideFillStyle(mouseOver.jötunn, "rgb(70, 175, 219)", "rgb(65, 166, 209)");
-    ctx.fillRect(jötunn.x, jötunn.y, 200, 100);
-    drawDodgerInfo("rgb(79, 203, 255)", "JÖTUNN", `ABILITY: ABSOLUTE ZERO`, jötunn);
+    drawDodgerCard(mouseOver.jötunn, highscore.limbo === 100, jötunn, "JÖTUNN", "ABSOLUTE ZERO", "LIMBO 100%", "rgb(70, 175, 219)", "rgb(65, 166, 209)", "rgb(79, 203, 255)");
     
     const crescendo = { x: 175, y: 150, };
     mouseOver.crescendo = mouseX > crescendo.x && mouseX < crescendo.x + 200 && mouseY > crescendo.y && mouseY < crescendo.y + 100;
-    decideFillStyle(mouseOver.crescendo, "rgb(20, 20, 20)", "rgb(30, 30, 30)");
-    ctx.fillRect(crescendo.x, crescendo.y, 200, 100);
-    drawDodgerInfo("rgb(0, 0, 0)", "CRESCENDO", `ABILITY: AMPLIFY`, crescendo);
+    drawDodgerCard(mouseOver.crescendo, highscore.hard >= 60, crescendo, "CRESCENDO", "AMPLIFY", "HARD 60S", "rgb(20, 20, 20)", "rgb(30, 30, 30)", "rgb(0, 0, 0)");
     
     const j_sab = { x: 425, y: 150, };
     mouseOver.j_sab = mouseX > j_sab.x && mouseX < j_sab.x + 200 && mouseY > j_sab.y && mouseY < j_sab.y + 100;
-    decideFillStyle(mouseOver.j_sab, "rgb(220, 0, 0)", "rgb(200, 0, 0)");
-    ctx.fillRect(j_sab.x, j_sab.y, 200, 100);
-    drawDodgerInfo("rgb(255, 0, 0)", "J-SAB", "ABILITY: DASH", j_sab);
+    drawDodgerCard(mouseOver.j_sab, highscore.andromeda === 100, j_sab, "J-SAB", "DASH", "ANDROMEDA 100%", "rgb(220, 0, 0)", "rgb(200, 0, 0)", "rgb(255, 0, 0)");
 
 
     // Ability Descriptions
@@ -960,7 +961,7 @@ function drawDodgerSelection() {
                     "temperature decelerate the speeds and spawn-rates of nearby adversaries.",
                     "Glaciate affects speed. Stagnate affects spawn-rate. Absolute Zero freezes both.",
                     "Speed Reduction: 0% - 70% | Spawn-rate Reduction: 0% - 20% | Swap Cooldown: 1s");
-    drawAbilityDesc(mouseOver.crescendo, /*highscore.hard >= 60*/true, "rgba(20, 20, 20, 0.9)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
+    drawAbilityDesc(mouseOver.crescendo, highscore.hard >= 60, "rgba(20, 20, 20, 0.9)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
                     "Crescendos harness the sound waves of their environment to augment their cores.",
                     "These dodgers, as if adapting to the rhythm, accelerate with the music, continually",
                     "modifying their cores until they outpace the waves themselves.",
