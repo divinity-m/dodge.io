@@ -126,6 +126,7 @@ function createBeam(variant="none") {
         get swcv () { // for jolt
             return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
         },
+        vulnerable: "None",
         distance: 0,
         get azcv () { // for jötunn
             const clampDist = Math.min(Math.max(absoluteZero.slowEnd, this.distance), absoluteZero.slowStart);
@@ -154,6 +155,7 @@ function createCircle(variant="none") {
         get swcv () { // for jolt
             return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
         },
+        vulnerable: "None",
         distance: 0,
         get azcv () { // for jötunn
             const clampDist = Math.min(Math.max(absoluteZero.slowEnd, this.distance), absoluteZero.slowStart);
@@ -185,14 +187,15 @@ function createSpike() {
         get reachedWall() {
             if ((this.x - this.r * 1.5001 < 0 || this.x + this.r * 1.5001 > cnv.width ||
                 this.y - this.r * 1.5001 < 0 || this.y + this.r * 1.5001 > cnv.height) && this.launched) {
-                return true
+                return true;
             }
-            else return false
+            else return false;
         },
         reset: 0,
         get swcv () { // for jolt
             return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
         },
+        vulnerable: "None",
         distance: 0,
         get azcv () { // for jötunn
             const clampDist = Math.min(Math.max(absoluteZero.slowEnd, this.distance), absoluteZero.slowStart);
@@ -565,21 +568,22 @@ function musicCollisions() {
             }
         }
 
-        if (player.dodger === "jolt" && danger.type !== "text") {
+        if (player.dodger === "jolt" && danger.type !== "text" && !danger?.invincible) {
             if (shockwave.activated && shockwave?.path && danger?.collisionPoints && !danger?.invincible) {
                 danger.collisionPoints.forEach(point => {
                     ctx.save();
                     ctx.translate(shockwave.x, shockwave.y);
                     ctx.rotate(shockwave.facingAngle);
                     // checks each individual collision point to see if the danger was hit by the wave
-                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
+                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])
+                        && (danger.vulnerable === shockwave.used || danger.vulnerable === "None")) {
                         // sets the size reset in motion
                         danger.reset = Date.now();
                     }
                     ctx.restore();
                 })
             }
-            if (danger?.reset && !danger?.invincible) {
+            if (danger?.reset) {
                 if (now - danger.reset > 2500) {
                     ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
                         if (danger?.[unit]) {
@@ -595,7 +599,7 @@ function musicCollisions() {
                                 danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                             }
                             if (danger[unit] < danger.baseUnit-0.0001) danger[unit] += danger.baseUnit/100;
-                            else danger[unit] = danger.baseUnit;
+                            else { danger[unit] = danger.baseUnit; danger.vulnerable = "None"; }
                             if (danger?.speed && danger?.speed < danger?.baseSpeed-0.0001) danger.speed += danger.baseSpeed/100;
                             else if (danger?.speed) danger.speed = danger.baseSpeed;
                         }
