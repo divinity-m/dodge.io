@@ -1,4 +1,4 @@
-console.log("reset amplify, danger stun fix");// DODGE.IO - MUSIC.JS
+console.log("jolts effect on dangers, do jotunns later");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -122,6 +122,10 @@ function createBeam(variant="none") {
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
+        reset: 0,
+        get swcv () { // for jolt
+            return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
+        },
     }
     if (beam.variant > 0.5) beam.variant = "vertical";
     else beam.variant = "horizontal";
@@ -138,6 +142,10 @@ function createCircle(variant="none") {
         colorValue: 185,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+        },
+        reset: 0,
+        get swcv () { // for jolt
+            return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
         },
     }
     circle.lineWidth = circle.r;
@@ -166,6 +174,10 @@ function createSpike() {
                 return true
             }
             else return false
+        },
+        reset: 0,
+        get swcv () { // for jolt
+            return 0.8 - 0.8 * Math.min(1, (now - this.reset)/5000);
         },
     }
     spike.speed = spike.baseSpeed;
@@ -337,18 +349,28 @@ function spawnAndDrawDanger() {
             )
            ) danger.colorValue += danger.spawnRate;
         if (danger.colorValue > 185 && (danger?.despawn || danger?.reachedWall)) danger.colorValue -= danger.despawnRate;
-
+        let joltEffectColor = `rgb(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
+        
         // shape
         if (danger.type === "beam") {
-            if (danger.variant === "vertical") ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
-            if (danger.variant === "horizontal") ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
+            ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
+            ctx.fillStyle = joltEffectColor;
+            ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
         }
         else if (danger.type === "circle") {
-            if (danger.variant === "bomb") drawCircle(danger.x, danger.y, danger.r);
-            if (danger.variant === "ring") { ctx.lineWidth = danger.lineWidth; drawCircle(danger.x, danger.y, danger.r, "stroke"); }
+            if (danger.variant === "bomb") {
+                drawCircle(danger.x, danger.y, danger.r);
+                ctx.fillStyle = joltEffectColor;
+                drawCircle(danger.x, danger.y, danger.r);
+            }
+            if (danger.variant === "ring") {
+                ctx.lineWidth = danger.lineWidth;
+                drawCircle(danger.x, danger.y, danger.r, "stroke");
+                ctx.strokeStyle = joltEffectColor;
+                drawCircle(danger.x, danger.y, danger.r, "stroke");
+            }
         }
         else if (danger.type === "spike") {
-            drawCircle(danger.x, danger.y, danger.r);
             let w = 1.75;
             let h = 1.5;
             function draw4Spikes() {
@@ -377,21 +399,27 @@ function spawnAndDrawDanger() {
                 ctx.lineTo(danger.r/w, danger.r/w);
                 ctx.fill();
             }
-            ctx.save();
-            ctx.translate(danger.x, danger.y);
-            ctx.rotate(danger.rotate);
-            draw4Spikes();
-            ctx.restore();
-            ctx.save();
-            ctx.translate(danger.x, danger.y);
-            ctx.rotate((Math.PI/3)+danger.rotate);
-            draw4Spikes();
-            ctx.restore();
-            ctx.save();
-            ctx.translate(danger.x, danger.y);
-            ctx.rotate((Math.PI/6)+danger.rotate);
-            draw4Spikes();
-            ctx.restore();   
+            function drawSpike() {
+                drawCircle(danger.x, danger.y, danger.r);
+                ctx.save();
+                ctx.translate(danger.x, danger.y);
+                ctx.rotate(danger.rotate);
+                draw4Spikes();
+                ctx.restore();
+                ctx.save();
+                ctx.translate(danger.x, danger.y);
+                ctx.rotate((Math.PI/3)+danger.rotate);
+                draw4Spikes();
+                ctx.restore();
+                ctx.save();
+                ctx.translate(danger.x, danger.y);
+                ctx.rotate((Math.PI/6)+danger.rotate);
+                draw4Spikes();
+                ctx.restore();
+            }
+            drawSpike();
+            ctx.fillStyle = joltEffectColor;
+            drawSpike();
             danger.rotate += Math.PI/100;
             
             if (danger.colorValue >= 255 && !danger.launched) {
@@ -489,7 +517,6 @@ function musicCollisions() {
             if (danger.type === "spike") distance -= danger.r*1.5;
             if (distance < 0) distance = 0;
             
-            // absoluteZero.slowStart = 175; absoluteZero.slowEnd = 75
             // limits the lowest possible distance by taking the higher value
             const maxDist = Math.max(distance, absoluteZero.slowEnd);
             
@@ -526,18 +553,20 @@ function musicCollisions() {
             })
         }
 
-        if (player.dodger === "jolt" && shockwave.activated && shockwave?.path && danger?.collisionPoints && !danger?.invincible) {
-            danger.collisionPoints.forEach(point => {
-                ctx.save();
-                ctx.translate(shockwave.x, shockwave.y);
-                ctx.rotate(shockwave.facingAngle);
-                // checks each individual collision point to see if the danger was hit by the wave
-                if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
-                    // sets the size reset in motion
-                    danger.reset = Date.now();
-                }
-                ctx.restore();
-            })
+        if (player.dodger === "jolt") {
+            if (shockwave.activated && shockwave?.path && danger?.collisionPoints && !danger?.invincible) {
+                danger.collisionPoints.forEach(point => {
+                    ctx.save();
+                    ctx.translate(shockwave.x, shockwave.y);
+                    ctx.rotate(shockwave.facingAngle);
+                    // checks each individual collision point to see if the danger was hit by the wave
+                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])) {
+                        // sets the size reset in motion
+                        danger.reset = Date.now();
+                    }
+                    ctx.restore();
+                })
+            }
         }
         if (danger?.reset && !danger?.invincible) {
             if (now - danger.reset > 2500) {
