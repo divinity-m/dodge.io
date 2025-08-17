@@ -152,7 +152,7 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn"].forEach(setting => {
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "disableCursorBtn"].forEach(setting => {
             if (mouseOver?.[setting]) {
                 if (mouseOver?.enemyOutBtn) {
                     if (settings.enemyOutlines) settings.enemyOutlines = false;
@@ -165,6 +165,10 @@ function recordLeftClick() {
                 if (mouseOver?.aZ_RangeBtn) {
                     if (settings.aZ_Range) settings.aZ_Range = false;
                     else settings.aZ_Range = true;
+                }
+                if (mouseOver?.disableCursorBtn) {
+                    if (settings.disableCursor) settings.disableCursor = false;
+                    else settings.disableCursor = true;
                 }
     
                 // Saves the users settings options
@@ -566,6 +570,13 @@ function drawStartScreen() {
     music.var.volume = musicVolume/100;
     
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
+        // Me
+        ctx.strokeStyle = player.color;
+        ctx.lineWidth = 1.5;
+        ctx.font = '30px Roboto';
+        ctx.textAlign = 'left';
+        ctx.strokeText("Vasto", 5, 30);
+        
         // PLAY BUTTON //
         const playBtn = {
             x: 250,
@@ -713,6 +724,7 @@ function drawSettings() {
         ctx.fillText("Music Volume", 50, 150);
         ctx.fillText("SFX Volume", 50, 200);
         ctx.fillText("Show Absolute Zero's Range", 50, 250);
+        //  ctx.fillText("Custom Cursor", 50, 300);
         
         // Enemy Outlines Button
         mouseOver.enemyOutBtn = mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
@@ -731,6 +743,12 @@ function drawSettings() {
         if (settings.aZ_Range) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
         ctx.fillRect(266, 235, 20, 20);
+
+        // Custom Cursor Button
+        /*mouseOver.disableCursor = mouseX > 266 && mouseX < 286 && mouseY > 235 && mouseY < 255;
+        if (settings.disableCursor) ctx.fillStyle = "lime";
+        else ctx.fillStyle = "red";
+        ctx.fillRect(266, 235, 20, 20);*/
 
         // Music Volume Slider & SFX Volume Slider (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 155 && mouseX <= 325 && mouseY >= 130 && mouseY <= 160;
@@ -901,13 +919,18 @@ function drawDodgerSelection() {
         // Locked
         if (!unlocked) {
             if (dodgerName !== "CRESCENDO") ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-            else ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+            else ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
             ctx.fillRect(dodger.x, dodger.y, 200, 100);
-            ctx.strokeStyle = colors[2];
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1.25;
             ctx.textAlign = "center";
+
+            ctx.strokeStyle = "rgb(255, 255, 255)";
             ctx.font = "bold 20px Arial";
-            ctx.strokeText(requirement, dodger.x + 100, dodger.y + 50);
+            ctx.strokeText(requirement, dodger.x + 100, dodger.y + 55);
+            
+            ctx.strokeStyle = colors[2];
+            ctx.font = "bold 19.5px Arial";
+            ctx.strokeText(requirement, dodger.x + 100, dodger.y + 55);
         }
     }
     function drawAbilityDesc(mouseOver, unlocked, bgColor, lockedColor, textColor, abilityName, ...description) {
@@ -928,11 +951,17 @@ function drawDodgerSelection() {
             for (let i = 0; i < description.length; i++) ctx.fillText(description[i], 70, 335 + i*25);
 
             if (!unlocked) {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+                if (abilityName !== "AMPLIFY") ctx.fillStyle = "rgba(0, 0, 0, 0.825)";
+                else ctx.fillStyle = "rgba(0, 0, 0, 0.525)";
                 ctx.fillRect(50, 275, 700, 175);
-                ctx.strokeStyle = lockedColor;
                 ctx.lineWidth = 2;
                 ctx.textAlign = "center";
+
+                ctx.strokeStyle = "rgb(255, 255, 255)";
+                ctx.font = "bold 71px Arial";
+                ctx.strokeText("LOCKED", cnv.width/2, 387);
+                
+                ctx.strokeStyle = lockedColor;
                 ctx.font = "bold 70px Arial";
                 ctx.strokeText("LOCKED", cnv.width/2, 387);
             }
@@ -954,7 +983,7 @@ function drawDodgerSelection() {
     
     const crescendo = { x: 175, y: 150, };
     mouseOver.crescendo = mouseX > crescendo.x && mouseX < crescendo.x + 200 && mouseY > crescendo.y && mouseY < crescendo.y + 100;
-    drawDodgerCard(mouseOver.crescendo, highscore.hard >= 60, crescendo, "CRESCENDO", "AMPLIFY", "HARD 60S", "rgb(20, 20, 20)", "rgb(30, 30, 30)", "rgb(0, 0, 0)");
+    drawDodgerCard(mouseOver.crescendo, highscore.hard >= 60, crescendo, "CRESCENDO", "AMPLIFY", "HARD 60S", "rgb(30, 30, 30)", "rgb(40, 40, 40)", "rgb(0, 0, 0)");
     
     const j_sab = { x: 425, y: 150, };
     mouseOver.j_sab = mouseX > j_sab.x && mouseX < j_sab.x + 200 && mouseY > j_sab.y && mouseY < j_sab.y + 100;
@@ -970,8 +999,8 @@ function drawDodgerSelection() {
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
                     "unfortunate soul stricken by the electrically infused pluse.",
                     "Shockwave Effect Reduction: 25% | Shockray Effect Reduction: 50%",
-                    "Shockray Effect Duration: Danger - 2.93s, Enemy - 5.43s",
-                    "Duration: 0.7s | Cooldown: 2s");
+                    "Effect Duration: Danger - 2.93s, Enemy - 5.43s",
+                    "Shockwave Cooldown: 5.5s | Shockray Cooldown: 8.5s");
     drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
                     "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
@@ -980,8 +1009,9 @@ function drawDodgerSelection() {
                     "Speed Reduction: 0% - 70% | Spawn-rate Reduction: 0% - 20% | Swap Cooldown: 1s");
     drawAbilityDesc(mouseOver.crescendo, highscore.hard >= 60, "rgba(20, 20, 20, 0.9)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
                     "Crescendos harness the sound waves of their environment to augment their cores.",
-                    "These dodgers, as if adapting to the rhythm, accelerate with the music, continually",
-                    "modifying their cores until they outpace the waves themselves.",
+                    "Whenever a melody is audible, these dodgers, as if adapting to the rhythm, accelerate",
+                    "with the music, continually modifying their cores until they outpace the waves",
+                    "themselves.",
                     "Top Speed: 8");
     drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
@@ -1463,8 +1493,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
         else if (enemy.ability === "decelerator" && enemyDist < player.r + enemy.auraRadius) underAura++;
     });
     
-    player.slowed = 1 - (underAura/10)
-    if (player.slowed < 0.7) player.slowed = 0.7;
+    player.slowed = Math.max(1 - (underAura/10), 0.7);
 }
 
 // ABILITIES
@@ -1544,21 +1573,21 @@ function abilities() { // player-specific abilities
             ctx.restore();
 
             // increase the radius of the beam and move it every frame
-            shockwave.radius *= 1.018;
+            shockwave.radius *= 1.022;
             if (shockwave.used === "Shockwave") {
                 /* shockwave.x = player.x;
                 shockwave.y = player.y; */
-                shockwave.cd = 7000;
+                shockwave.cd = 8500;
                 shockwave.effect = 0.75;
             }
             else if (shockwave.used === "Shockray") {
                 shockwave.x += shockwave.movex;
                 shockwave.y += shockwave.movey;
-                shockwave.cd = 3000;
+                shockwave.cd = 5500;
                 shockwave.effect = 0.5;
             }
             // once the radius is greater than 250, end the entire ability
-            if ((shockwave.radius > 800 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
+            if ((shockwave.radius > 1250 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
                 shockwave.activated = false;
                 shockwave.radius = 25;
                 shockwave.lastEnded = Date.now();
@@ -1587,16 +1616,26 @@ function abilities() { // player-specific abilities
     }
     // Amplify accelerates the player over time
     if (player.dodger === "crescendo") {
-        if (gameState === "musicMode") { // reach your peak speed 78.57%~ into a song
-            amplify.speed = music.var.currentTime/music.var.duration * 7;
-            player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
-        } else {
-            amplify.accel = 1/music.var.duration * 7; // 98.197 is the duration of interstellar
-            if (now - amplify.accelRate > 1000) {
-                amplify.speed += amplify.accel;
-                amplify.accelRate = Date.now();
+        amplify.accel = 1/music.var.duration * 7;
+        if (musicVolume > 0) {
+            if (gameState === "musicMode") { // reach your peak speed 78.57%~ into a song
+                amplify.speed = music.var.currentTime/music.var.duration * 7;
+                player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
+            } else {
+                if (now - amplify.accelRate > 1000) {
+                    amplify.speed += amplify.accel;
+                    amplify.speed = Math.min(amplify.limit - amplify.baseSpeed, amplify.speed);
+                    amplify.accelRate = Date.now();
+                }
+                player.baseSpeed = amplify.baseSpeed + amplify.speed;
             }
-            player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
+        } else {
+                if (now - amplify.accelRate > 1000) {
+                    amplify.speed -= amplify.accel;
+                    amplify.speed = Math.max(0, amplify.speed);
+                    amplify.accelRate = Date.now();
+                }
+                player.baseSpeed = amplify.baseSpeed + amplify.speed;
         }
     }
 }
