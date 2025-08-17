@@ -56,6 +56,7 @@ let mouseOver = {
     musicSlider: false,
     sfxSlider: false,
     aZ_RangeBtn: false,
+    disableCursorBtn: false,
 };
 
 let mouseX;
@@ -130,6 +131,7 @@ let settings = {
     musicSliderX: 240,
     sfxSliderX: 240,
     aZ_Range: true,
+    disableCursor: false,
 };
 
 let allEnemies = [];
@@ -233,7 +235,7 @@ if (localData) {
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score]) hs[score] = userData.highscore[score];
         })
-        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true};
+        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true, disableCursor: false,};
         ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range"].forEach(setting => {
             if (userData?.settings?.[setting]) s[setting] = userData.settings[setting];
         })
@@ -243,7 +245,7 @@ if (localData) {
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
                     settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX,
-                               sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range}};
+                               sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range, disableCursor: s.disableCursor}};
         // updates the current data to the locally saved data
         player = userData.player;
         highscore = userData.highscore;
