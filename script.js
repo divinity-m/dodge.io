@@ -117,7 +117,7 @@ let amplify = {
     baseSpeed: 2.5,
     speed: 0,
     accel: 0,
-    limit: 10,
+    limit: 8,
     accelRate: 0,
     reset: function () {
         this.speed = 0;
