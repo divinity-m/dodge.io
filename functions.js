@@ -1036,7 +1036,7 @@ function drawPlayer() {
             if (absoluteZero.passive === "Absolute Zero") ctx.strokeStyle = "rgba(0, 127, 255, 0.5)";
             if (absoluteZero.passive === "Glaciation") ctx.strokeStyle = "rgba(50, 151, 255, 0.5)";
             if (absoluteZero.passive === "Stagnation") ctx.strokeStyle = "rgba(84, 168, 255, 0.5)";
-        }
+        } else if (timeLeft <= 0 || innerGameState === "musicModeFail") = ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
         ctx.lineWidth = 2;
         drawCircle(player.x, player.y, absoluteZero.slowStart, "stroke");
     }
