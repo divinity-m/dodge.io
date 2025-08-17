@@ -1,4 +1,4 @@
-console.log("reset amplify, danger stun, typo");// DODGE.IO - MUSIC.JS
+console.log("reset amplify, danger stun fix");// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
@@ -153,23 +153,22 @@ function createSpike() {
         variant: "none",
         x: 0, y: 0, r: 20,
         rotate: 0, 
+        baseSpeed: 2.5 + 2 * (music.var.currentTime/music.var.duration),
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
         get color() {
             return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
         },
-        get speed() {
-            return 2.5 + 2 * (music.var.currentTime/music.var.duration);
-        },
         launched: false,
         get reachedWall() {
-            if ((this.x - this.r * 1.5 < 0 || this.x + this.r * 1.5 > cnv.width ||
-                this.y - this.r * 1.5 < 0 || this.y + this.r * 1.5 > cnv.height) && this.launched) {
+            if ((this.x - this.r * 1.5001 < 0 || this.x + this.r * 1.5001 > cnv.width ||
+                this.y - this.r * 1.5001 < 0 || this.y + this.r * 1.5001 > cnv.height) && this.launched) {
                 return true
             }
             else return false
         },
     }
+    spike.speed = spike.baseSpeed;
     const radiusSpace = spike.r * 1.501;
     spike.x = Math.random()*(cnv.width-(radiusSpace*2)) + radiusSpace;
     spike.y = Math.random()*(cnv.height-(radiusSpace*2)) + radiusSpace;
@@ -233,6 +232,7 @@ function spawnAndDrawDanger() {
                         else if (rand < 0.75) allDangers[0].y = radiusSpace;
                         else if (rand < 1) allDangers[0].y = cnv.height - radiusSpace;
                     } else {
+                        allDangers[0].location = location;
                         locations = {tl: [radiusSpace, radiusSpace], tr: [cnv.width-radiusSpace, radiusSpace],
                                      bl: [radiusSpace, cnv.height-radiusSpace], br: [cnv.width-radiusSpace, cnv.height-radiusSpace],
                                      tm: [cnv.width/2, radiusSpace], lm: [radiusSpace, cnv.height/2],
@@ -243,13 +243,8 @@ function spawnAndDrawDanger() {
                             allDangers[0].y = locations[location][1];
                         }
                     }
-                    if (modifiers?.speed) {
-                        Object.defineProperty(allDangers[0], "speed", {
-                            get() {
-                                return modifiers.speed;
-                            }
-                        })
-                    }
+                    if (modifiers?.speed) allDangers[0].baseSpeed = modifiers.speed;
+                    allDangers[0].speed = allDangers[0].baseSpeed;
                 } else if (dangerType === "text") {
                     allDangers.unshift(createText());
                     if (modifiers?.text) allDangers[0].text = modifiers.text;
@@ -403,23 +398,30 @@ function spawnAndDrawDanger() {
                 const dx = player.x - danger.x;
                 const dy = player.y - danger.y;
                 const dist = Math.hypot(dx, dy);
-                danger.movex = (dx/dist)*danger.speed;
-                danger.movey = (dy/dist)*danger.speed;
+                danger.facingAngle = Math.atan2(dy, dx);
+                danger.baseMoveX = Math.cos(danger.facingAngle);
+                danger.baseMoveY = Math.sin(danger.facingAngle);
                 // top and bottom aim
                 if ( (danger.y < danger.r*1.502 && player.y < danger.r*1.501) || 
-                     (danger.y > cnv.height-danger.r*1.502 && player.y > cnv.height-danger.r*1.501) ) danger.movey = 0;
+                     (danger.y > cnv.height-danger.r*1.502 && player.y > cnv.height-danger.r*1.501) ) danger.baseMoveY = 0;
                 // left and right aim
                 else if ( (danger.x < danger.r*1.502 && player.x < danger.r*1.501) ||
-                     (danger.x > cnv.width-danger.r*1.502 && player.x > cnv.width-danger.r*1.501) ) danger.movex = 0;;
-                danger.baseMoveX = danger.movex;
-                danger.baseMoveY = danger.movey;
-                danger.facingAngle = Math.atan2(dx, dy);
+                     (danger.x > cnv.width-danger.r*1.502 && player.x > cnv.width-danger.r*1.501) ) danger.baseMoveX = 0;
                 danger.launched = true;
+                danger.movex = danger.baseMoveX;
+                danger.movey = danger.baseMoveY;
             }
             
             if (danger.colorValue >= 255 && !danger.reachedWall) {
-                danger.x += danger.movex;
-                danger.y += danger.movey;
+                danger.x += danger.movex * danger.speed;
+                danger.y += danger.movey * danger.speed;
+            }
+
+            if (danger.reachedWall) {
+                if (danger.x - danger.r*1.5 < 0) danger.x = danger.r*1.5;
+                if (danger.x + danger.r*1.5 > cnv.width) danger.x = cnv.width - danger.r*1.5;
+                if (danger.y - danger.r*1.5 < 0) danger.y = danger.r*1.5;
+                if (danger.y + danger.r*1.5 > cnv.height) danger.y = cnv.height - danger.r*1.5;
             }
         }
         else if (danger.type === "text") {
@@ -539,7 +541,7 @@ function musicCollisions() {
         }
         if (danger?.reset && !danger?.invincible) {
             if (now - danger.reset > 2500) {
-                ["r", "w", "h", "lineWidth", "movex", "movey"].forEach(unit => {
+                ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
                     if (danger?.[unit]) {
                         if (danger.variant === "vertical") {
                             if (unit === "h") return;
@@ -554,15 +556,13 @@ function musicCollisions() {
                         }
                         if (danger[unit] < danger.baseUnit-0.0001) danger[unit] += danger.baseUnit/100;
                         else danger[unit] = danger.baseUnit;
-                        if (danger?.movex && danger?.movex < danger?.baseMoveX-0.0001) danger.movex += danger.baseMoveX/100;
-                        else if (danger?.movex) danger.movex = danger.baseMoveX;
-                        if (danger?.movey && danger?.movey < danger?.baseMoveY-0.0001) danger.movey += danger.baseMoveY/100;
-                        else if (danger?.movey) danger.movey = danger.baseMoveY;
+                        if (danger?.speed && danger?.speed < danger?.baseSpeed-0.0001) danger.speed += danger.baseSpeed/100;
+                        else if (danger?.speed) danger.speed = danger.baseSpeed;
                     }
                 })
             }
             else if (now - danger.reset <= 1000) {
-                ["r", "w", "h", "lineWidth", "movex", "movey"].forEach(unit => {
+                ["r", "w", "h", "lineWidth", "speed"].forEach(unit => {
                     if (danger.variant === "vertical") {
                         if (unit === "h") return;
                         danger.x = danger.baseX + (danger.baseUnit - danger.w)/2;
@@ -572,8 +572,7 @@ function musicCollisions() {
                         danger.y = danger.baseY + (danger.baseUnit - danger.h)/2;
                     }
                     if (danger?.[unit]) danger[unit] = danger.baseUnit/2;
-                    if (danger?.movex) danger.movex = danger.baseMoveX/2;
-                    if (danger?.movey) danger.movey = danger.baseMoveY/2;
+                    if (danger?.speed) danger.speed = danger.baseSpeed/2;
                 })
             }
         }
