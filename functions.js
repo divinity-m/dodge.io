@@ -1201,7 +1201,7 @@ function drawText() { // draws the current time, highest time, and enemy count
 
         if (now - shockwave.lastEnded >= shockwave.cd) { // 3s or 7s
             shockwave.usable = true;
-            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1])`, textX, 620);
+            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
         } else {
             shockwave.usable = false;
             ctx.fillText(`Active: ${shockwave.active} (${shockwaveCDLeft}s) | Swap (${controls[1]})`, textX, 620);
@@ -1209,7 +1209,7 @@ function drawText() { // draws the current time, highest time, and enemy count
     }
 
     // Amplify
-    else if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify (${player.baseSpeed.toFixed(1)})`, textX, 620);
+    else if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify ${player.baseSpeed.toFixed(1)}`, textX, 620);
 }
 
 function createEnemy() { // Creates an individual enemy with unique attributes
