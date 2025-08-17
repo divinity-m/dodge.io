@@ -97,6 +97,7 @@ let absoluteZero = {
 
 let shockwave = {
     usable: true,
+    active: "Shockwave",
     activated: false,
     radius: 25,
     path: new Path2D(),
