@@ -1,4 +1,4 @@
-console.log("cursorTrail setting, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("cursorTrail density, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -152,7 +152,7 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn", "cursorTrailBtn"].forEach(setting => {
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn", "cursorTrailSlider"].forEach(setting => {
             if (mouseOver?.[setting]) {
                 if (mouseOver?.enemyOutBtn) {
                     if (settings.enemyOutlines) settings.enemyOutlines = false;
@@ -170,7 +170,7 @@ function recordLeftClick() {
                     if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; allCursors = []; }
                     else { settings.customCursor = true; bodyEl.style.cursor = "none"; }
                 }
-                if (mouseOver?.cursorTrail) {
+                if (mouseOver?.cursorTrailSlider) {
                     if (settings.cursorTrail) settings.cursorTrail = false;
                     else settings.cursorTrail = true;
                 }
@@ -573,8 +573,12 @@ function createCursor() {
     let cursor = {
         r: 7.5,
         av: 1,
-        get subR () { return this.r/20; },
-        get subAv () { return this.av/20; },
+        get trailDensity () {
+            let clamp = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0); // x: 565 to 715
+            return 0.5 + 0.5*clamp;
+        },
+        get subR () { return this.r/20*this.trailDensity; },
+        get subAv () { return this.av/20*this.trailDensity; },
     }
     
     if (mouseX) cursor.x = mouseX;
@@ -602,13 +606,13 @@ function drawCursor() {
         ctx.fillStyle = player.color;
         drawCircle(mouseX, mouseY, 7.5);
         ctx.strokeStyle = player.subColor;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         drawCircle(mouseX, mouseY, 7.5, "stroke");
     }
 }
 
 function drawStartScreen() {
-    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
+    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565) * 100, 100), 0);
     music.var.volume = musicVolume/100;
     
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
@@ -749,8 +753,8 @@ function drawSettings() {
     const distGear = Math.hypot(gear.x+20 - mouseX, gear.y+20 - mouseY); // (770, 620) is the center of the gear
     mouseOver.settings = distGear < 30;
 
-    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
-    sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
+    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565) * 100, 100), 0);
+    sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552) * 100, 100), 0);
 
     if (innerGameState === "mainMenu") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
     else if (innerGameState === "settings") {
@@ -763,76 +767,63 @@ function drawSettings() {
         ctx.fillStyle = "black";
         ctx.fillText("Show Enemy Outlines", 50, 50);
         ctx.fillText("Disable Mouse Movement Activation", 50, 100);
-        ctx.fillText("Music Volume", 50, 150);
-        ctx.fillText("SFX Volume", 50, 200);
-        ctx.fillText("Show Absolute Zero's Range", 50, 250);
-        ctx.fillText("Custom Cursor", 50, 300);
+        ctx.fillText("Show Absolute Zero's Range", 50, 150);
+        ctx.fillText("Custom Cursor", 50, 200);
         
-        // Enemy Outlines Button
+        ctx.fillText("Music Volume", 450, 50);
+        ctx.fillText("SFX Volume", 450, 100);
+        ctx.fillText("Cursor Trail", 450, 150);
+
+        function drawSettingsButton(x, y, bool) {
+            if (bool) ctx.fillStyle = "lime";
+            else ctx.fillStyle = "red";
+            ctx.fillRect(x, y, 20, 20);
+        }
+        
+        // Buttons
         mouseOver.enemyOutBtn = mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
-        if (settings.enemyOutlines) ctx.fillStyle = "lime";
-        else ctx.fillStyle = "red";
-        ctx.fillRect(216, 35, 20, 20);
-    
-        // Disable Mouse Movement Button
-        mouseOver.disableMMBtn = mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
-        if (settings.disableMM) ctx.fillStyle = "lime";
-        else ctx.fillStyle = "red";
-        ctx.fillRect(318, 85, 20, 20);
-
-        // Absolute Zero's Range Button
-        mouseOver.aZ_RangeBtn = mouseX > 266 && mouseX < 286 && mouseY > 235 && mouseY < 255;
-        if (settings.aZ_Range) ctx.fillStyle = "lime";
-        else ctx.fillStyle = "red";
-        ctx.fillRect(266, 235, 20, 20);
-
-        // Custom Cursor Button
-        mouseOver.customCursorBtn = mouseX > 167 && mouseX < 187 && mouseY > 285 && mouseY < 305;
-        if (settings.customCursor) ctx.fillStyle = "lime";
-        else ctx.fillStyle = "red";
-        ctx.fillRect(167, 285, 20, 20);
-
-        // Music Volume Slider & SFX Volume Slider (wider than the actual rectangles for larger hitbox)
-        mouseOver.musicSlider = mouseX >= 155 && mouseX <= 325 && mouseY >= 130 && mouseY <= 160;
-        mouseOver.sfxSlider = mouseX >= 142 && mouseX <= 312 && mouseY >= 180 && mouseY <= 210;
+        drawSettingsButton(216, 35, settings.enemyOutlines);
         
-        if (mouseDown && mouseOver.musicSlider) {
-            if (mouseX >= 165 && mouseX <= 315) settings.musicSliderX = mouseX;
-            if (mouseX >= 315) settings.musicSliderX = 315;
-            if (mouseX <= 165) settings.musicSliderX = 165;
-        }
-        if (mouseDown && mouseOver.sfxSlider) {
-            if (mouseX >= 152 && mouseX <= 302) settings.sfxSliderX = mouseX;
-            if (mouseX >= 302) settings.sfxSliderX = 302;
-            if (mouseX <= 152) settings.sfxSliderX = 152;
-        }
+        mouseOver.disableMMBtn = mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
+        drawSettingsButton(316, 85, settings.disableMM);
+        
+        mouseOver.aZ_RangeBtn = mouseX > 266 && mouseX < 286 && mouseY > 135 && mouseY < 155;
+        drawSettingsButton(266, 135, settings.aZ_Range);
+        
+        mouseOver.customCursorBtn = mouseX > 167 && mouseX < 187 && mouseY > 185 && mouseY < 205;
+        drawSettingsButton(167, 185, settings.customCursor);
 
-        // volume bar outline
+        // Sliders (wider than the actual rectangles for larger hitbox)
+        mouseOver.musicSlider = mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
+        mouseOver.sfxSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
+        mouseOver.cursorTrail = mouseX >= 555 && mouseX <= 725 && mouseY >= 130 && mouseY <= 160;
+        
+        if (mouseDown && mouseOver.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
+        if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
+        if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 565), 715);
+
+        function drawSettingsSlider(x, y, sliderX) { 
+            ctx.beginPath();
+            ctx.roundRect(x, y, 150, 10, 5);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.roundRect(x, y, sliderX - x, 10, 5);
+            ctx.fill();
+            drawCircle(sliderX, y+5, 10);
+        }
+        
         ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(165, 140, 150, 10, 5);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.roundRect(152, 190, 150, 10, 5);
-        ctx.stroke();
-
-        // volume bar fill
         ctx.fillStyle = "white";
-        ctx.beginPath();
-        ctx.roundRect(165, 140, settings.musicSliderX - 165, 10, 5);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.roundRect(152, 190, settings.sfxSliderX - 152, 10, 5);
-        ctx.fill();
-        
-        drawCircle(settings.musicSliderX, 145, 10);
-        drawCircle(settings.sfxSliderX, 195, 10);
 
-        // volume text
+        // Sliders
+        drawSettingsSlider(565, 40, settings.musicSliderX);
+        drawSettingsSlider(552, 90, settings.sfxSliderX);
+        drawSettingsSlider(565, 140, settings.cursorTrail);
+
+        // Side Text
         ctx.textAlign = "center";
         ctx.font = "bold 15px Arial";
-        ctx.fillStyle = "white";
         ctx.fillText(`${musicVolume}`, 340, 150);
         ctx.fillText(`${sfxVolume}`, 327, 200);
     }
@@ -840,11 +831,11 @@ function drawSettings() {
 
 function drawDifficultySelection() {
     // Nested functions cuz fuck doing this shit over and over again
-    function drawDifficultyInfo(x, y, color, difficultyName, score = "none", adversary, ...description) {
+    function drawDifficultyInfo(x, y, color, difficultyName, score, adversary, ...description) {
         // Level Name
         ctx.fillStyle = color;
         ctx.textAlign = "left";
-        ctx.font = "bold 23px 'Lucida Console'";
+        ctx.font = "bold 20px 'Lucida Console'";
         ctx.fillText(difficultyName, x, y);
 
         // Level Score
@@ -855,7 +846,7 @@ function drawDifficultySelection() {
 
         // Level Description
         ctx.textAlign = "left";
-        ctx.font = "17px 'Lucida Console'";
+        ctx.font = "16px 'Lucida Console'";
         ctx.fillText(`${adversary}:  ${description[0]}`, x, y + 25);
         if (description[1]) ctx.fillText(description[1], x, y + 50);
     }
@@ -909,19 +900,19 @@ function drawDifficultySelection() {
     mouseOver.limbo = mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
     ctx.fillRect(50, 250, 200, 100);
-    drawDifficultyInfo(60, 280, "rgb(163, 0, 163)", "LIMBO", `none`, "Dangers", "Beams");
+    drawDifficultyInfo(60, 280, "rgb(163, 0, 163)", "LIMBO", `${highscore.limbo}%`, "Dangers", "Beams");
     drawPercentCompleted(50, 250, "rgb(163, 0, 163)", highscore.limbo);
 
     mouseOver.andromeda = mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
     ctx.fillRect(300, 250, 200, 100);
-    drawDifficultyInfo(310, 280, "rgb(0, 0, 0)", "ANDROMEDA", `none`, "Dangers", "Beams  Bombs", "Rings");
+    drawDifficultyInfo(310, 280, "rgb(0, 0, 0)", "ANDROMEDA", `${highscore.andromeda}%`, "Dangers", "Beams  Bombs", "Rings");
     drawPercentCompleted(300, 250, "rgb(0, 0, 0)", highscore.andromeda);
 
     mouseOver.euphoria = mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
     decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
     ctx.fillRect(550, 250, 200, 100);
-    drawDifficultyInfo(560, 280, "rgb(255, 165, 252)", "EUPHORIA", `none`, "Dangers", "Beams  Bombs", "Rings  Spikes");
+    drawDifficultyInfo(560, 280, "rgb(255, 165, 252)", "EUPHORIA", `${highscore.euphoria}%`, "Dangers", "Beams  Bombs", "Rings  Spikes");
     drawPercentCompleted(550, 250, "rgb(255, 165, 252)", highscore.euphoria);
 
     mouseOver.easy = mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
