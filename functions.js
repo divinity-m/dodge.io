@@ -1,4 +1,4 @@
-console.log("cursorCd was not defined so im forced to commit");// DODGE.IO - FUNCTIONS.JS
+console.log("array.splice(index, amount), not array.splice(array[index], amount)");// DODGE.IO - FUNCTIONS.JS
 function sayHi() {
     console.log("hello world");
 }
@@ -579,12 +579,9 @@ function createCursor() {
 
 function drawCursor() {
     if (settings.customCursor && mouseX && mouseY) {
-        allCursors.push(createCursor());
-        if (allCursors[0].av <= 0) allCursors.splice(allCursors[0], 1);
+        if (now-cursorsCd > 100) { allCursors.push(createCursor()); cursorsCd = Date.now();}
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].av <= 0) {
-                allCursors.splice(i, 1);
-            }
+            if (allCursors[i].av <= 0) allCursors.splice(i, 1);
         }
         allCursors.forEach(cursor => {
             if (cursor?.av) {
