@@ -567,17 +567,17 @@ function decideFillStyle(bool, color1, color2) {
 
 function createCursor() {
     let cursor = {
-        x: mouseX,
-        y: mouseY,
         r: 5,
         av: 1,
     }
-
-    return cursor
+    if (mouseX) cursor.x = mouseX;
+    if (mouseY) cursor.y = mouseY;
+    
+    return cursor;
 }
 
 function drawCursor() {
-    if (!settings.disableCursor) {
+    if (!settings.disableCursor && mouseX && mouseY) {
         if (now - cursorCd < 10) {}
         allCursors.push(createCursor());
         allCursors.forEach(cursor => {
