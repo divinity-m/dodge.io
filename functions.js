@@ -1,4 +1,4 @@
-console.log("add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("outer, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -589,17 +589,24 @@ function drawCursor() {
         }
         allCursors.forEach(cursor => {
             let playerColor = player.color.slice(4, player.color.length-1);
-            ctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
-            drawCircle(cursor.x, cursor.y, cursor.r);
+            outerctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
+            outerctx.beginPath()
+            outerctx.arc(cursor.x, cursor.y, cursor.r, Math.PI * 2, 0)
+            outerctx.fill();
             
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
         })
-        ctx.fillStyle = player.color;
-        drawCircle(cursorX, cursorY, 7.5);
-        ctx.strokeStyle = player.subColor;
-        ctx.lineWidth = 3;
-        drawCircle(cursorX, cursorY, 7.5, "stroke");
+        outerctx.fillStyle = player.color;
+        outerctx.beginPath()
+        outerctx.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0)
+        outerctx.fill();
+        
+        outerctx.strokeStyle = player.subColor;
+        outerctx.lineWidth = 3;
+        outerctx.beginPath()
+        outerctx.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0)
+        outerctx.stroke();
     }
 }
 
