@@ -1412,8 +1412,8 @@ function mouseMovement() {
         
 
         // Anti-no-clip (wall collisions)
-        player.x = Math.min(Math.max(player.x, player.r), cnv.width-player.r);
-        player.y = Math.min(Math.max(player.y, player.r), cnv.height-player.r);
+        player.x = Math.min(Math.max(player.x, player.r+1.5), cnv.width-player.r-1.5); // players lineWidth included
+        player.y = Math.min(Math.max(player.y, player.r+1.5), cnv.height-player.r-1.5);
     }
 }
 
