@@ -1,4 +1,4 @@
-console.log("cursorTrail density was unfinished, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("trailDensity tweaks and shi, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -573,12 +573,8 @@ function createCursor() {
     let cursor = {
         r: 7.5,
         av: 1,
-        get trailDensity () {
-            let density = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0); // x: 565 to 715
-            return 0.5 + 0.5*clamp;
-        },
-        get subR () { return this.r/20*this.trailDensity; },
-        get subAv () { return this.av/20*this.trailDensity; },
+        get subR () { return this.r/20*trailDensity; },
+        get subAv () { return this.av/20*trailDensity; },
     }
     
     if (mouseX) cursor.x = mouseX;
@@ -588,23 +584,17 @@ function createCursor() {
 
 function drawCursor() {
     if (settings.customCursor && mouseX && mouseY && lastPressing === "mouse") {
-        let density = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0);
-        
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].r <= 1/100 || density === 0) allCursors.splice(i, 1);
+            if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
         }
-        if (density > 0) {
-            allCursors.forEach(cursor => {
-                if (cursor?.av) {
-                    let playerColor = player.color.slice(4, player.color.length-1);
-                    ctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
-                    drawCircle(cursor.x, cursor.y, cursor.r);
-                    
-                    cursor.r -= cursor.subR;
-                    cursor.av -= cursor.subAv;
-                }
-            })
-        }
+        allCursors.forEach(cursor => {
+            let playerColor = player.color.slice(4, player.color.length-1);
+            ctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
+            drawCircle(cursor.x, cursor.y, cursor.r);
+            
+            cursor.r -= cursor.subR;
+            cursor.av -= cursor.subAv;
+        })
         ctx.fillStyle = player.color;
         drawCircle(mouseX, mouseY, 7.5);
         ctx.strokeStyle = player.subColor;
@@ -614,9 +604,6 @@ function drawCursor() {
 }
 
 function drawStartScreen() {
-    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565) * 100, 100), 0);
-    music.var.volume = musicVolume/100;
-    
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
         // Me
         ctx.strokeStyle = player.color;
@@ -755,8 +742,15 @@ function drawSettings() {
     const distGear = Math.hypot(gear.x+20 - mouseX, gear.y+20 - mouseY); // (770, 620) is the center of the gear
     mouseOver.settings = distGear < 30;
 
-    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565) * 100, 100), 0);
-    sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552) * 100, 100), 0);
+    settings.musicSliderX = Math.min(Math.max(settings.musicSliderX, 565), 715);
+    settings.sfxSliderX = Math.min(Math.max(settings.sfxSliderX, 552), 702);
+    settings.cursorTrail = Math.min(Math.max(settings.cursorTrail, 565), 715);
+    
+    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
+    sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
+    trailDensity = 0.5 + 0.5 * Math.max(Math.min((settings.sfxSliderX - 550) / (700 - 550), 1), 0);
+    music.var.volume = musicVolume;
+    sharpPop.volume = sfxVolume;
 
     if (innerGameState === "mainMenu") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
     else if (innerGameState === "settings") {
@@ -798,13 +792,13 @@ function drawSettings() {
         // Sliders (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
         mouseOver.sfxSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
-        mouseOver.cursorTrail = mouseX >= 555 && mouseX <= 725 && mouseY >= 130 && mouseY <= 160;
+        mouseOver.cursorTrail = mouseX >= 540 && mouseX <= 710 && mouseY >= 130 && mouseY <= 160;
         
         if (mouseDown && mouseOver.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
         if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
-        if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 565), 715);
+        if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
 
-        function drawSettingsSlider(x, y, sliderX) { 
+        function drawSettingsSlider(x, y, sliderX, value) { 
             ctx.beginPath();
             ctx.roundRect(x, y, 150, 10, 5);
             ctx.stroke();
@@ -812,22 +806,19 @@ function drawSettings() {
             ctx.roundRect(x, y, sliderX - x, 10, 5);
             ctx.fill();
             drawCircle(sliderX, y+5, 10);
+            if (value) ctx.fillText(value, x+175, y);
         }
         
         ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
         ctx.fillStyle = "white";
-
-        // Sliders
-        drawSettingsSlider(565, 40, settings.musicSliderX);
-        drawSettingsSlider(552, 90, settings.sfxSliderX);
-        drawSettingsSlider(565, 140, settings.cursorTrail);
-
-        // Side Text
         ctx.textAlign = "center";
         ctx.font = "bold 15px Arial";
-        ctx.fillText(`${musicVolume}`, 340, 150);
-        ctx.fillText(`${sfxVolume}`, 327, 200);
+
+        // Sliders
+        drawSettingsSlider(565, 40, settings.musicSliderX, musicVolume);
+        drawSettingsSlider(552, 90, settings.sfxSliderX, sfxVolume);
+        drawSettingsSlider(550, 140, settings.cursorTrail);
     }
 }
 
@@ -1485,12 +1476,8 @@ function restartEndless() { // Resets certain variables once the play button is 
     
     // Re-order the allEnemies array to draw the enemies with the auras (decelerator enemies) first
     // this prevents inconsistent overlapping when they're drawn
-    allEnemies = [...allEnemies.filter(enemy => enemy.ability === "decelerator"), ...allEnemies.filter(enemy => enemy.ability !== "decelerator")]
+    allEnemies = [...allEnemies.filter(enemy => enemy.ability === "decelerator"), ...allEnemies.filter(enemy => enemy.ability !== "decelerator")];
 
-    musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
-    sfxVolume = Math.floor((settings.sfxSliderX - 152) / 1.5);
-    sharpPop.volume = sfxVolume/100;
-    music.var.volume = musicVolume/100;
     music.var.currentTime = 0;
     music.promise = music.var.play();
     
