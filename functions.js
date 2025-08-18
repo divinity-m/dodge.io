@@ -1,4 +1,4 @@
-console.log("invulnurable enemies");// DODGE.IO - FUNCTIONS.JS
+console.log("cursorCd was undefined so im forced to commit");// DODGE.IO - FUNCTIONS.JS
 function sayHi() {
     console.log("hello world");
 }
@@ -567,28 +567,33 @@ function decideFillStyle(bool, color1, color2) {
 
 function createCursor() {
     let cursor = {
-        r: 5,
+        r: 7.5,
         av: 1,
+        get subR () { return this.r/10; },
+        get subAv () { return this.av/10; },
     }
     if (mouseX) cursor.x = mouseX;
     if (mouseY) cursor.y = mouseY;
-    
     return cursor;
 }
 
 function drawCursor() {
     if (!settings.disableCursor && mouseX && mouseY) {
-        if (now - cursorCd < 10) {}
         allCursors.push(createCursor());
         allCursors.forEach(cursor => {
-            ctx.fillStyle = `rgba(255, 255, 255, ${cursor.av})`;
-            drawCircle(cursor.x, cursor.y, cursor.r);
-
-            cursor.r -= 0.05;
-            cursor.av -= 0.01;
+            if (cursor?.av) {
+                let playerColor = player.color.slice(4, player.color.length-1);
+                ctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
+                drawCircle(cursor.x, cursor.y, cursor.r);
+                
+                cursor.r -= cursor.subR;
+                cursor.av -= cursor.subAv;
+            }
         })
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].av <= 0) delete allCursors[i];
+            if (allCursors[i].av <= 0) {
+                allCursors.splice(i, 1);
+            }
         }
         return 0;
     }
