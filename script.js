@@ -1,14 +1,19 @@
 // DODGE.IO - SCRIPT.JS
-console.log("background canvas")
+console.log("cursor canvas")
 const bodyEl = document.getElementById("bodyEl");
-const cnv = document.getElementById("canvas");
+const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
-const outercnv = document.getElementById("background");
-const outerctx = outercnv.getContext('2d');
+const cnvBg = document.getElementById("background");
+const ctxBg = outercnv.getContext('2d');
+const cnvCursor = document.getElementById("cursor");
+const ctxCursor = outercnv.getContext('2d');
 
+cursorCanvas.width = window.innerWidth;
+cursorCanvas.height = window.innerHeight;
 
 let gameState = "loading";
 let innerGameState = "loading";
+
 // Keyboard
 let lastPressing = "mouse";
 document.addEventListener("keydown", recordKeyDown)
@@ -78,10 +83,10 @@ window.addEventListener('mousemove', (event) => {
     mouseY = event.clientY - cnvRect.top;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 
-    const outercnvRect = outercnv.getBoundingClientRect();
-    cursorX = event.clientX - outercnvRect.left;
-    cursorY = event.clientY - outercnvRect.top;
+    cursorX = event.clientX;
+    cursorY = event.clientY;
     if (settings?.customCursor && settings?.cursorTrail) {
+        bodyEl.style.cursor = "none";
         if (trailDensity > 0.5) allCursors.push(createCursor());
         for (let i = allCursors.length-1; i >= 0; i--) {
             if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
@@ -318,8 +323,8 @@ window.addEventListener('beforeunload', () => {
 requestAnimationFrame(draw)
 function draw() {
     now = Date.now()
-    outerctx.fillStyle = "rgb(200, 200, 200)";
-    outerctx.fillRect(0, 0, outercnv.width, outercnv.height);
+    ctxBg.fillStyle = "rgb(200, 200, 200)";
+    ctxBg.fillRect(0, 0, outercnv.width, outercnv.height);
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, cnv.width, cnv.height);
 
