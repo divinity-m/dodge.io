@@ -574,7 +574,7 @@ function createCursor() {
         r: 7.5,
         av: 1,
         get trailDensity () {
-            let clamp = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0); // x: 565 to 715
+            let density = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0); // x: 565 to 715
             return 0.5 + 0.5*clamp;
         },
         get subR () { return this.r/20*this.trailDensity; },
@@ -588,10 +588,12 @@ function createCursor() {
 
 function drawCursor() {
     if (settings.customCursor && mouseX && mouseY && lastPressing === "mouse") {
+        let density = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0);
+        
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].r <= 1/100) allCursors.splice(i, 1);
+            if (allCursors[i].r <= 1/100 || density === 0) allCursors.splice(i, 1);
         }
-        if (settings.cursorTrail) {
+        if (density > 0) {
             allCursors.forEach(cursor => {
                 if (cursor?.av) {
                     let playerColor = player.color.slice(4, player.color.length-1);
