@@ -565,9 +565,31 @@ function decideFillStyle(bool, color1, color2) {
     else ctx.fillStyle = color2;
 }
 
+function createCursor() {
+    let cursor = {
+        x: mouseX,
+        y: mouseY,
+        r: 5,
+        av: 1,
+    }
+
+    return cursor
+}
+
 function drawCursor() {
     if (!settings.disableCursor) {
-        // ctx.fillStyle = `rgba(255, 255, 255, ${cursor.av})`
+        if (now - cursorCd < 10) {}
+        allCursors.push(createCursor());
+        allCursors.forEach(cursor => {
+            ctx.fillStyle = `rgba(255, 255, 255, ${cursor.av})`;
+            drawCircle(cursor.x, cursor.y, cursor.r);
+
+            cursor.r -= 0.05;
+            cursor.av -= 0.01;
+        })
+        for (let i = allCursors.length-1; i >= 0; i--) {
+            if (allCursors[i].av <= 0) delete allCursors[i];
+        }
         return 0;
     }
 }
