@@ -63,11 +63,12 @@ let mouseOver = {
 let mouseX;
 let mouseY;
 let track = false;
+let allCursors = [];
 window.addEventListener('mousemove', (event) => {
     const rect = cnv.getBoundingClientRect();
     mouseX = event.clientX - rect.left;
     mouseY = event.clientY - rect.top;
-
+    allCursors.push(createCursor());
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
 
@@ -138,8 +139,6 @@ let settings = {
 
 let allEnemies = [];
 let allDangers = [];
-let allCursors = [];
-let cursorCd = 0;
 
 // Time, Highscore, and Difficulty
 let now = Date.now();
