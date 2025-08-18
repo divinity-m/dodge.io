@@ -1,4 +1,4 @@
-console.log("cursorCd was undefined so im forced to commit");// DODGE.IO - FUNCTIONS.JS
+console.log("cursorCd was not defined so im forced to commit");// DODGE.IO - FUNCTIONS.JS
 function sayHi() {
     console.log("hello world");
 }
