@@ -1,4 +1,4 @@
-console.log("array.splice(index, amount), not array.splice(array[index], amount)");// DODGE.IO - FUNCTIONS.JS
+console.log("testing allCursors array length");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
