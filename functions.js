@@ -1,4 +1,4 @@
-console.log("outer, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("outer, add cursor animation");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
