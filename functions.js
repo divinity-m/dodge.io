@@ -577,13 +577,13 @@ function createCursor() {
         get subAv () { return this.av/20*trailDensity; },
     }
     
-    if (mouseX) cursor.x = mouseX;
-    if (mouseY) cursor.y = mouseY;
+    if (cursorX) cursor.x = cursorX;
+    if (cursorY) cursor.y = cursorY;
     return cursor;
 }
 
 function drawCursor() {
-    if (settings.customCursor && mouseX && mouseY && lastPressing === "mouse") {
+    if (settings.customCursor && cursorX && cursorY && lastPressing === "mouse") {
         for (let i = allCursors.length-1; i >= 0; i--) {
             if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
         }
@@ -596,10 +596,10 @@ function drawCursor() {
             cursor.av -= cursor.subAv;
         })
         ctx.fillStyle = player.color;
-        drawCircle(mouseX, mouseY, 7.5);
+        drawCircle(cursorX, cursorY, 7.5);
         ctx.strokeStyle = player.subColor;
         ctx.lineWidth = 3;
-        drawCircle(mouseX, mouseY, 7.5, "stroke");
+        drawCircle(cursorX, cursorY, 7.5, "stroke");
     }
 }
 
