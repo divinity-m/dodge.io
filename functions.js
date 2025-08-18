@@ -602,7 +602,7 @@ function drawCursor() {
         ctx.fillStyle = player.color;
         drawCircle(mouseX, mouseY, 7.5);
         ctx.strokeStyle = player.subColor;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         drawCircle(mouseX, mouseY, 7.5, "stroke");
     }
 }
