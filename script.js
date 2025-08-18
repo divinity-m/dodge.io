@@ -70,7 +70,7 @@ window.addEventListener('mousemove', (event) => {
     mouseX = event.clientX - rect.left;
     mouseY = event.clientY - rect.top;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
-    if (settings?.customCursor === true && settings?.cursorTrail === true) {
+    if (settings?.customCursor && settings?.cursorTrail) {
         allCursors.push(createCursor());
         for (let i = allCursors.length-1; i >= 0; i--) {
             if (allCursors[i].r <= 1/100) allCursors.splice(i, 1);
