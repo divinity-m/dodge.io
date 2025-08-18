@@ -3,10 +3,6 @@ function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
     player.hit = 0;
-    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565) * 100, 100), 0);
-    sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552) * 100, 100), 0);
-    sharpPop.volume = sfxVolume/100;
-    music.var.volume = musicVolume/100;
     music.var.currentTime = 0;
     music.promise = music.var.play();
     music.timestamps = [...music.backUpTS];
