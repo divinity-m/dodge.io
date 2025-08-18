@@ -58,7 +58,7 @@ let mouseOver = {
     sfxSlider: false,
     aZ_RangeBtn: false,
     customCursorBtn: false,
-    cursorTrailBtn: false,
+    cursorTrailSlider: false,
 };
 
 let mouseX;
@@ -98,11 +98,11 @@ let player = {
 let settings = {
     enemyOutlines: true,
     disableMM: false,
-    musicSliderX: 240,
-    sfxSliderX: 240,
+    musicSliderX: 640,
+    sfxSliderX: 627,
     aZ_Range: true,
     customCursor: true,
-    cursorTrail: true,
+    cursorTrail: 715,
 };
 
 let dash = {
@@ -138,7 +138,7 @@ let amplify = {
     speed: 0,
     accel: 0,
     limit: 8,
-    accelRate: 0,
+    accelRate: Date.now(),
     reset: function () {
         this.speed = 0;
         this.accel = 0;
@@ -246,7 +246,7 @@ if (localData) {
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score] !== undefined) hs[score] = userData.highscore[score];
         })
-        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true, customCursor: true, cursorTrail: true};
+        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 640, sfxSliderX: 627, aZ_Range: true, customCursor: true, cursorTrail: 715};
         ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "customCursor", "cursorTrail"].forEach(setting => {
             if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
         })
