@@ -1,8 +1,8 @@
 console.log("array.splice(index, amount), not array.splice(array[index], amount)");// DODGE.IO - FUNCTIONS.JS
-function sayHi() {
+/*function sayHi() {
     console.log("hello world");
 }
-sayHi();
+sayHi();*/
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
