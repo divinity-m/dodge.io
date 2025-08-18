@@ -320,7 +320,6 @@ window.addEventListener('beforeunload', () => {
 
 
 // Drawing the game
-requestAnimationFrame(draw)
 function draw() {
     now = Date.now()
     ctxBg.fillStyle = "rgb(200, 200, 200)";
@@ -417,7 +416,37 @@ function draw() {
         abilities();
         musicCollisions();
     }
-    drawCursor();
-    requestAnimationFrame(draw)
+    requestAnimationFrame(draw);
 }
-draw()
+
+function drawCursor() {
+    if (settings?.customCursor && cursorX && cursorY && lastPressing === "mouse") {
+        for (let i = allCursors.length-1; i >= 0; i--) {
+            if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
+        }
+        allCursors.forEach(cursor => {
+            let playerColor = player.color.slice(4, player.color.length-1);
+            ctxCursor.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
+            ctxCursor.beginPath();
+            ctxCursor.arc(cursor.x, cursor.y, cursor.r, Math.PI * 2, 0);
+            ctxCursor.fill();
+            
+            cursor.r -= cursor.subR;
+            cursor.av -= cursor.subAv;
+        })
+        ctxCursor.fillStyle = player.color;
+        ctxCursor.beginPath();
+        ctxCursor.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0);
+        ctxCursor.fill();
+        
+        ctxCursor.strokeStyle = player.subColor;
+        ctxCursor.lineWidth = 3;
+        ctxCursor.beginPath();
+        ctxCursor.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0);
+        ctxCursor.stroke();
+    }
+    requestAnimationFrame(drawCursor);
+}
+
+draw();
+drawCursor();
