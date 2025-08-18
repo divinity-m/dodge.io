@@ -317,6 +317,8 @@ window.addEventListener('beforeunload', () => {
 requestAnimationFrame(draw)
 function draw() {
     now = Date.now()
+    outerctx.fillStyle = "rgb(200, 200, 200)";
+    outerctx.fillRect(0, 0, outercnv.width, outercnv.height);
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, cnv.width, cnv.height);
 
