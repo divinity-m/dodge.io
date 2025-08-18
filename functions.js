@@ -1,4 +1,4 @@
-console.log("trailDensity tweaks and shi, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
