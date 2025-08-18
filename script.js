@@ -77,7 +77,7 @@ window.addEventListener('mousemove', (event) => {
             if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
         }
         
-        if (mouseX < -7.5 || mouseX > cnv.width+7.5 || mouseY < -7.5 || mouseY > cnv.height+7.5) bodyEl.style.cursor = "auto"; // 7.5 is the cursor radius
+        if (mouseX < -9 || mouseX > cnv.width+9 || mouseY < -9 || mouseY > cnv.height+9) bodyEl.style.cursor = "auto"; // cursor radius: 7.5, lineWidth: 3;
         else bodyEl.style.cursor = "none";
     }
 });
