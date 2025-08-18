@@ -1,4 +1,4 @@
-console.log("testing allCursors array length");// DODGE.IO - FUNCTIONS.JS
+console.log("fixed custom cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -569,27 +569,20 @@ function createCursor() {
     let cursor = {
         r: 7.5,
         av: 1,
-        get subR () { return this.r/10; },
-        get subAv () { return this.av/10; },
+        get subR () { return this.r/25; },
+        get subAv () { return this.av/25; },
     }
+    
     if (mouseX) cursor.x = mouseX;
     if (mouseY) cursor.y = mouseY;
     return cursor;
 }
 
 function drawCursor() {
-    if (settings.customCursor && mouseX && mouseY) {
-        if (now-cursorsCd > 10) { allCursors.push(createCursor()); cursorsCd = Date.now();}
-        let loopMax = Math.min(allCursors.length, 50); // lag prevention
-        let first;
-        let second;
-        if (allCursors.length < 10) first = allCursors.length;
-        for (let i = loopMax-1; i >= 0; i--) {
-            if (allCursors[i].av <= 0) allCursors.splice(i, 1);
-        }
-        if (allCursors.length < 10) {
-            second = allCursors.length;
-            console.log(`1:${first} | 2: ${second}`);
+    if (settings.customCursor && mouseX && mouseY && lastPressing === "mouse") {
+        allCursors.push(createCursor());
+        for (let i = allCursors.length-1; i >= 0; i--) {
+            if (allCursors[i].r <= 1/100) allCursors.splice(i, 1);
         }
         allCursors.forEach(cursor => {
             if (cursor?.av) {
