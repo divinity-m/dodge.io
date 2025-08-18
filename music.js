@@ -1,4 +1,4 @@
-console.log("shockwave and shockray hits dangers");// DODGE.IO - MUSIC.JS
+// DODGE.IO - MUSIC.JS
 function restartMusicMode() {
     allDangers = [];
     player.lives = 3;
