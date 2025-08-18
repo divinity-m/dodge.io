@@ -1,4 +1,4 @@
-console.log("cursor ")// DODGE.IO - SCRIPT.JS
+console.log("allCursors = [];")// DODGE.IO - SCRIPT.JS
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
@@ -74,7 +74,7 @@ window.addEventListener('mousemove', (event) => {
         if (allCursors[0].av <= 0) allCursors.splice(allCursors[0], 1);
         if (mouseX < 0 || mouseX > cnv.width || mouseY < 0 || mouseY > cnv.height) bodyEl.style.cursor = "auto";
         else bodyEl.style.cursor = "none";
-    } else allCursors = [];
+    }
 });
 
 // Player & Enemies
