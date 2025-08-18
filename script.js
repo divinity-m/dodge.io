@@ -8,8 +8,8 @@ const ctxBg = outercnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
 const ctxCursor = outercnv.getContext('2d');
 
-cursorCanvas.width = window.innerWidth;
-cursorCanvas.height = window.innerHeight;
+cnvCursor.width = window.innerWidth;
+cnvCursor.height = window.innerHeight;
 
 let gameState = "loading";
 let innerGameState = "loading";
