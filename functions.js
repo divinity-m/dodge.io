@@ -167,8 +167,8 @@ function recordLeftClick() {
                     else settings.aZ_Range = true;
                 }
                 if (mouseOver?.customCursorBtn) {
-                    if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; }
-                    else { settings.customCursor = true; bodyEl.style.cursor = "none";}
+                    if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; allCursors = []; }
+                    else { settings.customCursor = true; bodyEl.style.cursor = "none"; }
                 }
     
                 // Saves the users settings options
