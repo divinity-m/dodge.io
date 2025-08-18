@@ -71,10 +71,13 @@ window.addEventListener('mousemove', (event) => {
     mouseY = event.clientY - rect.top;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
     if (settings?.customCursor && settings?.cursorTrail) {
-        allCursors.push(createCursor());
+        let density = Math.max(Math.min((settings.cursorTrail - 565) / (715 - 565), 1), 0);
+
+        if (density > 0) allCursors.push(createCursor());
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].r <= 1/100) allCursors.splice(i, 1);
+            if (allCursors[i].r <= 1/100 || density === 0) allCursors.splice(i, 1);
         }
+        
         if (mouseX < -7.5 || mouseX > cnv.width+7.5 || mouseY < -7.5 || mouseY > cnv.height+7.5) bodyEl.style.cursor = "auto"; // 7.5 is the cursor radius
         else bodyEl.style.cursor = "none";
     }
