@@ -4,9 +4,9 @@ const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvBg = document.getElementById("background");
-const ctxBg = outercnv.getContext('2d');
+const ctxBg = cnvBg.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
-const ctxCursor = outercnv.getContext('2d');
+const ctxCursor = cnvCursor.getContext('2d');
 
 cnvCursor.width = window.innerWidth;
 cnvCursor.height = window.innerHeight;
