@@ -1,4 +1,4 @@
-console.log("fixed custom cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("cursorTrail setting, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -152,7 +152,7 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn"].forEach(setting => {
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn", "cursorTrailBtn"].forEach(setting => {
             if (mouseOver?.[setting]) {
                 if (mouseOver?.enemyOutBtn) {
                     if (settings.enemyOutlines) settings.enemyOutlines = false;
@@ -169,6 +169,10 @@ function recordLeftClick() {
                 if (mouseOver?.customCursorBtn) {
                     if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; allCursors = []; }
                     else { settings.customCursor = true; bodyEl.style.cursor = "none"; }
+                }
+                if (mouseOver?.cursorTrail) {
+                    if (settings.cursorTrail) settings.cursorTrail = false;
+                    else settings.cursorTrail = true;
                 }
     
                 // Saves the users settings options
@@ -569,8 +573,8 @@ function createCursor() {
     let cursor = {
         r: 7.5,
         av: 1,
-        get subR () { return this.r/25; },
-        get subAv () { return this.av/25; },
+        get subR () { return this.r/20; },
+        get subAv () { return this.av/20; },
     }
     
     if (mouseX) cursor.x = mouseX;
@@ -580,20 +584,26 @@ function createCursor() {
 
 function drawCursor() {
     if (settings.customCursor && mouseX && mouseY && lastPressing === "mouse") {
-        allCursors.push(createCursor());
         for (let i = allCursors.length-1; i >= 0; i--) {
             if (allCursors[i].r <= 1/100) allCursors.splice(i, 1);
         }
-        allCursors.forEach(cursor => {
-            if (cursor?.av) {
-                let playerColor = player.color.slice(4, player.color.length-1);
-                ctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
-                drawCircle(cursor.x, cursor.y, cursor.r);
-                
-                cursor.r -= cursor.subR;
-                cursor.av -= cursor.subAv;
-            }
-        })
+        if (settings.cursorTrail) {
+            allCursors.forEach(cursor => {
+                if (cursor?.av) {
+                    let playerColor = player.color.slice(4, player.color.length-1);
+                    ctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
+                    drawCircle(cursor.x, cursor.y, cursor.r);
+                    
+                    cursor.r -= cursor.subR;
+                    cursor.av -= cursor.subAv;
+                }
+            })
+        }
+        ctx.fillStyle = player.color;
+        drawCircle(mouseX, mouseY, 7.5);
+        ctx.strokeStyle = player.subColor;
+        ctx.lineWidth = 3;
+        drawCircle(mouseX, mouseY, 7.5, "stroke");
     }
 }
 
@@ -834,7 +844,7 @@ function drawDifficultySelection() {
         // Level Name
         ctx.fillStyle = color;
         ctx.textAlign = "left";
-        ctx.font = "23px 'Lucida Console'";
+        ctx.font = "bold 23px 'Lucida Console'";
         ctx.fillText(difficultyName, x, y);
 
         // Level Score
@@ -845,7 +855,7 @@ function drawDifficultySelection() {
 
         // Level Description
         ctx.textAlign = "left";
-        ctx.font = "15px 'Lucida Console'";
+        ctx.font = "17px 'Lucida Console'";
         ctx.fillText(`${adversary}:  ${description[0]}`, x, y + 25);
         if (description[1]) ctx.fillText(description[1], x, y + 50);
     }
@@ -891,7 +901,7 @@ function drawDifficultySelection() {
     ctx.textAlign = "center";
     ctx.fillStyle = "grey";
     
-    ctx.font = "30px Arial";
+    ctx.font = "bold 30px Arial";
     ctx.fillText("NORMAL LEVELS", cnv.width/2, 220);
     ctx.fillText("ENDLESS LEVELS", cnv.width/2, 420);
 
@@ -925,7 +935,7 @@ function drawDifficultySelection() {
     drawDifficultyInfo(310, 480, "rgb(255, 255, 0)", "MEDIUM", `${highscore.medium}s`, "Enemies", "Normals", "Decelerators");
 
     mouseOver.hard = mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
-    decideFillStyle(mouseOver.hard, "rgb(60, 60, 60)", "rgb(40, 40, 40)");
+    decideFillStyle(mouseOver.hard, "rgb(40, 40, 40)", "rgb(50, 50, 50)");
     ctx.fillRect(550, 450, 200, 100);
     drawDifficultyInfo(560, 480, "rgb(0, 0, 0)", "HARD", `${highscore.hard}s`, "Enemies", "Normals", "Decelerators  Homings");
 }
@@ -1109,6 +1119,9 @@ function drawGameOver() {
 function drawPlayer() {
     ctx.fillStyle = player.color;
     drawCircle(player.x, player.y, player.r);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = player.subColor;
+    drawCircle(player.x, player.y, player.r, "stroke");
     if (player.dodger === "jötunn" && settings.aZ_Range) {
         if (gameState !== "musicMode") {
             if (absoluteZero.passive === "Absolute Zero") ctx.strokeStyle = "rgba(0, 127, 255, 0.5)";
@@ -1388,10 +1401,8 @@ function keyboardControls() {
         player.y += dyKB * player.speed;
 
         // Anti-no-clip (wall collisions)
-        if (player.x - player.r  < 0) player.x = player.r;
-        if (player.x + player.r  > cnv.width) player.x = cnv.width - player.r;
-        if (player.y - player.r  < 0) player.y = player.r; 
-        if (player.y + player.r  > cnv.height) player.y = cnv.height - player.r;
+        player.x = Math.min(Math.max(player.x, player.r), cnv.width-player.r);
+        player.y = Math.min(Math.max(player.y, player.r), cnv.height-player.r);
     }
 }
 
@@ -1417,10 +1428,8 @@ function mouseMovement() {
         
 
         // Anti-no-clip (wall collisions)
-        if (player.x - player.r  < 0) player.x = player.r;
-        if (player.x + player.r  > cnv.width) player.x = cnv.width - player.r;
-        if (player.y - player.r  < 0) player.y = player.r; 
-        if (player.y + player.r  > cnv.height) player.y = cnv.height - player.r;
+        player.x = Math.min(Math.max(player.x, player.r), cnv.width-player.r);
+        player.y = Math.min(Math.max(player.y, player.r), cnv.height-player.r);
     }
 }
 
@@ -1461,10 +1470,10 @@ function moveEnemies() { // Loops through the allEnemies array to move each enem
         enemy.y += enemy.movey;
         
         // Anti-no-clip (wall collisions)
-        if (enemy.x - enemy.r < 0) { enemy.x = enemy.r; enemy.facingAngle = Math.PI - enemy.facingAngle; }
-        if (enemy.x + enemy.r > cnv.width) { enemy.x = cnv.width - enemy.r; enemy.facingAngle = Math.PI - enemy.facingAngle; }
-        if (enemy.y - enemy.r < 0) { enemy.y = enemy.r; enemy.facingAngle = -enemy.facingAngle; }
-        if (enemy.y + enemy.r > cnv.height) { enemy.y = cnv.height - enemy.r; enemy.facingAngle = -enemy.facingAngle; }
+        enemy.x = Math.min(Math.max(enemy.x, enemy.r), cnv.width-enemy.r);
+        enemy.y = Math.min(Math.max(enemy.y, enemy.r), cnv.height-enemy.r);
+        if (enemy.x === enemy.r || enemy.x === cnv.width-enemy.r) enemy.facingAngle = Math.PI - enemy.facingAngle;
+        if (enemy.y === enemy.r || enemy.y === cnv.height-enemy.r) enemy.facingAngle = -enemy.facingAngle;
         
         // Normalize the angle with the ever reliable Math.atan2()
         enemy.facingAngle = Math.atan2(Math.sin(enemy.facingAngle), Math.cos(enemy.facingAngle));
