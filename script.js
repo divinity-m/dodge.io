@@ -429,6 +429,7 @@ function drawCursor() {
     }
     
     if (settings?.customCursor && cursorX && cursorY && lastPressing === "mouse") {
+        ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
         // Cursor
         for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1); // removes trails with low av's
         
