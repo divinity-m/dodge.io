@@ -230,15 +230,15 @@ if (localData) {
         
         let p = {dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)", invincible: false};
         ["dodger", "color", "subColor", "invincible"].forEach(attribute => {
-            if (userData?.player?.[attribute]) p[attribute] = userData.player[attribute];
+            if (userData?.player?.[attribute] !== undefined) p[attribute] = userData.player[attribute];
         })
         let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0};
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
-            if (userData?.highscore?.[score]) hs[score] = userData.highscore[score];
+            if (userData?.highscore?.[score] !== undefined) hs[score] = userData.highscore[score];
         })
         let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true, disableCursor: false,};
-        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range"].forEach(setting => {
-            if (userData?.settings?.[setting]) s[setting] = userData.settings[setting];
+        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "disableCursor"].forEach(setting => {
+            if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
         })
                 
         userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, baseSpeed: 2.5, slowed: 1, dodger: p.dodger,
