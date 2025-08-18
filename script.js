@@ -72,8 +72,11 @@ window.addEventListener('mousemove', (event) => {
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
     if (settings?.customCursor === true) {
         allCursors.push(createCursor());
-        if (allCursors[0].av <= 0) allCursors.splice(0, 1);
-        if (mouseX < 0 || mouseX > cnv.width || mouseY < 0 || mouseY > cnv.height) bodyEl.style.cursor = "auto";
+        let loopMax = Math.min(allCursors.length, 50); // lag prevention
+        for (let i = loopMax-1; i >= 0; i--) {
+            if (allCursors[i].av <= 0) allCursors.splice(i, 1);
+        }
+        if (mouseX < -7.5 || mouseX > cnv.width+7.5 || mouseY < -7.5 || mouseY > cnv.height+7.5) bodyEl.style.cursor = "auto"; // 7.5 is the cursor radius
         else bodyEl.style.cursor = "none";
     }
 });
@@ -329,7 +332,7 @@ function draw() {
         if (now - loadingGame >= 1000) {
             ctx.font = "20px 'Verdana'";
             ctx.textAlign = "left";
-            ctx.fillText("click anywhere on the screen to skip", 20, cnv.height - 20);
+            ctx.fillText("click anywhere to skip", 20, cnv.height - 20);
         }
         
         music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
@@ -343,7 +346,7 @@ function draw() {
 
         ctx.font = "20px Verdana";
         ctx.textAlign = "left";
-        ctx.fillText("click anywhere on the screen to start", 20, cnv.height - 20);
+        ctx.fillText("click anywhere to start", 20, cnv.height - 20);
     }
     else if (endLoading && gameState === "loading") {
         music.promise = music.var.play();
