@@ -1,4 +1,4 @@
-console.log("invisible cursor")// DODGE.IO - SCRIPT.JS
+console.log("cursor ")// DODGE.IO - SCRIPT.JS
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
