@@ -1,4 +1,4 @@
-console.log("allCursors = [];")// DODGE.IO - SCRIPT.JS
+// DODGE.IO - SCRIPT.JS
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
@@ -6,7 +6,7 @@ const ctx = cnv.getContext('2d');
 let gameState = "loading";
 let innerGameState = "loading";
 // Keyboard
-let lastPressing = "kb";
+let lastPressing = "mouse";
 document.addEventListener("keydown", recordKeyDown)
 document.addEventListener("keyup", recordKeyUp)
 let keyboardMovementOn = false;
@@ -64,7 +64,6 @@ let mouseX;
 let mouseY;
 let track = false;
 let allCursors = [];
-let cursorsCd = 0;
 window.addEventListener('mousemove', (event) => {
     const rect = cnv.getBoundingClientRect();
     mouseX = event.clientX - rect.left;
@@ -72,9 +71,8 @@ window.addEventListener('mousemove', (event) => {
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
     if (settings?.customCursor === true) {
         allCursors.push(createCursor());
-        let loopMax = Math.min(allCursors.length, 50); // lag prevention
-        for (let i = loopMax-1; i >= 0; i--) {
-            if (allCursors[i].av <= 0) allCursors.splice(i, 1);
+        for (let i = allCursors.length-1; i >= 0; i--) {
+            if (allCursors[i].r <= 1/100) allCursors.splice(i, 1);
         }
         if (mouseX < -7.5 || mouseX > cnv.width+7.5 || mouseY < -7.5 || mouseY > cnv.height+7.5) bodyEl.style.cursor = "auto"; // 7.5 is the cursor radius
         else bodyEl.style.cursor = "none";
