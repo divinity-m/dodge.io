@@ -1,4 +1,4 @@
-console.log("bodyEl")// DODGE.IO - SCRIPT.JS
+console.log("invisible cursor")// DODGE.IO - SCRIPT.JS
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
@@ -68,8 +68,11 @@ window.addEventListener('mousemove', (event) => {
     const rect = cnv.getBoundingClientRect();
     mouseX = event.clientX - rect.left;
     mouseY = event.clientY - rect.top;
-    allCursors.push(createCursor());
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
+    allCursors.push(createCursor());
+    if (allCursors[0].av <= 0) allCursors.splice(allCursors[0], 1);
+    if (mouseX < 0 || mouseX > cnv.width || mouseY < 0 || mouseY > cnv.height) { bodyEl.style.cursor = "auto"; console.log("e"); }
+    else bodyEl.style.cursor = "none";
 });
 
 // Player & Enemies
