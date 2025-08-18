@@ -57,7 +57,7 @@ let mouseOver = {
     musicSlider: false,
     sfxSlider: false,
     aZ_RangeBtn: false,
-    disableCursorBtn: false,
+    customCursorBtn: false,
 };
 
 let mouseX;
@@ -69,10 +69,12 @@ window.addEventListener('mousemove', (event) => {
     mouseX = event.clientX - rect.left;
     mouseY = event.clientY - rect.top;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
-    allCursors.push(createCursor());
-    if (allCursors[0].av <= 0) allCursors.splice(allCursors[0], 1);
-    if (mouseX < 0 || mouseX > cnv.width || mouseY < 0 || mouseY > cnv.height) { bodyEl.style.cursor = "auto"; console.log("e"); }
-    else bodyEl.style.cursor = "none";
+    if (settings?.customCursor === true) {
+        allCursors.push(createCursor());
+        if (allCursors[0].av <= 0) allCursors.splice(allCursors[0], 1);
+        if (mouseX < 0 || mouseX > cnv.width || mouseY < 0 || mouseY > cnv.height) bodyEl.style.cursor = "auto";
+        else bodyEl.style.cursor = "none";
+    } else allCursors = [];
 });
 
 // Player & Enemies
@@ -88,6 +90,15 @@ let player = {
     subColor: "rgb(230, 230, 230)",
     facingAngle: 0,
     invincible: false,
+};
+
+let settings = {
+    enemyOutlines: true,
+    disableMM: false,
+    musicSliderX: 240,
+    sfxSliderX: 240,
+    aZ_Range: true,
+    customCursor: true,
 };
 
 let dash = {
@@ -130,15 +141,6 @@ let amplify = {
         this.accelRate = Date.now();
     },
 }
-
-let settings = {
-    enemyOutlines: true,
-    disableMM: false,
-    musicSliderX: 240,
-    sfxSliderX: 240,
-    aZ_Range: true,
-    disableCursor: false,
-};
 
 let allEnemies = [];
 let allDangers = [];
@@ -240,8 +242,8 @@ if (localData) {
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score] !== undefined) hs[score] = userData.highscore[score];
         })
-        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true, disableCursor: false,};
-        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "disableCursor"].forEach(setting => {
+        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 240, sfxSliderX: 240, aZ_Range: true, customCursor: false,};
+        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "customCursor"].forEach(setting => {
             if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
         })
                 
@@ -250,7 +252,7 @@ if (localData) {
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
                     settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX,
-                               sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range, disableCursor: s.disableCursor}};
+                               sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range, customCursor: s.customCursor}};
         // updates the current data to the locally saved data
         player = userData.player;
         highscore = userData.highscore;
