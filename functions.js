@@ -565,6 +565,12 @@ function decideFillStyle(bool, color1, color2) {
     else ctx.fillStyle = color2;
 }
 
+function drawCursor() {
+    if (!settings.disableCursor) {
+        return 0
+    }
+}
+
 function drawStartScreen() {
     musicVolume = Math.floor((settings.musicSliderX - 165) / 1.5);
     music.var.volume = musicVolume/100;
@@ -724,7 +730,7 @@ function drawSettings() {
         ctx.fillText("Music Volume", 50, 150);
         ctx.fillText("SFX Volume", 50, 200);
         ctx.fillText("Show Absolute Zero's Range", 50, 250);
-        //  ctx.fillText("Custom Cursor", 50, 300);
+        ctx.fillText("Custom Cursor", 50, 300);
         
         // Enemy Outlines Button
         mouseOver.enemyOutBtn = mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
@@ -745,10 +751,10 @@ function drawSettings() {
         ctx.fillRect(266, 235, 20, 20);
 
         // Custom Cursor Button
-        /*mouseOver.disableCursor = mouseX > 266 && mouseX < 286 && mouseY > 235 && mouseY < 255;
+        mouseOver.disableCursorBtn = mouseX > 167 && mouseX < 187 && mouseY > 285 && mouseY < 305;
         if (settings.disableCursor) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
-        ctx.fillRect(266, 235, 20, 20);*/
+        ctx.fillRect(167, 285, 20, 20);
 
         // Music Volume Slider & SFX Volume Slider (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 155 && mouseX <= 325 && mouseY >= 130 && mouseY <= 160;
