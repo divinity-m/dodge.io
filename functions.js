@@ -579,9 +579,17 @@ function createCursor() {
 
 function drawCursor() {
     if (settings.customCursor && mouseX && mouseY) {
-        if (now-cursorsCd > 100) { allCursors.push(createCursor()); cursorsCd = Date.now();}
-        for (let i = allCursors.length-1; i >= 0; i--) {
+        if (now-cursorsCd > 10) { allCursors.push(createCursor()); cursorsCd = Date.now();}
+        let loopMax = Math.min(allCursors.length, 50); // lag prevention
+        let first;
+        let second;
+        if (allCursors.length < 10) first = allCursors.length;
+        for (let i = loopMax-1; i >= 0; i--) {
             if (allCursors[i].av <= 0) allCursors.splice(i, 1);
+        }
+        if (allCursors.length < 10) {
+            second = allCursors.length;
+            console.log(`1:${first} | 2: ${second}`);
         }
         allCursors.forEach(cursor => {
             if (cursor?.av) {
