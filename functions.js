@@ -1,4 +1,4 @@
-console.log("outer, add cursor animation");// DODGE.IO - FUNCTIONS.JS
+console.log("add cursor animation");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -580,6 +580,20 @@ function createCursor() {
     if (cursorX) cursor.x = cursorX;
     if (cursorY) cursor.y = cursorY;
     return cursor;
+}
+function createClick() {
+    let click = {
+        r: 1,
+        av: 1,
+        lw: 0.5,
+        get addR () { return this.r/20; },
+        get subAv () { return this.av/20; },
+        get addLw () { return this.lw/20; },
+    }
+    
+    if (cursorX) click.x = cursorX;
+    if (cursorY) click.y = cursorY;
+    return click;
 }
 
 function drawStartScreen() {
