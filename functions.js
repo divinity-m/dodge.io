@@ -152,7 +152,7 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "disableCursorBtn"].forEach(setting => {
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn"].forEach(setting => {
             if (mouseOver?.[setting]) {
                 if (mouseOver?.enemyOutBtn) {
                     if (settings.enemyOutlines) settings.enemyOutlines = false;
@@ -166,9 +166,9 @@ function recordLeftClick() {
                     if (settings.aZ_Range) settings.aZ_Range = false;
                     else settings.aZ_Range = true;
                 }
-                if (mouseOver?.disableCursorBtn) {
-                    if (settings.disableCursor) settings.disableCursor = false;
-                    else settings.disableCursor = true;
+                if (mouseOver?.customCursorBtn) {
+                    if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; }
+                    else { settings.customCursor = true; bodyEl.style.cursor = "none";}
                 }
     
                 // Saves the users settings options
@@ -578,8 +578,14 @@ function createCursor() {
 }
 
 function drawCursor() {
-    if (!settings.disableCursor && mouseX && mouseY) {
+    if (settings.customCursor && mouseX && mouseY) {
         allCursors.push(createCursor());
+        if (allCursors[0].av <= 0) allCursors.splice(allCursors[0], 1);
+        for (let i = allCursors.length-1; i >= 0; i--) {
+            if (allCursors[i].av <= 0) {
+                allCursors.splice(i, 1);
+            }
+        }
         allCursors.forEach(cursor => {
             if (cursor?.av) {
                 let playerColor = player.color.slice(4, player.color.length-1);
@@ -590,11 +596,6 @@ function drawCursor() {
                 cursor.av -= cursor.subAv;
             }
         })
-        for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].av <= 0) {
-                allCursors.splice(i, 1);
-            }
-        }
     }
 }
 
@@ -778,8 +779,8 @@ function drawSettings() {
         ctx.fillRect(266, 235, 20, 20);
 
         // Custom Cursor Button
-        mouseOver.disableCursorBtn = mouseX > 167 && mouseX < 187 && mouseY > 285 && mouseY < 305;
-        if (settings.disableCursor) ctx.fillStyle = "lime";
+        mouseOver.customCursorBtn = mouseX > 167 && mouseX < 187 && mouseY > 285 && mouseY < 305;
+        if (settings.customCursor) ctx.fillStyle = "lime";
         else ctx.fillStyle = "red";
         ctx.fillRect(167, 285, 20, 20);
 
