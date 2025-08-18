@@ -1,4 +1,4 @@
-console.log("cursorTrail density, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
+console.log("cursorTrail density was unfinished, add cursor animation, make bigger canvas for cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
