@@ -589,24 +589,24 @@ function drawCursor() {
         }
         allCursors.forEach(cursor => {
             let playerColor = player.color.slice(4, player.color.length-1);
-            outerctx.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
-            outerctx.beginPath()
-            outerctx.arc(cursor.x, cursor.y, cursor.r, Math.PI * 2, 0)
-            outerctx.fill();
+            ctxCursor.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
+            ctxCursor.beginPath()
+            ctxCursor.arc(cursor.x, cursor.y, cursor.r, Math.PI * 2, 0)
+            ctxCursor.fill();
             
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
         })
-        outerctx.fillStyle = player.color;
-        outerctx.beginPath()
-        outerctx.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0)
-        outerctx.fill();
+        ctxCursor.fillStyle = player.color;
+        ctxCursor.beginPath()
+        ctxCursor.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0)
+        ctxCursor.fill();
         
-        outerctx.strokeStyle = player.subColor;
-        outerctx.lineWidth = 3;
-        outerctx.beginPath()
-        outerctx.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0)
-        outerctx.stroke();
+        ctxCursor.strokeStyle = player.subColor;
+        ctxCursor.lineWidth = 3;
+        ctxCursor.beginPath()
+        ctxCursor.arc(cursorX, cursorY, 7.5, Math.PI * 2, 0)
+        ctxCursor.stroke();
     }
 }
 
