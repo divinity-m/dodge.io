@@ -138,6 +138,7 @@ let settings = {
 let allEnemies = [];
 let allDangers = [];
 let allCursors = [];
+let cursorCd;
 
 // Time, Highscore, and Difficulty
 let now = Date.now();
