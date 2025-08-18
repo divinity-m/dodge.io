@@ -567,7 +567,8 @@ function decideFillStyle(bool, color1, color2) {
 
 function drawCursor() {
     if (!settings.disableCursor) {
-        return 0
+        // ctx.fillStyle = `rgba(255, 255, 255, ${cursor.av})`
+        return 0;
     }
 }
 
