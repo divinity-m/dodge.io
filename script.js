@@ -391,6 +391,7 @@ function draw() {
         abilities();
         musicCollisions();
     }
+    drawCursor();
     requestAnimationFrame(draw)
 }
 draw()
