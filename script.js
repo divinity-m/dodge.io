@@ -2,6 +2,9 @@
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
+const outercnv = document.getElementById("outer-canvas");
+const outerctx = outercnv.getContext('2d');
+
 
 let gameState = "loading";
 let innerGameState = "loading";
@@ -64,21 +67,24 @@ let mouseOver = {
 let mouseX;
 let mouseY;
 let track = false;
+let cursorX;
+let cursorY;
 let allCursors = [];
 let trailDensity = 1;
 window.addEventListener('mousemove', (event) => {
-    const rect = cnv.getBoundingClientRect();
-    mouseX = event.clientX - rect.left;
-    mouseY = event.clientY - rect.top;
+    const cnvRect = cnv.getBoundingClientRect();
+    mouseX = event.clientX - cnvRect.left;
+    mouseY = event.clientY - cnvRect.top;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
+
+    const outercnvRect = outercnv.getBoundingClientRect();
+    cursorX = event.clientX - outercnvRect.left;
+    cursorY = event.clientY - outercnvRect.top;
     if (settings?.customCursor && settings?.cursorTrail) {
         if (trailDensity > 0.5) allCursors.push(createCursor());
         for (let i = allCursors.length-1; i >= 0; i--) {
             if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
         }
-        
-        if (mouseX < -9 || mouseX > cnv.width+9 || mouseY < -9 || mouseY > cnv.height+9) bodyEl.style.cursor = "auto"; // cursor radius: 7.5, lineWidth: 3;
-        else bodyEl.style.cursor = "none";
     }
 });
 
