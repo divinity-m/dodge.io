@@ -1,8 +1,9 @@
 // DODGE.IO - SCRIPT.JS
+console.log("background canvas")
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("canvas");
 const ctx = cnv.getContext('2d');
-const outercnv = document.getElementById("outer-canvas");
+const outercnv = document.getElementById("background");
 const outerctx = outercnv.getContext('2d');
 
 
