@@ -177,7 +177,7 @@ function recordLeftClick() {
                 // Sliders
                 if (mouseOver?.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
                 if (mouseOver?.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
-                if (mouseOver?.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 552), 702);
+                if (mouseOver?.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 555), 705);
                 if (mouseOver?.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
     
                 // Saves the users settings options
@@ -748,7 +748,7 @@ function drawSettings() {
     
     musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
     sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
-    absoluteZero.av = Math.max(Math.min((settings.aZ_Av - 552) / (702 - 552), 1), 0)
+    absoluteZero.av = Math.max(Math.min((settings.aZ_Av - 555) / (705 - 555), 1), 0)
     trailDensity = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0);
     music.var.volume = musicVolume;
     sharpPop.volume = sfxVolume;
@@ -804,12 +804,12 @@ function drawSettings() {
         // Sliders (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
         mouseOver.sfxSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
-        mouseOver.aZ_AvSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 130 && mouseY <= 160;
+        mouseOver.aZ_AvSlider = mouseX >= 545 && mouseX <= 715 && mouseY >= 130 && mouseY <= 160;
         mouseOver.cursorTrailSlider = mouseX >= 540 && mouseX <= 710 && mouseY >= 180 && mouseY <= 210;
         
         if (mouseDown && mouseOver.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
         if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
-        if (mouseDown && mouseOver.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 552), 702);
+        if (mouseDown && mouseOver.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 555), 705);
         if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
 
         function drawSettingsSlider(x, y, sliderX, number) { 
@@ -832,8 +832,8 @@ function drawSettings() {
         // Sliders
         drawSettingsSlider(565, 40, settings.musicSliderX, Math.floor(musicVolume*100));
         drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(sfxVolume*100));
-        drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(absoluteZero.av*100));
-        drawSettingsSlider(550, 140, settings.cursorTrail, Math.floor(trailDensity*100));
+        drawSettingsSlider(555, 140, settings.sfxSliderX, Math.floor(absoluteZero.av*100));
+        drawSettingsSlider(550, 190, settings.cursorTrail, Math.floor(trailDensity*100));
     }
 }
 
