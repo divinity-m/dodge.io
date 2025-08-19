@@ -334,6 +334,7 @@ function draw() {
     now = Date.now()
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, cnv.width, cnv.height);
+    detectHover(); // checks if the mouse is hovering over a button
 
     // Loading Screen
     if (now - loadingGame <= 5000 && !endLoading) { // Takes 5 seconds to load the game safely
