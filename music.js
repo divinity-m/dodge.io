@@ -34,12 +34,6 @@ function loopAudio() {
 
 function drawEndLevel() {
     if (timeLeft <= 0 || innerGameState === "musicModeFail") {
-        // Level Percentage
-        let percentage = Math.floor(music.var.currentTime / music.var.duration * 100);
-        if (music.name === "Alarm 9") highscore.limbo = percentage;
-        if (music.name === "Astral Projection") highscore.andromeda = percentage;
-        if (music.name === "Divine") highscore.euphoria = percentage;
-
         // Rect Variables
         let exitX = 150;
         let exitY = (cnv.height/2 - 100);
