@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("fixing bugs w/ cursor density")
+console.log("fixing bugs w/ cursor density, playerBase speed")
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
