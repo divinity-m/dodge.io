@@ -8,7 +8,7 @@ function restartMusicMode() {
     music.timestamps = [...music.backUpTS];
     timeLeft = (music.var.duration - music.var.currentTime).toFixed(2);
     dash.lastEnded = 0;
-    shockwave.lastEnded = 0;
+    shockwave.reset();
     amplify.reset();
     innerGameState = 'inMusicMode';
     gameState = "musicMode";
@@ -79,6 +79,8 @@ function drawEndLevel() {
             ctx.fillText(`Exiting In`, 250, cnv.height/2 - 25);
             ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 250, cnv.height/2 + 25);
             if (now - startTime >= 3000) {
+                dash.lastEnded = 0;
+                shockwave.reset();
                 amplify.reset();
                 music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
                 music.var.currentTime = 0;
