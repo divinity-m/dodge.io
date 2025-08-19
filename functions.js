@@ -797,7 +797,7 @@ function drawSettings() {
         if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
         if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
 
-        function drawSettingsSlider(x, y, sliderX, value) { 
+        function drawSettingsSlider(x, y, sliderX, number) { 
             ctx.beginPath();
             ctx.roundRect(x, y, 150, 10, 5);
             ctx.stroke();
@@ -805,7 +805,7 @@ function drawSettings() {
             ctx.roundRect(x, y, sliderX - x, 10, 5);
             ctx.fill();
             drawCircle(sliderX, y+5, 10);
-            if (value !== undefined) ctx.fillText(value, x+165, y+10);
+            if (value !== undefined) ctx.fillText(number, x+165, y+10);
         }
         
         ctx.strokeStyle = "white";
@@ -817,8 +817,7 @@ function drawSettings() {
         // Sliders
         drawSettingsSlider(565, 40, settings.musicSliderX, Math.floor(musicVolume*100));
         drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(sfxVolume*100));
-        let trailDensityText = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0) * 100;
-        drawSettingsSlider(550, 140, settings.cursorTrail, Math.floor(trailDensityText));
+        drawSettingsSlider(550, 140, settings.cursorTrail, Math.floor(trailDensity*100));
     }
 }
 
