@@ -743,7 +743,7 @@ function drawSettings() {
 
     settings.musicSliderX = Math.min(Math.max(settings.musicSliderX, 565), 715);
     settings.sfxSliderX = Math.min(Math.max(settings.sfxSliderX, 552), 702);
-    settings.aZ_Av = Math.min(Math.max(settings.aZ_Av, 552), 702);
+    settings.aZ_Av = Math.min(Math.max(settings.aZ_Av, 555), 705);
     settings.cursorTrail = Math.min(Math.max(settings.cursorTrail, 550), 700);
     
     musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
@@ -832,7 +832,7 @@ function drawSettings() {
         // Sliders
         drawSettingsSlider(565, 40, settings.musicSliderX, Math.floor(musicVolume*100));
         drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(sfxVolume*100));
-        drawSettingsSlider(555, 140, settings.sfxSliderX, Math.floor(absoluteZero.av*100));
+        drawSettingsSlider(555, 140, settings.aZ_Av, Math.floor(absoluteZero.av*100));
         drawSettingsSlider(550, 190, settings.cursorTrail, Math.floor(trailDensity*100));
     }
 }
