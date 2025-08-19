@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("no-cursor attempted fix 2")
+console.log("no-cursor attempted fix 2, trail fix")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
