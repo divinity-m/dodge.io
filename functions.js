@@ -578,24 +578,27 @@ function createCursor() {
     let cursor = {
         r: 7.5,
         av: 1,
-        get subR () { return this.r/20*trailDensity; },
-        get subAv () { return this.av/20*trailDensity; },
+        subR: 7.5/Math.max(1, 30*trailDensity),
+        subAv: 1/Math.max(1, 30*trailDensity),
     }
-    
-    if (cursorX) cursor.x = cursorX;
-    if (cursorY) cursor.y = cursorY;
+    let playerColor = player.color.slice(4, player.color.length-1);
+    cursor.color = `rgba(${playerColor}, ${cursor.av})`;
+    cursor.x = cursorX;
+    cursor.y = cursorY;
     return cursor;
 }
+
 function createClick() {
     let click = {
         r: 1,
         av: 1,
         addR: 24/15, // 1 + 24/15 * 15
-        subAv: 1/15, // 1 - n/15 * 15
+        subAv: 1/15, // 1 - 1/15 * 15
     }
-    
-    if (cursorX) click.x = cursorX;
-    if (cursorY) click.y = cursorY;
+    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
+    click.color = `rgba(${playerSubColor}, ${click.av})`;
+    click.x = cursorX;
+    click.y = cursorY;
     return click;
 }
 
@@ -740,11 +743,11 @@ function drawSettings() {
 
     settings.musicSliderX = Math.min(Math.max(settings.musicSliderX, 565), 715);
     settings.sfxSliderX = Math.min(Math.max(settings.sfxSliderX, 552), 702);
-    settings.cursorTrail = Math.min(Math.max(settings.cursorTrail, 565), 715);
+    settings.cursorTrail = Math.min(Math.max(settings.cursorTrail, 550), 700);
     
     musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
     sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
-    trailDensity = 0.5 + 0.5 * Math.max(Math.min((settings.sfxSliderX - 550) / (700 - 550), 1), 0);
+    trailDensity = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0);
     music.var.volume = musicVolume;
     sharpPop.volume = sfxVolume;
 
@@ -788,7 +791,7 @@ function drawSettings() {
         // Sliders (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
         mouseOver.sfxSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
-        mouseOver.cursorTrail = mouseX >= 540 && mouseX <= 710 && mouseY >= 130 && mouseY <= 160;
+        mouseOver.cursorTrailSlider = mouseX >= 540 && mouseX <= 710 && mouseY >= 130 && mouseY <= 160;
         
         if (mouseDown && mouseOver.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
         if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
@@ -802,19 +805,20 @@ function drawSettings() {
             ctx.roundRect(x, y, sliderX - x, 10, 5);
             ctx.fill();
             drawCircle(sliderX, y+5, 10);
-            if (value) ctx.fillText(value, x+175, y);
+            if (value !== undefined) ctx.fillText(value, x+165, y+10);
         }
         
         ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
         ctx.fillStyle = "white";
-        ctx.textAlign = "center";
+        ctx.textAlign = "left";
         ctx.font = "bold 15px Arial";
 
         // Sliders
-        drawSettingsSlider(565, 40, settings.musicSliderX, musicVolume);
-        drawSettingsSlider(552, 90, settings.sfxSliderX, sfxVolume);
-        drawSettingsSlider(550, 140, settings.cursorTrail);
+        drawSettingsSlider(565, 40, settings.musicSliderX, Math.floor(musicVolume*100));
+        drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(sfxVolume*100));
+        let trailDensityText = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0) * 100;
+        drawSettingsSlider(550, 140, settings.cursorTrail, Math.floor(trailDensityText));
     }
 }
 
@@ -1411,8 +1415,13 @@ function mouseMovement() {
         const clampDist = Math.min(slowStart, mouseDist);
         const factor = clampDist / slowStart;
         const slowFactor = 0.3 + 0.7 * factor;
-        player.x += Math.cos(player.facingAngle) * player.speed * slowFactor;
-        player.y += Math.sin(player.facingAngle) * player.speed * slowFactor;
+
+        // Prevents player moving into itself when the mouse is directly overtop it
+
+        if (mouseDist > player.speed/6) {
+            player.x += Math.cos(player.facingAngle) * player.speed * slowFactor;
+            player.y += Math.sin(player.facingAngle) * player.speed * slowFactor;
+        }
         
 
         // Anti-no-clip (wall collisions)
