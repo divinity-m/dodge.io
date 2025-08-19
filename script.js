@@ -459,7 +459,7 @@ function drawCursor() {
         })
 
         let hovering = false;
-        mouseOver.forEach(hover => { if (hover) hovering = true; })
+        Object.keys(mouseOver).forEach(hover => { if (mouseOver[hover]) hovering = true; })
         if (hovering) { // hoving inverts cursor colors, clicking reduces alpha value
             if (mouseDown) ctxCursor.fillStyle = `rgba(${playerSubColor}, 0.75)`;
             else ctxCursor.fillStyle = player.subColor;
