@@ -1158,21 +1158,29 @@ function drawText() { // draws the current time, highest time, and enemy count
     // Current time in seconds
     currentTime = ((now-startTime) / 1000).toFixed(2);
     timeLeft = (music.var.duration - music.var.currentTime).toFixed(2);
-    
-    if (gameState === "endlessMode") {
-        // Updates the highscore and saves it to local storage
-        if (Number(currentTime) > Number(highscore[difficulty.level])) {
+    if (gmaeState === "endlessMode" || gameState === "endlessOver" || gameState === "musicMode") {
+        // Difficulty Highscore
+        if (Number(currentTime) > Number(highscore?.[difficulty.level]) && gameState !== "musicMode") {
             highscore[difficulty.level] = currentTime;
             highscoreColor = difficulty.color
-
-            userData.highscore = highscore;
-            // Saves data every 5 seconds (incase the user disconnects/crashes)
-            if (now - lastSave >= 5000) {
-                localStorage.setItem('localUserData', JSON.stringify(userData));
-                lastSave = Date.now();
-            }
         }
 
+        // Level Percentage
+        let percentage = Math.floor(music.var.currentTime / music.var.duration * 100);
+        if (gameState === "musicMode") {
+            if (music.name === "Alarm 9") highscore.limbo = Math.max(highscore.limbo, percentage);
+            if (music.name === "Astral Projection") highscore.andromeda = Math.max(highscore.andromeda, percentage);
+            if (music.name === "Divine") highscore.euphoria = Math.max(highscore.euphoria, percentage);
+        }
+        
+        // Saves data every second incase the user disconnects/crashes
+        userData.highscore = highscore;
+        if (now - lastSave > 1000) {
+            localStorage.setItem('localUserData', JSON.stringify(userData));
+            lastSave = Date.now();
+        }
+    }
+    if (gameState === "endlessMode") {
         // Draws the times and the enemy count
         ctx.font = "20px Verdana";
         ctx.textAlign = 'center';
