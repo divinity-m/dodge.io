@@ -154,6 +154,7 @@ function recordLeftClick() {
     else if (innerGameState === "settings") {
         ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn", "cursorTrailSlider"].forEach(setting => {
             if (mouseOver?.[setting]) {
+                // Buttons
                 if (mouseOver?.enemyOutBtn) {
                     if (settings.enemyOutlines) settings.enemyOutlines = false;
                     else settings.enemyOutlines = true;
@@ -174,6 +175,10 @@ function recordLeftClick() {
                     if (settings.cursorTrail) settings.cursorTrail = false;
                     else settings.cursorTrail = true;
                 }
+                // Sliders
+                if (mouseOver?.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
+                if (mouseOver?.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
+                if (mouseOver?.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
     
                 // Saves the users settings options
                 userData.settings = settings;
