@@ -90,7 +90,6 @@ window.addEventListener('mousemove', (event) => {
     cursorX = event.clientX;
     cursorY = event.clientY;
     if (settings?.customCursor && settings?.cursorTrail && cursorX !== undefined && cursorY !== undefined) {
-        bodyEl.style.cursor = "none";
         if (trailDensity > 0) allCursors.push(createCursor()); // wont create new trails if the trail density is 0
         for (let i = allCursors.length-1; i >= 0; i--) {
             if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1);
