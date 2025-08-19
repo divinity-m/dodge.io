@@ -440,9 +440,8 @@ function drawCursor() {
     ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
   
     // Cursor & Cursor Trail
-
-    if (settings.customCursor) { document.documentElement.classList.add("no-cursor"); allCursors = []; }
-    else document.documentElement.classList.remove("no-cursor");
+    if (settings.customCursor) document.documentElement.classList.add("no-cursor");
+    else { document.documentElement.classList.remove("no-cursor"); allCursors = []; }
   
     for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
     let playerColor = player.color.slice(4, player.color.length-1);
