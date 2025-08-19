@@ -1133,7 +1133,7 @@ function drawPlayer() {
     drawCircle(player.x, player.y, player.r, "stroke");
     // Draws Absolute Zero's range
     if (player.dodger === "jötunn" && settings.aZ_Range) {
-        const azGradient = ctx.createRadialGradient(player.x, player.y, absoluteZero.slowEnd, player.x, palyer.y, absoluteZero.slowStart);
+        const azGradient = ctx.createRadialGradient(player.x, player.y, absoluteZero.slowEnd, player.x, player.y, absoluteZero.slowStart);
         if (gameState !== "musicMode") {
             let azColor = [];
             if (absoluteZero.passive === "Absolute Zero") azColor = [0, 127, 255];
