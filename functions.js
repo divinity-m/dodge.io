@@ -1158,7 +1158,7 @@ function drawText() { // draws the current time, highest time, and enemy count
     // Current time in seconds
     currentTime = ((now-startTime) / 1000).toFixed(2);
     timeLeft = (music.var.duration - music.var.currentTime).toFixed(2);
-    if (gmaeState === "endlessMode" || gameState === "endlessOver" || gameState === "musicMode") {
+    if (gameState === "endlessMode" || gameState === "endlessOver" || gameState === "musicMode") {
         // Difficulty Highscore
         if (Number(currentTime) > Number(highscore?.[difficulty.level]) && gameState !== "musicMode") {
             highscore[difficulty.level] = currentTime;
