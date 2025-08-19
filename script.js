@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("canvas resize, overflow hiddens, nothing-beats a-jet2-holiday")
+console.log("increase cursor despawn rate")
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
