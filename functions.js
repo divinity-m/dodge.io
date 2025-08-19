@@ -171,8 +171,8 @@ function recordLeftClick() {
                     else settings.aZ_Range = true;
                 }
                 if (mouseOver?.customCursorBtn) {
-                    if (settings.customCursor) { settings.customCursor = false; bodyEl.classList.remove("no-cursor"); allCursors = []; }
-                    else { settings.customCursor = true; bodyEl.classList.add("no-cursor"); }
+                    if (settings.customCursor) settings.customCursor = false;
+                    else settings.customCursor = true;
                 }
                 // Sliders
                 if (mouseOver?.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
