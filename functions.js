@@ -1,4 +1,4 @@
-console.log("resizing cursor");// DODGE.IO - FUNCTIONS.JS
+// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
