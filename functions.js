@@ -805,7 +805,7 @@ function drawSettings() {
             ctx.roundRect(x, y, sliderX - x, 10, 5);
             ctx.fill();
             drawCircle(sliderX, y+5, 10);
-            if (value !== undefined) ctx.fillText(number, x+165, y+10);
+            if (number !== undefined) ctx.fillText(number, x+165, y+10);
         }
         
         ctx.strokeStyle = "white";
