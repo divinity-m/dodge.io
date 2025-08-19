@@ -121,7 +121,7 @@ function createBeam(variant="none") {
         spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
         colorValue: 185,
         get color() {
-            return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+            return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
         },
         reset: 0,
         get swcv () { // for jolt
@@ -150,7 +150,7 @@ function createCircle(variant="none") {
         spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
         colorValue: 185,
         get color() {
-            return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+            return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
         },
         reset: 0,
         get swcv () { // for jolt
@@ -182,7 +182,7 @@ function createSpike() {
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
         get color() {
-            return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+            return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
         },
         launched: false,
         get reachedWall() {
@@ -221,7 +221,7 @@ function createText() {
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
         get color() {
-            return `rgb(${this.colorValue}, ${this.colorValue}, ${this.colorValue})`;
+            return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue} 0.95)`;
         },
     }
     return text;
@@ -364,8 +364,6 @@ function spawnAndDrawDanger() {
     }
     // Danger Drawing
     allDangers.forEach(danger => {
-        ctx.fillStyle = danger.color;
-        ctx.strokeStyle = danger.color;
         // colorValue
         if (danger.colorValue >= 255 && danger.type !== "spike") danger.despawn = true;
         if (danger.colorValue < 255 &&
@@ -380,7 +378,7 @@ function spawnAndDrawDanger() {
         function joltOrJötunnFillStyle() {
             if (player.dodger === "jolt") return joltEffectColor;
             else if (player.dodger === "jötunn") return jötunnEffectColor;
-            else return "rgba(255, 255, 255, 0)";
+            else return danger.color;
         }
         
         // shape
