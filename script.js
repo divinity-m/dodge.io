@@ -3,13 +3,16 @@ console.log("cursor canvas")
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
-const cnvBg = document.getElementById("background");
-const ctxBg = cnvBg.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
 const ctxCursor = cnvCursor.getContext('2d');
 
-cnvCursor.width = window.innerWidth;
-cnvCursor.height = window.innerHeight;
+function resizeCursorCanvas() {
+  cnvCursor.width = window.innerWidth;
+  cnvCursor.height = window.innerHeight;
+}
+
+window.addEventListener("resize", resizeCursorCanvas);
+resizeCursorCanvas(); // call once at start
 
 let gameState = "loading";
 let innerGameState = "loading";
@@ -323,8 +326,6 @@ window.addEventListener('beforeunload', () => {
 // Drawing the game
 function draw() {
     now = Date.now()
-    ctxBg.fillStyle = "rgb(200, 200, 200)";
-    ctxBg.fillRect(0, 0, cnvBg.width, cnvBg.height);
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, cnv.width, cnv.height);
 
@@ -428,12 +429,13 @@ function drawCursor() {
         if (type === "stroke") ctxCursor.stroke();
     }
     
-    if (settings?.customCursor && cursorX && cursorY && lastPressing === "mouse") {
+    if (settings?.customCursor) {
         ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
         // Cursor
         for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1); // removes trails with low av's
         
         let playerColor = player.color.slice(4, player.color.length-1);
+        let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
         allCursors.forEach(cursor => {
             ctxCursor.fillStyle = `rgba(${playerColor}, ${cursor.av})`;
             drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
@@ -441,7 +443,7 @@ function drawCursor() {
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
         })
-        if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
+        if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.5)`;
         else ctxCursor.fillStyle = player.color;
         drawCursorCircle(cursorX, cursorY, 7.5, "fill");
         
@@ -450,16 +452,15 @@ function drawCursor() {
         drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
 
         // Click Animation
-        for (let i = allClicks.length-1; i >= 0; i--) if (allClicks[i].av <= 1/100) allClicks.splice(i, 1); // removes clicks with low av's
+        for (let i = allClicks.length-1; i >= 0; i--) if (allClicks[i].av < 0) allClicks.splice(i, 1); // removes transparent clicks (0 av)
         
         allClicks.forEach(click => {
-            ctxCursor.strokeStyle = `rgba(${playerColor}, ${click.av})`;
-            ctxCursor.lineWidth = click.lw;
+            ctxCursor.strokeStyle = `rgba(${playerSubColor}, ${click.av})`;
+            ctxCursor.lineWidth = 2;
             drawCursorCircle(click.x, click.y, click.r, "stroke");
 
             click.r += click.addR;
             click.av -= click.subAv;
-            click.lw += click.addLw;
         })
     }
     requestAnimationFrame(drawCursor);
