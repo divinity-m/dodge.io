@@ -171,8 +171,8 @@ function recordLeftClick() {
                     else settings.aZ_Range = true;
                 }
                 if (mouseOver?.customCursorBtn) {
-                    if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; allCursors = []; }
-                    else { settings.customCursor = true; bodyEl.style.cursor = "none"; }
+                    if (settings.customCursor) { settings.customCursor = false; bodyEl.classList.remove("no-cursor"); allCursors = []; }
+                    else { settings.customCursor = true; bodyEl.classList.add("no-cursor"); }
                 }
                 // Sliders
                 if (mouseOver?.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
