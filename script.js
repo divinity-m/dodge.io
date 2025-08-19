@@ -441,6 +441,7 @@ function drawCursor() {
     // Cursor
     for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
     let playerColor = player.color.slice(4, player.color.length-1);
+    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
     if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
         allCursors.forEach(cursor => {
             ctxCursor.fillStyle = cursor.color;
@@ -449,12 +450,20 @@ function drawCursor() {
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
         })
-        if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
-        else ctxCursor.fillStyle = player.color;
-        drawCursorCircle(cursorX, cursorY, 7.5, "fill");
-        
-        ctxCursor.strokeStyle = player.subColor;
+
+        let hovering = false;
+        mouseOver.forEach(hover => { if (hover) hovering = true; })
+        if (hovering) { // hoving inverts cursor colors, clicking reduces alpha value
+            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerSubColor}, 0.75)`;
+            else ctxCursor.fillStyle = player.subColor;
+            ctxCursor.strokeStyle = player.color;
+        } else {
+            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
+            else ctxCursor.fillStyle = player.color;
+            ctxCursor.strokeStyle = player.subColor;
+        }
         ctxCursor.lineWidth = 3;
+        drawCursorCircle(cursorX, cursorY, 7.5, "fill");
         drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
     }
   
