@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("buggy player abilities, az range, az alpha value slider, no cursor")
+console.log("buggy player abilities, az range, az alpha value slider, hovering")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
