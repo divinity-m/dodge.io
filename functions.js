@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("no-cursor is still buggy, dangers not showing, undefined timestamps fix")
+console.log("no-cursor is still buggy, undefined timestamps fix")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
