@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("buggy shockwave, az range, az alpha value slider, hovering2, no-cursor is buggy")
+console.log("buggy shockwave, no-cursor is still buggy")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
