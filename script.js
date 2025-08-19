@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("no-cursor attempted fix 2, trail fix")
+console.log("hovering over links")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
@@ -456,8 +456,17 @@ function drawCursor() {
         })
 
         let hovering = false;
-        Object.keys(mouseOver).forEach(hover => { if (mouseOver[hover]) hovering = true; })
-        if (hovering) { // hoving inverts cursor colors, clicking reduces alpha value
+        // Canvas Buttons
+        Object.keys(mouseOver).forEach(hover => {
+          if (mouseOver[hover]) hovering = true;
+        })
+        // Document Hyperlinks
+        let hyperlinks = document.getElementsByTagName('a');
+        for (let i = 0; i < hyperlinks.length; i++) {
+          if (hyperlinks[i].matches(":hover")) hovering = true;
+        }
+        // hoving inverts cursor colors, clicking reduces alpha value
+        if (hovering) {
             if (mouseDown) ctxCursor.fillStyle = `rgba(${playerSubColor}, 0.75)`;
             else ctxCursor.fillStyle = player.subColor;
             ctxCursor.strokeStyle = player.color;
