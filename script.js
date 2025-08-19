@@ -441,7 +441,7 @@ function drawCursor() {
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
         })
-        if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.5)`;
+        if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
         else ctxCursor.fillStyle = player.color;
         drawCursorCircle(cursorX, cursorY, 7.5, "fill");
         
