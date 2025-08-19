@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("buggy player abilities, az range, az alpha value slider, hovering, no-cursor is buggy")
+console.log("buggy shockwave, az range, az alpha value slider, hovering, no-cursor is buggy")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
@@ -1191,7 +1191,7 @@ function drawEnemies() {
         drawCircle(enemy.x, enemy.y, enemy.r);
 
         // shows jolt's effect
-        enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // clamped between 0 and 1;
+        if (gameState !== "endlessOver") enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // clamped between 0 and 1;
         let av = 0.8 - enemy.swcv*0.8;
         ctx.fillStyle = `rgba(200, 200, 0, ${av})`;
         drawCircle(enemy.x, enemy.y, enemy.r);
@@ -1655,20 +1655,21 @@ function abilities() { // player-specific abilities
 
         ctx.restore();
 
-        // increase the radius of the beam and move it every frame
-        if (gameState !== "gameOver") shockwave.radius *= 1.022;
-        if (shockwave.used === "Shockwave") {
-            /* shockwave.x = player.x;
-            shockwave.y = player.y; */
-            shockwave.cd = 8500;
-            shockwave.effect = 0.75;
+        // pauses beam if the player dies
+        if (gameState !== "endlessOver") {
+            shockwave.radius *= 1.022;
+            if (shockwave.used === "Shockwave") {
+                shockwave.cd = 8500;
+                shockwave.effect = 0.75;
+            }
+            else if (shockwave.used === "Shockray") {
+                shockwave.x += shockwave.movex;
+                shockwave.y += shockwave.movey;
+                shockwave.cd = 5500;
+                shockwave.effect = 0.5;
+            }
         }
-        else if (shockwave.used === "Shockray") {
-            shockwave.x += shockwave.movex;
-            shockwave.y += shockwave.movey;
-            shockwave.cd = 5500;
-            shockwave.effect = 0.5;
-        }
+        
         // once the radius is greater than 250, end the entire ability
         if ((shockwave.radius > 1250 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
             shockwave.activated = false;
@@ -1676,7 +1677,7 @@ function abilities() { // player-specific abilities
             shockwave.lastEnded = Date.now();
         }
     }
-    if (player.dodger === "jolt") {
+    if (player.dodger === "jolt" && gameState !== "endlessOver") {
         allEnemies.forEach(enemy => {
             // Restore the stats of enemies after 5 seconds have passed
             if (now - enemy.reset >= 5000) {
