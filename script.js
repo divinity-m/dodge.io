@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("fixing bugs w/ cursor density, mm, cursor not dissapearing")
+console.log("fixing bugs w/ cursor density")
 const bodyEl = document.getElementById("bodyEl");
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
