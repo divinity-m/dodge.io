@@ -837,7 +837,7 @@ function drawDifficultySelection() {
         // Level Name
         ctx.fillStyle = color;
         ctx.textAlign = "left";
-        ctx.font = "bold 20px 'Lucida Console'";
+        ctx.font = "bold 19px 'Lucida Console'";
         ctx.fillText(difficultyName, x, y);
 
         // Level Score
@@ -848,7 +848,7 @@ function drawDifficultySelection() {
 
         // Level Description
         ctx.textAlign = "left";
-        ctx.font = "16px 'Lucida Console'";
+        ctx.font = "15.5px 'Lucida Console'";
         ctx.fillText(`${adversary}:  ${description[0]}`, x, y + 25);
         if (description[1]) ctx.fillText(description[1], x, y + 50);
     }
