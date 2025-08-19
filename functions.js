@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("no-cursor attempted fix, hovering function")
+console.log("no-cursor attempted fix")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
@@ -568,10 +568,10 @@ function detectHover() {
     mouseOver.restart = gameState === "endlessOver" && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
 
     mouseOver.evader = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
-    mouseOver.j_sab = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 300 && mouseX < 300 && mouseY > 25 && mouseY < 125;
+    mouseOver.j_sab = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 425 && mouseX < 625 && mouseY > 150 && mouseY < 250;
     mouseOver.jötunn = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
-    mouseOver.jolt = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 175 && mouseX < 375 && mouseY > 150 && mouseY < 250;
-    mouseOver.crescendo = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 425 && mouseX < 625 && mouseY > 150 && mouseY < 250;
+    mouseOver.jolt = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 300 && mouseX < 500 && mouseY > 25 && mouseY < 125;
+    mouseOver.crescendo = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 175 && mouseX < 375 && mouseY > 150 && mouseY < 250;
 
     mouseOver.easy = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
     mouseOver.medium = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
