@@ -364,22 +364,23 @@ function spawnAndDrawDanger() {
     }
     // Danger Drawing
     allDangers.forEach(danger => {
-        // colorValue
-        if (danger.colorValue >= 255 && danger.type !== "spike") danger.despawn = true;
-        if (danger.colorValue < 255 &&
-            (
-            (!danger?.despawn && danger.type !== "spike") || (!danger?.reachedWall && danger.type === "spike")
-            )
-           ) danger.colorValue += danger.spawnRate;
-        if (danger.colorValue > 185 && (danger?.despawn || danger?.reachedWall)) danger.colorValue -= danger.despawnRate;
+        ctx.fillStyle = danger.color;
+        ctx.strokeStyle = danger.color;
         let joltEffectColor = `rgba(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
         let jötunnEffectColor = `rgba(80, ${198+danger.colorValue/10}, ${229+danger.colorValue/10}, ${danger.azcv})`;
-
         function joltOrJötunnFillStyle() {
             if (player.dodger === "jolt") return joltEffectColor;
             else if (player.dodger === "jötunn") return jötunnEffectColor;
-            else return danger.color;
+            else return "rgb(255, 255, 255, 0)";
         }
+        
+        // colorValue
+        if (danger.colorValue >= 255 && danger.type !== "spike") danger.despawn = true;
+        
+        if (danger.colorValue < 255 && ( (!danger?.despawn && danger.type !== "spike") ||
+             (!danger?.reachedWall && danger.type === "spike") ) ) danger.colorValue += danger.spawnRate;
+        
+        if (danger.colorValue > 185 && (danger?.despawn || danger?.reachedWall)) danger.colorValue -= danger.despawnRate;
         
         // shape
         if (danger.type === "beam") {
