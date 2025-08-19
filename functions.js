@@ -1124,6 +1124,13 @@ function drawPlayer() {
         ctx.lineWidth = 2;
         drawCircle(player.x, player.y, absoluteZero.slowStart, "stroke");
     }
+    if (gameState === "musicMode") {
+        // Draws player lives
+        ctx.textAlign = "center";
+        ctx.font = "20px Impact";
+        ctx.fillStyle = player.subColor;
+        ctx.fillText(player.lives, player.x, player.y + 6.5);
+    }
 }
 
 function drawEnemies() {
