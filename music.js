@@ -298,14 +298,12 @@ function spawnAndDrawDanger() {
                 if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
                 if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
                 else if (modifiers?.despawnRate === 0) allDangers[0].despawnRate = 0;
-                music.timestamps.splice(i, 1);
 
                 // Beam X and Y's
                 if (allDangers[0].variant === "vertical") { allDangers[0].y = 0; allDangers[0].h = cnv.height; }
                 if (allDangers[0].variant === "horizontal") { allDangers[0].x = 0; allDangers[0].w = cnv.width; }
                 
-                
-                // collision points
+                // Collision Points
                 if (player.dodger === "jolt" && !modifiers?.invincible) {
                     allDangers[0].reset = 1;
                     if (allDangers[0].type === "circle" || allDangers[0].type === "spike") {
@@ -359,6 +357,8 @@ function spawnAndDrawDanger() {
                         })
                     }
                 }
+                
+                music.timestamps.splice(i, 1);
             }
         }
     }
