@@ -16,16 +16,9 @@
                 height: 100%;
             }
             body {
+                background-color: rgb(200, 200, 200);
                 text-align: center;
                 font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-            }
-            #background {
-                position: absolute; /* scrolls with the page */
-                top: 0; left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: -1; /* keeps it behind other elements */
-                pointer-events: none; /* clicks go through */
             }
             #game {
               z-index: 1;
@@ -57,9 +50,7 @@
             }
         </style>
     </head>
-    <body id="bodyEl">
-        <canvas id="background"></canvas>
-        
+    <body id="bodyEl">        
         <div style="display: none;">
             <!-- Images -->
             <img id="gear-filled" src="DodgeImages/gear-filled.png">
