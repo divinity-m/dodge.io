@@ -3,8 +3,6 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("no-cursor attempted fix")
-
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
         if (now - loadingGame >= 1000 && gameState == "loading") {
