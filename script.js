@@ -93,7 +93,7 @@ window.addEventListener('mousemove', (event) => {
         bodyEl.style.cursor = "none";
         if (trailDensity > 0.5) allCursors.push(createCursor());
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].r <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1);
+            if (allCursors[i].r <= 1/10 || trailDensity === 0.5) allCursors.splice(i, 1);
         }
     }
 });
@@ -432,7 +432,7 @@ function drawCursor() {
     if (settings?.customCursor) {
         ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
         // Cursor
-        for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av <= 1/100 || trailDensity === 0.5) allCursors.splice(i, 1); // removes trails with low av's
+        for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av <= 1/10 || trailDensity === 0.5) allCursors.splice(i, 1); // removes trails with low av's
         
         let playerColor = player.color.slice(4, player.color.length-1);
         let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
