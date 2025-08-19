@@ -759,7 +759,7 @@ function drawSettings() {
         ctx.font = "bold 15px Arial";
         
         // Settings Title Texts
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         ctx.fillText("Show Enemy Outlines", 50, 50);
         ctx.fillText("Disable Mouse Movement Activation", 50, 100);
         ctx.fillText("Show Absolute Zero's Range", 50, 150);
@@ -770,9 +770,19 @@ function drawSettings() {
         ctx.fillText("Cursor Trail", 450, 150);
 
         function drawSettingsButton(x, y, bool) {
-            if (bool) ctx.fillStyle = "lime";
-            else ctx.fillStyle = "red";
-            ctx.fillRect(x, y, 20, 20);
+            ctx.lineWidth = 2;
+            if (bool) {
+                ctx.fillStyle = "rgba(0, 220, 0, 0.8)";
+                ctx.strokeStyle = "rgba(0, 255, 0, 0.8)";
+                ctx.fillRect(x, y, 20, 20);
+                ctx.strokeRect(x, y, 20, 20);
+            }
+            else {
+                ctx.fillStyle = "rgba(220, 0, 0, 0.8)";
+                ctx.strokeStyle = "rgba(255, 0, 0, 0.8)";
+                ctx.fillRect(x, y, 20, 20);
+                ctx.strokeRect(x, y, 20, 20);
+            }
         }
         
         // Buttons
@@ -808,9 +818,9 @@ function drawSettings() {
             if (number !== undefined) ctx.fillText(number, x+165, y+10);
         }
         
-        ctx.strokeStyle = "white";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
         ctx.lineWidth = 2;
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         ctx.textAlign = "left";
         ctx.font = "bold 15px Arial";
 
