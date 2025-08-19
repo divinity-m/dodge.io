@@ -82,7 +82,9 @@ function drawEndLevel() {
                 dash.lastEnded = 0;
                 shockwave.reset();
                 amplify.reset();
-                music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
+                music.var = aNewStart;
+                music.name = "A New Start";
+                music.artist = "Thygan Buch";
                 music.var.currentTime = 0;
                 music.promise = music.var.play();
                 gameState = "startScreen";
