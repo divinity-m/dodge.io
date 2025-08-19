@@ -61,7 +61,16 @@ function drawEndLevel() {
             ctx.fillStyle = music.subColor;
             ctx.fillRect(redoX + (100-sideLength/2), redoY + (100-sideLength/2), sideLength, sideLength);
         }
+        // Exit Rect Stroke
+        if (timeLeft <= 0) ctx.strokeStyle = "rgb(0, 245, 0)";
+        if (innerGameState === "musicModeFail") ctx.strokeStyle = "rgb(245, 0, 0)";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(exitX, exitY, 200, 200);
+        // Redo Rect Stroke
+        ctx.strokeStyle = music.subColor;
+        ctx.strokeRect(redoX, redoY, 200, 200);
         
+        // Conditionals
         ctx.textAlign = "center";
         ctx.font = "30px Verdana";
         // Exit Rect Conditional
@@ -616,10 +625,4 @@ function musicCollisions() {
         pauseAudio(music.promise, music.var);
         innerGameState = "musicModeFail";
     }
-    
-    // Draws player lives
-    ctx.textAlign = "center";
-    ctx.font = "20px Impact";
-    ctx.fillStyle = player.subColor;
-    ctx.fillText(player.lives, player.x, player.y + 6.5);
 }
