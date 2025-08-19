@@ -69,6 +69,7 @@ let mouseOver = {
     musicSlider: false,
     sfxSlider: false,
     aZ_RangeBtn: false,
+    aZ_AvSlider: false,
     customCursorBtn: false,
     cursorTrailSlider: false,
 };
@@ -118,6 +119,7 @@ let settings = {
     musicSliderX: 640,
     sfxSliderX: 627,
     aZ_Range: true,
+    aZ_Av: 650,
     customCursor: true,
     cursorTrail: 715,
 };
@@ -132,6 +134,7 @@ let dash = {
 
 let absoluteZero = {
     usable: true,
+    av: 0.5,
     passive: "Absolute Zero",
     slowStart: 273.15,
     slowEnd: 75,
@@ -148,6 +151,11 @@ let shockwave = {
     lastEnded: 0,
     cd: 7000,
     effect: 0.75,
+    reset: function () {
+        this.lastEnded = 0;
+        this.activated = false;
+        this.radius = 25;
+    }
 };
 
 let amplify = {
@@ -264,8 +272,8 @@ if (localData) {
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score] !== undefined) hs[score] = userData.highscore[score];
         })
-        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 640, sfxSliderX: 627, aZ_Range: true, customCursor: true, cursorTrail: 715};
-        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "customCursor", "cursorTrail"].forEach(setting => {
+        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 640, sfxSliderX: 627, aZ_Range: true, aZ_Av: 650, customCursor: true, cursorTrail: 715};
+        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "aZ_Av", "customCursor", "cursorTrail"].forEach(setting => {
             if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
         })
                 
@@ -273,8 +281,8 @@ if (localData) {
                                 color: p.color, subColor: p.subColor, facingAngle: 0, invincible: p.invincible},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
-                    settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX,
-                               sfxSliderX: s.sfxSliderX, aZ_Range: s.aZ_Range, customCursor: s.customCursor, cursorTrail: s.cursorTrail}};
+                    settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX, sfxSliderX: s.sfxSliderX,
+                              aZ_Range: s.aZ_Range, aZ_Av: s.aZ_Av, customCursor: s.customCursor, cursorTrail: s.cursorTrail}};
         // updates the current data to the locally saved data
         player = userData.player;
         highscore = userData.highscore;
@@ -405,11 +413,12 @@ function draw() {
         drawGameOver();
         drawPlayer();
         drawEnemies();
+        abilities();
     }
     else if (gameState === "musicMode") {
+        drawEndLevel();
         spawnAndDrawDanger();
         drawText();
-        drawEndLevel();
         drawPlayer();
         
         keyboardControls();
