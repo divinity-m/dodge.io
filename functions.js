@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("buggy shockwave, no-cursor is still buggy")
+console.log("no-cursor is still buggy, dangers not showing")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
