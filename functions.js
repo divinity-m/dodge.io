@@ -3,6 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
+console.log("buggy player abilities, az range, az alpha value slider")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
@@ -140,6 +141,8 @@ function recordLeftClick() {
         // Plays 'A New Start' when users are redirected back to the Main Menu
         if (gameState === "endlessOver") {
             allEnemies = [];
+            dash.lastEnded = 0;
+            shockwave.reset();
             amplify.reset();
             music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
             music.var.currentTime = 0;
@@ -152,7 +155,7 @@ function recordLeftClick() {
 
     // Settings
     else if (innerGameState === "settings") {
-        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "customCursorBtn", "cursorTrailSlider"].forEach(setting => {
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "aZ_AvSlider", "customCursorBtn", "cursorTrailSlider"].forEach(setting => {
             if (mouseOver?.[setting]) {
                 // Buttons
                 if (mouseOver?.enemyOutBtn) {
@@ -171,13 +174,10 @@ function recordLeftClick() {
                     if (settings.customCursor) { settings.customCursor = false; bodyEl.style.cursor = "auto"; allCursors = []; }
                     else { settings.customCursor = true; bodyEl.style.cursor = "none"; }
                 }
-                if (mouseOver?.cursorTrailSlider) {
-                    if (settings.cursorTrail) settings.cursorTrail = false;
-                    else settings.cursorTrail = true;
-                }
                 // Sliders
                 if (mouseOver?.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
                 if (mouseOver?.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
+                if (mouseOver?.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 552), 702);
                 if (mouseOver?.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
     
                 // Saves the users settings options
@@ -743,10 +743,12 @@ function drawSettings() {
 
     settings.musicSliderX = Math.min(Math.max(settings.musicSliderX, 565), 715);
     settings.sfxSliderX = Math.min(Math.max(settings.sfxSliderX, 552), 702);
+    settings.aZ_Av = Math.min(Math.max(settings.aZ_Av, 552), 702);
     settings.cursorTrail = Math.min(Math.max(settings.cursorTrail, 550), 700);
     
     musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
     sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
+    absoluteZero.av = Math.max(Math.min((settings.aZ_Av - 552) / (702 - 552), 1), 0)
     trailDensity = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0);
     music.var.volume = musicVolume;
     sharpPop.volume = sfxVolume;
@@ -767,7 +769,8 @@ function drawSettings() {
         
         ctx.fillText("Music Volume", 450, 50);
         ctx.fillText("SFX Volume", 450, 100);
-        ctx.fillText("Cursor Trail", 450, 150);
+        ctx.fillText("AZ's Opacity", 450, 150);
+        ctx.fillText("Cursor Trail", 450, 200);
 
         function drawSettingsButton(x, y, bool) {
             ctx.lineWidth = 2;
@@ -801,10 +804,12 @@ function drawSettings() {
         // Sliders (wider than the actual rectangles for larger hitbox)
         mouseOver.musicSlider = mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
         mouseOver.sfxSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
-        mouseOver.cursorTrailSlider = mouseX >= 540 && mouseX <= 710 && mouseY >= 130 && mouseY <= 160;
+        mouseOver.aZ_AvSlider = mouseX >= 542 && mouseX <= 712 && mouseY >= 130 && mouseY <= 160;
+        mouseOver.cursorTrailSlider = mouseX >= 540 && mouseX <= 710 && mouseY >= 180 && mouseY <= 210;
         
         if (mouseDown && mouseOver.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
         if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
+        if (mouseDown && mouseOver.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 552), 702);
         if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
 
         function drawSettingsSlider(x, y, sliderX, number) { 
@@ -827,6 +832,7 @@ function drawSettings() {
         // Sliders
         drawSettingsSlider(565, 40, settings.musicSliderX, Math.floor(musicVolume*100));
         drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(sfxVolume*100));
+        drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(absoluteZero.av*100));
         drawSettingsSlider(550, 140, settings.cursorTrail, Math.floor(trailDensity*100));
     }
 }
@@ -1109,23 +1115,51 @@ function drawGameOver() {
     ctx.strokeText('Try Again', 480, 135);
 }
 
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
 function drawPlayer() {
     ctx.fillStyle = player.color;
     drawCircle(player.x, player.y, player.r);
     ctx.lineWidth = 3;
+    let prevStrokeStyle = ctx.strokeStyle; // for az range
     ctx.strokeStyle = player.subColor;
     drawCircle(player.x, player.y, player.r, "stroke");
+    // Draws Absolute Zero's range
     if (player.dodger === "jötunn" && settings.aZ_Range) {
+        const azGradient = ctx.createRadialGradient(player.x, player.y, absoluteZero.slowEnd, player.x, palyer.y, absoluteZero.slowStart);
         if (gameState !== "musicMode") {
-            if (absoluteZero.passive === "Absolute Zero") ctx.strokeStyle = "rgba(0, 127, 255, 0.5)";
-            if (absoluteZero.passive === "Glaciation") ctx.strokeStyle = "rgba(50, 151, 255, 0.5)";
-            if (absoluteZero.passive === "Stagnation") ctx.strokeStyle = "rgba(84, 168, 255, 0.5)";
-        } else if (timeLeft <= 0 || innerGameState === "musicModeFail") ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+            let azColor = [];
+            if (absoluteZero.passive === "Absolute Zero") azColor = [0, 127, 255];
+            if (absoluteZero.passive === "Glaciation") azColor = [50, 151, 255];
+            if (absoluteZero.passive === "Stagnation") azColor = [84, 168, 255];
+            
+            azGradient.addColorStop(0, `rgba(${azColor[0]}, ${azColor[1]}, ${azColor[2]}, ${absoluteZero.av})`);
+            azGradient.addColorStop(1, `rgba(79, 203, 255, ${absoluteZero.av})`);
+            ctx.fillStyle = azGradient;
+            ctx.strokeStyle = `rgba(${azColor[0]}, ${azColor[1]}, ${azColor[2]}, 0.75)`;
+        } else if (timeLeft <= 0 || innerGameState === "musicModeFail") {
+            azGradient.addColorStop(1, `rgba(255, 255, 255, ${absoluteZero.av})`);
+            ctx.fillStyle = azGradient;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+        } else if (gameState === "musicMode") {
+            azGradient.addColorStop(0, `rgba(255, 255, 255, ${absoluteZero.av})`);
+            azGradient.addColorStop(1, `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, ${absoluteZero.av})`);
+            ctx.fillStyle = azGradient;
+            ctx.strokeStyle = `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, 0.75)`;
+        }
+        drawCircle(player.x, player.y, absoluteZero.slowStart, "fill");
         ctx.lineWidth = 2;
         drawCircle(player.x, player.y, absoluteZero.slowStart, "stroke");
     }
+    // Draws player lives
     if (gameState === "musicMode") {
-        // Draws player lives
         ctx.textAlign = "center";
         ctx.font = "20px Impact";
         ctx.fillStyle = player.subColor;
@@ -1516,7 +1550,7 @@ function restartEndless() { // Resets certain variables once the play button is 
     lastSpawn = 0;
     
     dash.lastEnded = 0;
-    shockwave.lastEnded = 0;
+    shockwave.reset();
     amplify.reset();
     
     innerGameState = "inEndless";
@@ -1588,62 +1622,61 @@ function abilities() { // player-specific abilities
         })
     }
     // Shockwave launches an electromagnetic pulse that stuns and shrinks adversaries
-    if (player.dodger === "jolt") {
-        if (shockwave.activated) {
-            // create the shockwaves path
-            shockwave.path = new Path2D();
-            if (shockwave.used === "Shockwave") shockwave.path.arc(0, 0, shockwave.radius, Math.PI*2, 0);
-            else if (shockwave.used === "Shockray") {
-                shockwave.path.moveTo(0, -shockwave.radius);
-                shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
-                shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
-            }
-
-            // save and transform the canvas
-            ctx.save();
-            ctx.translate(shockwave.x, shockwave.y);
-            ctx.rotate(shockwave.facingAngle);
-
-            // draw the shockwave
-            if (shockwave.used === "Shockwave") ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
-            else if (shockwave.used === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
-            ctx.fill(shockwave.path);
-
-            // checks for collisions
-            allEnemies.forEach(enemy => { 
-                enemy.collisionPoints.forEach(point => {
-                    if (ctx.isPointInPath(shockwave.path, point[0], point[1])
-                       && (enemy.vulnerable === shockwave.used || enemy.vulnerable === "None")) {
-                        enemy.reset = Date.now(); // starts the time which an enemy got hit
-                        enemy.vulnerable = shockwave.used;
-                    }
-                })
-            })
-
-            ctx.restore();
-
-            // increase the radius of the beam and move it every frame
-            shockwave.radius *= 1.022;
-            if (shockwave.used === "Shockwave") {
-                /* shockwave.x = player.x;
-                shockwave.y = player.y; */
-                shockwave.cd = 8500;
-                shockwave.effect = 0.75;
-            }
-            else if (shockwave.used === "Shockray") {
-                shockwave.x += shockwave.movex;
-                shockwave.y += shockwave.movey;
-                shockwave.cd = 5500;
-                shockwave.effect = 0.5;
-            }
-            // once the radius is greater than 250, end the entire ability
-            if ((shockwave.radius > 1250 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
-                shockwave.activated = false;
-                shockwave.radius = 25;
-                shockwave.lastEnded = Date.now();
-                console.log(shockwave.used)
-            }
+    if (shockwave.activated) {
+        // create the shockwaves path
+        shockwave.path = new Path2D();
+        if (shockwave.used === "Shockwave") shockwave.path.arc(0, 0, shockwave.radius, Math.PI*2, 0);
+        else if (shockwave.used === "Shockray") {
+            shockwave.path.moveTo(0, -shockwave.radius);
+            shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
+            shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
         }
+
+        // save and transform the canvas
+        ctx.save();
+        ctx.translate(shockwave.x, shockwave.y);
+        ctx.rotate(shockwave.facingAngle);
+
+        // draw the shockwave
+        if (shockwave.used === "Shockwave") ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+        else if (shockwave.used === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
+        ctx.fill(shockwave.path);
+
+        // checks for collisions
+        allEnemies.forEach(enemy => { 
+            enemy.collisionPoints.forEach(point => {
+                if (ctx.isPointInPath(shockwave.path, point[0], point[1])
+                    && (enemy.vulnerable === shockwave.used || enemy.vulnerable === "None")) {
+                    enemy.reset = Date.now(); // starts the time which an enemy got hit
+                    enemy.vulnerable = shockwave.used;
+                }
+            })
+        })
+
+        ctx.restore();
+
+        // increase the radius of the beam and move it every frame
+        if (gameState !== "gameOver") shockwave.radius *= 1.022;
+        if (shockwave.used === "Shockwave") {
+            /* shockwave.x = player.x;
+            shockwave.y = player.y; */
+            shockwave.cd = 8500;
+            shockwave.effect = 0.75;
+        }
+        else if (shockwave.used === "Shockray") {
+            shockwave.x += shockwave.movex;
+            shockwave.y += shockwave.movey;
+            shockwave.cd = 5500;
+            shockwave.effect = 0.5;
+        }
+        // once the radius is greater than 250, end the entire ability
+        if ((shockwave.radius > 1250 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
+            shockwave.activated = false;
+            shockwave.radius = 25;
+            shockwave.lastEnded = Date.now();
+        }
+    }
+    if (player.dodger === "jolt") {
         allEnemies.forEach(enemy => {
             // Restore the stats of enemies after 5 seconds have passed
             if (now - enemy.reset >= 5000) {
@@ -1667,7 +1700,7 @@ function abilities() { // player-specific abilities
     // Amplify accelerates the player over time
     if (player.dodger === "crescendo") {
         amplify.accel = 1/music.var.duration * 7;
-        if (musicVolume > 0) {
+        if (musicVolume > 0 && gameState !== "endlessOver") { // only accelerate if the music is audible and we're not in the game over screen
             if (gameState === "musicMode") { // reach your peak speed 78.57%~ into a song
                 amplify.speed = music.var.currentTime/music.var.duration * 7;
                 player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
@@ -1679,7 +1712,8 @@ function abilities() { // player-specific abilities
                 }
                 player.baseSpeed = amplify.baseSpeed + amplify.speed;
             }
-        } else {
+        }
+        if (musicVolume <= 0) {
                 if (now - amplify.accelRate > 1000) {
                     amplify.speed -= amplify.accel;
                     amplify.speed = Math.max(0, amplify.speed);
