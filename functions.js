@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("no-cursor is still buggy")
+console.log("no-cursor attempted fix")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
