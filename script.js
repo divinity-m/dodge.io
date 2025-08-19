@@ -91,9 +91,9 @@ window.addEventListener('mousemove', (event) => {
     cursorY = event.clientY;
     if (settings?.customCursor && settings?.cursorTrail && cursorX !== undefined && cursorY !== undefined) {
         bodyEl.style.cursor = "none";
-        if (trailDensity > 0.5) allCursors.push(createCursor());
+        if (trailDensity > 0) allCursors.push(createCursor()); // wont create new trails if the trail density is 0
         for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].r <= 0 || trailDensity === 0) allCursors.splice(i, 1);
+            if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1);
         }
     }
 });
@@ -158,6 +158,7 @@ let amplify = {
     limit: 8,
     accelRate: Date.now(),
     reset: function () {
+        player.baseSpeed = 2.5;
         this.speed = 0;
         this.accel = 0;
         this.accelRate = Date.now();
