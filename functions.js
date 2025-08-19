@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("no-cursor is still buggy, undefined timestamps fix")
+console.log("no-cursor is still buggy")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
@@ -1174,26 +1174,13 @@ function drawEnemies() {
             drawCircle(enemy.x, enemy.y, enemy.auraRadius);
         }
 
-        if (settings.enemyOutlines) {
-            let cv;
-            if (player.dodger === "jolt") {
-                cv = 255 - enemy.swcv*255; // jolts effect on enemy outlines
-                ctx.fillStyle = `rgb(${cv}, ${cv}, 0)`;
-            } else if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
-                cv = 100 - enemy.azcv*100;  // jötunns effect on enemy outlines
-                ctx.fillStyle = `rgb(0, 0, ${cv})`;
-            } else ctx.fillStyle = `rgb(0, 0, 0)`;
-            
-            drawCircle(enemy.x, enemy.y, enemy.r * 1.11)
-        }
-
         ctx.fillStyle = enemy.color;
         drawCircle(enemy.x, enemy.y, enemy.r);
 
         // shows jolt's effect
         if (gameState !== "endlessOver") enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // clamped between 0 and 1;
         let swav = 0.8 - enemy.swcv*0.8;
-        ctx.fillStyle = `rgba(200, 200, 0, ${swav})`;
+        ctx.fillStyle = `rgba(150, 150, 0, ${swav})`;
         drawCircle(enemy.x, enemy.y, enemy.r);
 
         // show jötunn's effect
@@ -1204,6 +1191,20 @@ function drawEnemies() {
         if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
             ctx.fillStyle = `rgba(17, 47, 56, ${azav})`;
             drawCircle(enemy.x, enemy.y, enemy.r);
+        }
+
+        if (settings.enemyOutlines) {
+            let cv;
+            if (player.dodger === "jolt") {
+                cv = 255 - enemy.swcv*255; // jolts effect on enemy outlines
+                ctx.strokeStyle = `rgb(${cv}, ${cv}, 0)`;
+            } else if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
+                cv = 100 - enemy.azcv*100;  // jötunns effect on enemy outlines
+                ctx.strokeStyle = `rgb(0, 0, ${cv})`;
+            } else ctx.strokeStyle = `rgb(0, 0, 0)`;
+
+            ctx.lineWidth = enemy.r/12.5;
+            drawCircle(enemy.x, enemy.y, enemy.r, "stroke");
         }
     })
 }
