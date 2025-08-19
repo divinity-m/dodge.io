@@ -3,7 +3,7 @@
     console.log("hello world");
 }
 sayHi();*/
-console.log("no-cursor attempted fix")
+console.log("no-cursor attempted fix, hovering function")
 
 function loadingScreen(validInput) {
     if (validInput || endLoading) {
