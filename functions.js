@@ -1010,11 +1010,11 @@ function drawDodgerSelection() {
 
     const jolt = { x: 300, y: 25, };
     mouseOver.jolt = mouseX > jolt.x && mouseX < jolt.x + 200 && mouseY > jolt.y && mouseY < jolt.y + 100;
-    drawDodgerCard(mouseOver.jolt, highscore.medium >= 30, jolt, "JOLT", "SHOCKWAVE", "MEDIUM 30S", "rgb(220, 220, 0)", "rgb(210, 210, 0)", "yellow");
+    drawDodgerCard(mouseOver.jolt, highscore.medium >= 30, jolt, "JOLT", "SHOCKWAVE", "MEDIUM 30S", "rgb(230, 230, 0)", "rgb(220, 220, 0)", "yellow");
     
     const jötunn = { x: 550, y: 25, };
     mouseOver.jötunn = mouseX > jötunn.x && mouseX < jötunn.x + 200 && mouseY > jötunn.y && mouseY < jötunn.y + 100;
-    drawDodgerCard(mouseOver.jötunn, highscore.limbo === 100, jötunn, "JÖTUNN", "ABSOLUTE ZERO", "LIMBO 100%", "rgb(70, 175, 219)", "rgb(65, 166, 209)", "rgb(79, 203, 255)");
+    drawDodgerCard(mouseOver.jötunn, highscore.limbo === 100, jötunn, "JÖTUNN", "ABSOLUTE ZERO", "LIMBO 100%", "rgb(75, 180, 225)", "rgb(68, 168, 212)", "rgb(79, 203, 255)");
     
     const crescendo = { x: 175, y: 150, };
     mouseOver.crescendo = mouseX > crescendo.x && mouseX < crescendo.x + 200 && mouseY > crescendo.y && mouseY < crescendo.y + 100;
@@ -1022,33 +1022,33 @@ function drawDodgerSelection() {
     
     const j_sab = { x: 425, y: 150, };
     mouseOver.j_sab = mouseX > j_sab.x && mouseX < j_sab.x + 200 && mouseY > j_sab.y && mouseY < j_sab.y + 100;
-    drawDodgerCard(mouseOver.j_sab, highscore.andromeda === 100, j_sab, "J-SAB", "DASH", "ANDROMEDA 100%", "rgb(220, 0, 0)", "rgb(200, 0, 0)", "rgb(255, 0, 0)");
+    drawDodgerCard(mouseOver.j_sab, highscore.andromeda === 100, j_sab, "J-SAB", "DASH", "ANDROMEDA 100%", "rgb(230, 0, 0)", "rgb(220, 0, 0)", "rgb(255, 0, 0)");
 
 
     // Ability Descriptions
-    drawAbilityDesc(mouseOver.evader, true, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.7)", "rgba(200, 200, 200, 0.7)", "SKILL",
+    drawAbilityDesc(mouseOver.evader, true, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.9)", "rgba(200, 200, 200, 0.7)", "SKILL",
                     "Evaders have no unique abilities or traits; they rely solely on familiarity with their",
                     "adversaries to weave past offensive attacks.",
                     "Base Speed: 2.5");
-    drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.7)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
+    drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.9)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
                     "unfortunate soul stricken by the electrically infused pluse.",
                     "Shockwave Effect Reduction: 25% | Shockray Effect Reduction: 50%",
                     "Effect Duration: Danger - 2.93s, Enemy - 5.43s",
                     "Shockwave Cooldown: 5.5s | Shockray Cooldown: 8.5s");
-    drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.7)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
+    drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.9)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
                     "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
                     "temperature decelerate the speeds and spawn-rates of nearby adversaries.",
                     "Glaciate affects speed. Stagnate affects spawn-rate. Absolute Zero freezes both.",
                     "Speed Reduction: 0% - 70% | Spawn-rate Reduction: 0% - 20% | Swap Cooldown: 1s");
-    drawAbilityDesc(mouseOver.crescendo, highscore.hard >= 60, "rgba(20, 20, 20, 0.9)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
+    drawAbilityDesc(mouseOver.crescendo, highscore.hard >= 60, "rgba(20, 20, 20, 0.85)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
                     "Crescendos harness the sound waves of their environment to augment their cores.",
                     "Whenever a melody is audible, these dodgers, as if adapting to the rhythm, accelerate",
                     "with the music, continually modifying their cores until they outpace the waves",
                     "themselves.",
                     "Top Speed: 8");
-    drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.7)", "rgba(210, 0, 0, 0.7)", "rgba(200, 0, 0, 0.7)", "DASH",
+    drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.6)", "rgba(210, 0, 0, 0.9)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
                     "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
