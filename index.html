@@ -33,6 +33,9 @@
                 z-index: 2; /* above game canvas */
                 pointer-events: none;
             }
+            .no-cursor * {
+                cursor: none !important;
+            }
             p {
                 display: inline;
                 margin-right: 50px;
@@ -52,7 +55,7 @@
             }
         </style>
     </head>
-    <body id="bodyEl">        
+    <body id="bodyEl" class="no-cursor">        
         <div style="display: none;">
             <!-- Images -->
             <img id="gear-filled" src="DodgeImages/gear-filled.png">
