@@ -1177,7 +1177,7 @@ function drawEnemies() {
         if (settings.enemyOutlines) {
             let cv;
             if (player.dodger === "jolt") {
-                cv = 100 - enemy.swcv*100; // jolts effect on enemy outlines
+                cv = 255 - enemy.swcv*255; // jolts effect on enemy outlines
                 ctx.fillStyle = `rgb(${cv}, ${cv}, 0)`;
             } else if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
                 cv = 100 - enemy.azcv*100;  // jötunns effect on enemy outlines
@@ -1192,17 +1192,17 @@ function drawEnemies() {
 
         // shows jolt's effect
         if (gameState !== "endlessOver") enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // clamped between 0 and 1;
-        let av = 0.8 - enemy.swcv*0.8;
-        ctx.fillStyle = `rgba(200, 200, 0, ${av})`;
+        let swav = 0.8 - enemy.swcv*0.8;
+        ctx.fillStyle = `rgba(200, 200, 0, ${swav})`;
         drawCircle(enemy.x, enemy.y, enemy.r);
 
         // show jötunn's effect
         const enemyDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
         const clampDist = Math.min(Math.max(absoluteZero.slowEnd, enemyDist), absoluteZero.slowStart);
         enemy.azcv = (clampDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd);
-        av = 0.7 - enemy.azcv*0.7;
+        let azav = 0.7 - enemy.azcv*0.7;
         if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
-            ctx.fillStyle = `rgba(17, 47, 56, ${av})`;
+            ctx.fillStyle = `rgba(17, 47, 56, ${azav})`;
             drawCircle(enemy.x, enemy.y, enemy.r);
         }
     })
