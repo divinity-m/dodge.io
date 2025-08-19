@@ -1,4 +1,4 @@
-console.log("add cursor animation");// DODGE.IO - FUNCTIONS.JS
+console.log("resizing cursor");// DODGE.IO - FUNCTIONS.JS
 /*function sayHi() {
     console.log("hello world");
 }
@@ -585,10 +585,8 @@ function createClick() {
     let click = {
         r: 1,
         av: 1,
-        lw: 0.5,
-        get addR () { return this.r/20; },
-        get subAv () { return this.av/20; },
-        get addLw () { return this.lw/20; },
+        addR: 24/15, // 1 + 24/15 * 15
+        subAv: 1/15, // 1 - n/15 * 15
     }
     
     if (cursorX) click.x = cursorX;
