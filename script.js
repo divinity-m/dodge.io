@@ -38,10 +38,11 @@ document.addEventListener("touchstart", () => {mouseDown = true; recordLeftClick
 document.addEventListener("touchend", () => {mouseDown = false});
 document.addEventListener("touchcancel", () => {mouseDown = false});
 
-document.addEventListener("click", () => {allClicks.push(createClick()); recordLeftClick();});
-document.addEventListener("contextmenu", recordRightClick);
+document.addEventListener("click", () => {allClicks.push(createClick("left")); recordLeftClick();});
+document.addEventListener("contextmenu", () => {allClicks.push(createClick("right")); recordRightClick();});
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
+        allClicks.push(createClick("middle"));
         recordMiddleClick();
     }
 });
@@ -433,72 +434,10 @@ function draw() {
         abilities();
         musicCollisions();
     }
-
-    // drawCursor
-    function drawCursorCircle(x, y, r, type) {
-        ctxCursor.beginPath();
-        ctxCursor.arc(x, y, r, Math.PI * 2, 0);
-        if (type === "fill") ctxCursor.fill();
-        if (type === "stroke") ctxCursor.stroke();
-    }
-    ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
-  
-    // Cursor & Cursor Trail
-    if (settings.customCursor) document.documentElement.classList.add("no-cursor");
-    else { document.documentElement.classList.remove("no-cursor"); allCursors = []; }
-  
-    for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
-    let playerColor = player.color.slice(4, player.color.length-1);
-    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
-    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
-        allCursors.forEach(cursor => {
-            ctxCursor.fillStyle = cursor.color;
-            drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
-            
-            cursor.r -= cursor.subR;
-            cursor.av -= cursor.subAv;
-        })
-
-        let hovering = false;
-        // Canvas Buttons
-        Object.keys(mouseOver).forEach(hover => {
-          if (mouseOver[hover]) hovering = true;
-        })
-        // Document Hyperlinks
-        let hyperlinks = document.getElementsByTagName('a');
-        for (let i = 0; i < hyperlinks.length; i++) {
-          if (hyperlinks[i].matches(":hover")) hovering = true;
-        }
-        // hoving inverts cursor colors, clicking reduces alpha value
-        if (hovering) {
-            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerSubColor}, 0.75)`;
-            else ctxCursor.fillStyle = player.subColor;
-            ctxCursor.strokeStyle = player.color;
-        } else {
-            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
-            else ctxCursor.fillStyle = player.color;
-            ctxCursor.strokeStyle = player.subColor;
-        }
-        ctxCursor.lineWidth = 3;
-        drawCursorCircle(cursorX, cursorY, 7.5, "fill");
-        drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
-    }
-  
-    // Click Animation
-    for (let i = allClicks.length-1; i >= 0; i--) if (allClicks[i].av < 0) allClicks.splice(i, 1); // removes clicks with low av's
-    allClicks.forEach(click => {
-        ctxCursor.strokeStyle = click.color;
-        ctxCursor.lineWidth = 2;
-        drawCursorCircle(click.x, click.y, click.r, "stroke");
-
-        click.r += click.addR;
-        click.av -= click.subAv;
-    })
-
   
     requestAnimationFrame(draw);
 }
-/*
+
 function drawCursor() {
     function drawCursorCircle(x, y, r, type) {
         ctxCursor.beginPath();
@@ -515,7 +454,7 @@ function drawCursor() {
     for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
-    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
+    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined && ) {
         allCursors.forEach(cursor => {
             ctxCursor.fillStyle = cursor.color;
             drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
@@ -545,22 +484,30 @@ function drawCursor() {
             ctxCursor.strokeStyle = player.subColor;
         }
         ctxCursor.lineWidth = 3;
-        drawCursorCircle(cursorX, cursorY, 7.5, "fill");
-        drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
+        if (lastPressed === "mouse") {
+          drawCursorCircle(cursorX, cursorY, 7.5, "fill");
+          drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
+        }
     }
   
     // Click Animation
     for (let i = allClicks.length-1; i >= 0; i--) if (allClicks[i].av < 0) allClicks.splice(i, 1); // removes clicks with low av's
     allClicks.forEach(click => {
-        ctxCursor.strokeStyle = click.color;
+        if (click.button === "left" || click.button === "middle") ctxCursor.strokeStyle = click.colorLeft;
+        if (click.button === "right") ctxCursor.strokeStyle = click.colorRight;
+      
         ctxCursor.lineWidth = 2;
         drawCursorCircle(click.x, click.y, click.r, "stroke");
+        if (click.button === "middle") {
+            ctxCursor.strokeStyle = click.colorRight;
+            drawCursorCircle(click.x, click.y, click.r-2, "stroke");
+        }
 
         click.r += click.addR;
         click.av -= click.subAv;
     })
     requestAnimationFrame(drawCursor);
 }
-*/
+
 draw();
-//drawCursor();
+drawCursor();
