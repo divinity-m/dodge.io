@@ -38,8 +38,14 @@ document.addEventListener("touchstart", () => {mouseDown = true; recordLeftClick
 document.addEventListener("touchend", () => {mouseDown = false});
 document.addEventListener("touchcancel", () => {mouseDown = false});
 
-document.addEventListener("click", () => {allClicks.push(createClick("left")); recordLeftClick();});
-document.addEventListener("contextmenu", () => {allClicks.push(createClick("right")); recordRightClick();});
+document.addEventListener("click", () => {
+  allClicks.push(createClick("left"));
+  recordLeftClick();
+});
+document.addEventListener("contextmenu", (event) => {
+  allClicks.push(createClick("right"));
+  recordRightClick(event);
+});
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
         allClicks.push(createClick("middle"));
