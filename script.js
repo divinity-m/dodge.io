@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("merged canvases")
+console.log("changing positions")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
@@ -111,8 +111,8 @@ window.addEventListener('mousemove', (event) => {
 
 // Player & Enemies
 let player = {
-    x: cnv.width/2,
-    y: cnv.height/2,
+    x: GAME_WIDTH/2,
+    y: GAME_HEIGHT/2,
     r: 15,
     speed: 2.5,
     baseSpeed: 2.5,
@@ -289,7 +289,7 @@ if (localData) {
             if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
         })
                 
-        userData = {player: {x: cnv.width/2, y: cnv.height/2, r: 15, speed: 2.5, baseSpeed: 2.5, slowed: 1, dodger: p.dodger,
+        userData = {player: {x: GAME_WIDTH/2, y: GAME_HEIGHT/2, r: 15, speed: 2.5, baseSpeed: 2.5, slowed: 1, dodger: p.dodger,
                                 color: p.color, subColor: p.subColor, facingAngle: 0, invincible: p.invincible},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
@@ -337,7 +337,7 @@ function draw() {
     ctx.translate(offsetX, offsetY); // translate to the offset
   
     ctx.fillStyle = "rgb(185, 185, 185)";
-    ctx.fillRect(0, 0, cnv.width, cnv.height);
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     detectHover(); // checks if the mouse is hovering over a button
 
     // Loading Screen
@@ -352,15 +352,15 @@ function draw() {
         ctx.fillStyle = "rgb(87, 87, 87)";
         ctx.font = "40px 'Verdana'";
         ctx.textAlign = "center";
-        ctx.fillText(options[LI], cnv.width/2, cnv.height/2);
+        ctx.fillText(options[LI], GAME_WIDTH/2, GAME_HEIGHT/2);
 
         ctx.font = "30px 'Verdana'";
-        ctx.fillText(`${now - loadingGame}/5000`, cnv.width/2, cnv.height/2 + 50);
+        ctx.fillText(`${now - loadingGame}/5000`, GAME_WIDTH/2, GAME_HEIGHT/2 + 50);
 
         if (now - loadingGame >= 1000) {
             ctx.font = "20px 'Verdana'";
             ctx.textAlign = "left";
-            ctx.fillText("click anywhere to skip", 20, cnv.height - 20);
+            ctx.fillText("click anywhere to skip", 20, GAME_HEIGHT - 20);
         }
         
         music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
@@ -370,11 +370,11 @@ function draw() {
         ctx.fillStyle = "rgb(87, 87, 87)";
         ctx.font = "40px Verdana";
         ctx.textAlign = "center";
-        ctx.fillText("Dodge.io", cnv.width/2, cnv.height/2);
+        ctx.fillText("Dodge.io", GAME_WIDTH/2, GAME_HEIGHT/2);
 
         ctx.font = "20px Verdana";
         ctx.textAlign = "left";
-        ctx.fillText("click anywhere to start", 20, cnv.height - 20);
+        ctx.fillText("click anywhere to start", 20, GAME_HEIGHT - 20);
     }
     else if (endLoading && gameState === "loading") {
         music.promise = music.var.play();
