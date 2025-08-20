@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("canvas offset not updating?")
+console.log("canvas offset fix")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
@@ -7,13 +7,13 @@ const ctx = cnv.getContext('2d');
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 650;
 let offsetX = (cnv.width - GAME_WIDTH) / 2;
-let offsetY = (cnv.height - GAME_HEIGHT) / 2 + 100;
+let offsetY = (cnv.height - GAME_HEIGHT) / 2 + 25;
 
 function resizeCursorCanvas() {
     cnv.width = window.innerWidth;
     cnv.height = window.innerHeight;
     offsetX = (cnv.width - GAME_WIDTH) / 2;
-    offsetY = (cnv.height - GAME_HEIGHT) / 2 + 100;
+    offsetY = (cnv.height - GAME_HEIGHT) / 2 + 25;
 }
 window.addEventListener("resize", resizeCursorCanvas);
 resizeCursorCanvas();
