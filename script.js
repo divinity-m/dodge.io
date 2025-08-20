@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("changing positions")
+console.log("cursor offset")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
@@ -94,8 +94,8 @@ let lastCursorTrail = 0;
 let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
     const rect = cnv.getBoundingClientRect();
-    const screenX = (event.clientX - rect.left) * (GAME_WIDTH / cnv.width);
-    const screenY = (event.clientY - rect.top) * (GAME_HEIGHT / cnv.height);
+    const screenX = event.clientX;
+    const screenY = event.clientY;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 
     // cursor trails
