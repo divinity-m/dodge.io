@@ -1,16 +1,18 @@
 // DODGE.IO - SCRIPT.JS
+console.log("merged canvases")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
-const cnvCursor = document.getElementById("cursor");
-const ctxCursor = cnvCursor.getContext('2d');
+
+// game units
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 650;
 
 function resizeCursorCanvas() {
-  cnvCursor.width = window.innerWidth;
-  cnvCursor.height = window.innerHeight;
+  cnv.width = window.innerWidth;
+  cnv.height = window.innerHeight;
 }
-
 window.addEventListener("resize", resizeCursorCanvas);
-resizeCursorCanvas(); // call once at start
+resizeCursorCanvas();
 
 let gameState = "loading";
 let innerGameState = "loading";
@@ -91,13 +93,20 @@ let allCursors = [];
 let lastCursorTrail = 0;
 let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
-    const cnvRect = cnv.getBoundingClientRect();
-    mouseX = event.clientX - cnvRect.left;
-    mouseY = event.clientY - cnvRect.top;
+    const rect = cnv.getBoundingClientRect();
+    const screenX = (event.clientX - rect.left) * (GAME_WIDTH / cnv.width);
+    const screenY = (event.clientY - rect.top) * (GAME_HEIGHT / cnv.height);
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 
-    cursorX = event.clientX;
-    cursorY = event.clientY;
+    // cursor trails
+    cursorX = screenX;
+    cursorY = screenX;
+
+    // offset mouse
+    const offsetX = (cnv.width - GAME_WIDTH) / 2;
+    const offsetY = (cnv.height - GAME_HEIGHT) / 2;
+    mouseX = screenX - offsetX;
+    mouseY = screenY - offsetY;
 });
 
 // Player & Enemies
@@ -318,6 +327,15 @@ window.addEventListener('beforeunload', () => {
 // Drawing the game
 function draw() {
     now = Date.now()
+    ctx.clearRect(0, 0, cnv.width, cnv.height); // resets the canvas so previous drawings dont stay
+
+    // scale so 800×650 game fits the screen
+    const offsetX = (cnv.width - GAME_WIDTH) / 2;
+    const offsetY = (cnv.height - GAME_HEIGHT) / 2;
+
+    ctx.save();
+    ctx.translate(offsetX, offsetY); // translate to the offset
+  
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, cnv.width, cnv.height);
     detectHover(); // checks if the mouse is hovering over a button
@@ -413,17 +431,16 @@ function draw() {
         musicCollisions();
     }
   
-    requestAnimationFrame(draw);
-}
+    ctx.restore(); // reverse the offset
 
-function drawCursor() {
+  
+    // CURSOR STUFF
     function drawCursorCircle(x, y, r, type) {
-        ctxCursor.beginPath();
-        ctxCursor.arc(x, y, r, Math.PI * 2, 0);
-        if (type === "fill") ctxCursor.fill();
-        if (type === "stroke") ctxCursor.stroke();
+        ctx.beginPath();
+        ctx.arc(x, y, r, Math.PI * 2, 0);
+        if (type === "fill") ctx.fill();
+        if (type === "stroke") ctx.stroke();
     }
-    ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
   
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
@@ -447,7 +464,7 @@ function drawCursor() {
         }
       
         allCursors.forEach(cursor => {
-            ctxCursor.fillStyle = cursor.color;
+            ctx.fillStyle = cursor.color;
             drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
             
             cursor.r -= cursor.subR;
@@ -466,15 +483,15 @@ function drawCursor() {
         }
         // hoving inverts cursor colors, clicking reduces alpha value
         if (hovering) {
-            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerSubColor}, 0.75)`;
-            else ctxCursor.fillStyle = player.subColor;
-            ctxCursor.strokeStyle = player.color;
+            if (mouseDown) ctx.fillStyle = `rgba(${playerSubColor}, 0.75)`;
+            else ctx.fillStyle = player.subColor;
+            ctx.strokeStyle = player.color;
         } else {
-            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
-            else ctxCursor.fillStyle = player.color;
-            ctxCursor.strokeStyle = player.subColor;
+            if (mouseDown) ctx.fillStyle = `rgba(${playerColor}, 0.75)`;
+            else ctx.fillStyle = player.color;
+            ctx.strokeStyle = player.subColor;
         }
-        ctxCursor.lineWidth = 3;
+        ctx.lineWidth = 3;
         if (lastPressing === "mouse") {
           drawCursorCircle(cursorX, cursorY, 7.5, "fill");
           drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
@@ -483,21 +500,21 @@ function drawCursor() {
   
     // Click Animation
     allClicks.forEach(click => {
-        if (click.button === "left" || click.button === "middle") ctxCursor.strokeStyle = click.colorLeft;
-        if (click.button === "right") ctxCursor.strokeStyle = click.colorRight;
+        if (click.button === "left" || click.button === "middle") ctx.strokeStyle = click.colorLeft;
+        if (click.button === "right") ctx.strokeStyle = click.colorRight;
       
-        ctxCursor.lineWidth = 2.5;
+        ctx.lineWidth = 2.5;
         drawCursorCircle(click.x, click.y, click.r, "stroke");
         if (click.button === "middle") {
-            ctxCursor.strokeStyle = click.colorRight;
+            ctx.strokeStyle = click.colorRight;
             if (click.r-2.5 > 0) drawCursorCircle(click.x, click.y, click.r-2.5, "stroke");
         }
 
         click.r += click.addR;
         click.av -= click.subAv;
     })
-    requestAnimationFrame(drawCursor);
+
+    requestAnimationFrame(draw);
 }
 
 draw();
-drawCursor();
