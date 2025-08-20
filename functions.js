@@ -341,8 +341,8 @@ function recordLeftClick() {
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                 }
                 if (mouseOver?.euphoria) {
-                    const xMid = cnv.width/2;
-                    const yMid = cnv.height/2;
+                    const xMid = GAME_WIDTH/2;
+                    const yMid = GAME_HEIGHT/2;
                     function lessThan(time = 33.590) {
                         return [[time, "horizontal", {size: 150, coords: ["player"]}], [time+0.388, "vertical", {size: 150, coords: ["player"]}], [time+0.902, "horizontal", {size: 150, coords: ["player"]}],
                                   // 2.095, 2.47
@@ -375,10 +375,10 @@ function recordLeftClick() {
                         let duration = 3.995 - 3.137;
                         if (extras === "leftSpikeWall" || extras === "rightSpikeWall") {
                             let interval = (duration / 14);
-                            let margin = (cnv.height-(30*14)) / 15; // 650 = (r*2 * 14) + 15n
+                            let margin = (GAME_HEIGHT-(30*14)) / 15; // 650 = (r*2 * 14) + 15n
                             let xValue;
                             if (extras === "leftSpikeWall") xValue = 10 * 1.501;
-                            else if (extras === "rightSpikeWall") xValue = cnv.width - 10 * 1.501;
+                            else if (extras === "rightSpikeWall") xValue = GAME_WIDTH - 10 * 1.501;
                             for (let i = 0; i < 14; i++) {
                                 dS.push([time+3.137 + (interval*i), "spike", {size: 10, speed: 5, coords: [xValue, margin*(i+1) + 30*i + 15], spawnRate: 0.5}]);
                             }
@@ -413,13 +413,13 @@ function recordLeftClick() {
                                  [32.631, "spike", {size: 20, speed: 3.5, location: "tl", spawnRate: 0.8, despawnRate: 3}],
                                  [32.632, "spike", {size: 20, speed: 3.5, location: "tr", spawnRate: 0.5, despawnRate: 3}],
                                  [32.931, "spike", {size: 20, speed: 3.5, location: "br", spawnRate: 0.4, despawnRate: 3}],
-                                 [73.081, "vertical", {size: cnv.width/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}], // 4 walls
-                                 [73.610, "vertical", {size: cnv.width/2, coords: [xMid, 0], spawnRate: 1, despawnRate: 5}],
-                                 [74.125, "horizontal", {size: cnv.height/2, coords: [0, yMid], spawnRate: 1, despawnRate: 5}],
-                                 [74.646, "horizontal", {size: cnv.height/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
+                                 [73.081, "vertical", {size: GAME_WIDTH/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}], // 4 walls
+                                 [73.610, "vertical", {size: GAME_WIDTH/2, coords: [xMid, 0], spawnRate: 1, despawnRate: 5}],
+                                 [74.125, "horizontal", {size: GAME_HEIGHT/2, coords: [0, yMid], spawnRate: 1, despawnRate: 5}],
+                                 [74.646, "horizontal", {size: GAME_HEIGHT/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                                  [85.341, "vertical", {size: 200, coords: ["player"]}], [87.219, "vertical", {size: 200, coords: ["player"]}],
                                  [87.400, "horizontal", {size: 200, coords: ["player"]}], [89.331, "horizontal", {size: 200, coords: ["player"]}],
-                                 [140.914, "bomb", {size: 500, coords: [cnv.width, cnv.height], spawnRate: 1, despawnRate: 5}], // 2 corner semi circles
+                                 [140.914, "bomb", {size: 500, coords: [GAME_WIDTH, GAME_HEIGHT], spawnRate: 1, despawnRate: 5}], // 2 corner semi circles
                                  [141.458, "bomb", {size: 500, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
                                  [141.957, "spike", {size: 50, location: "bl", spawnRate: 0.3, despawnRate: 3}], // spike triangle
                                  [142.482, "spike", {size: 50, location: "tm", spawnRate: 0.3, despawnRate: 3}],
@@ -459,7 +459,7 @@ function recordLeftClick() {
                     startBeat = 75.250;
                     beats = 16;
                     let corner = 1;
-                    let coords = {1:[0, 0], 2:[cnv.width, 0], 3:[cnv.width, cnv.height], 4:[0, cnv.height]};
+                    let coords = {1:[0, 0], 2:[GAME_WIDTH, 0], 3:[GAME_WIDTH, GAME_HEIGHT], 4:[0, GAME_HEIGHT]};
                     for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
                         music.timestamps.push([i-0.2, "bomb", {size: 300, coords: coords[corner], spawnRate: 1}]);
                         corner++;
@@ -485,7 +485,7 @@ function recordLeftClick() {
                     let side = 1;
                     coords = {1:[0, 0, "vertical", xMid], 2:[0, 0, "horizontal", yMid],
                               3:[xMid, 0, "vertical", xMid], 4:[0, yMid, "horizontal", yMid]};
-                    music.timestamps.push([131.571, "vertical", {size: cnv.width/2, coords: [0, 0], spawnRate: 0.325, despawnRate: 5,}]);
+                    music.timestamps.push([131.571, "vertical", {size: GAME_WIDTH/2, coords: [0, 0], spawnRate: 0.325, despawnRate: 5,}]);
                     for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) {
                         side++;
                         if (side > 4) side = 1;
@@ -500,9 +500,9 @@ function recordLeftClick() {
                     let w = 300;
                     for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
                         music.timestamps.push([i, "bomb", {size: w, coords: [0, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        music.timestamps.push([i, "bomb", {size: w, coords: [cnv.width, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        music.timestamps.push([i, "bomb", {size: w, coords: [cnv.width, cnv.height], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        music.timestamps.push([i, "bomb", {size: w, coords: [0, cnv.height], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        music.timestamps.push([i, "bomb", {size: w, coords: [GAME_WIDTH, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        music.timestamps.push([i, "bomb", {size: w, coords: [GAME_WIDTH, GAME_HEIGHT], spawnRate: 0.3, despawnRate: 0.7,}]);
+                        music.timestamps.push([i, "bomb", {size: w, coords: [0, GAME_HEIGHT], spawnRate: 0.3, despawnRate: 0.7,}]);
                         w += 80;
                     }
                     music.timestamps = music.timestamps.concat(deepSynth(150.313));
@@ -930,8 +930,8 @@ function drawDifficultySelection() {
     ctx.fillStyle = "grey";
     
     ctx.font = "bold 30px Arial";
-    ctx.fillText("NORMAL LEVELS", cnv.width/2, 220);
-    ctx.fillText("ENDLESS LEVELS", cnv.width/2, 420);
+    ctx.fillText("NORMAL LEVELS", GAME_WIDTH/2, 220);
+    ctx.fillText("ENDLESS LEVELS", GAME_WIDTH/2, 420);
 
     // Levels
     decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
@@ -1008,7 +1008,7 @@ function drawDodgerSelection() {
             ctx.fillStyle = textColor;
             ctx.textAlign = "center";
             ctx.font = "30px Arial";
-            ctx.fillText(abilityName, cnv.width/2, 310);
+            ctx.fillText(abilityName, GAME_WIDTH/2, 310);
             
             ctx.textAlign = "left";
             ctx.font = "17.5px Arial";
@@ -1023,11 +1023,11 @@ function drawDodgerSelection() {
 
                 ctx.strokeStyle = "rgb(255, 255, 255)";
                 ctx.font = "bold 71px Arial";
-                ctx.strokeText("LOCKED", cnv.width/2, 387);
+                ctx.strokeText("LOCKED", GAME_WIDTH/2, 387);
                 
                 ctx.strokeStyle = lockedColor;
                 ctx.font = "bold 70px Arial";
-                ctx.strokeText("LOCKED", cnv.width/2, 387);
+                ctx.strokeText("LOCKED", GAME_WIDTH/2, 387);
             }
         }
     }
@@ -1274,7 +1274,7 @@ function drawText() { // draws the current time, highest time, and enemy count
         else if (timeLeft > 0) timeLeftColor = "rgb(235, 0, 0)";
         
         ctx.fillStyle = timeLeftColor;
-        ctx.fillText(`${timeLeft}s`, cnv.width/2, 40);
+        ctx.fillText(`${timeLeft}s`, GAME_WIDTH/2, 40);
         
         ctx.fillStyle = music.textColor; // credit fillStyle
     }
@@ -1282,7 +1282,7 @@ function drawText() { // draws the current time, highest time, and enemy count
     // Credits artist in the bottom left corner
     ctx.font = "12.5px Verdana";
     ctx.textAlign = "left";
-    ctx.fillText(`Song - ${music.name} by ${music.artist}`, 10, cnv.height - 10);
+    ctx.fillText(`Song - ${music.name} by ${music.artist}`, 10, GAME_HEIGHT - 10);
     
     // Abilites
     ctx.font = "20px Verdana";
@@ -1295,7 +1295,7 @@ function drawText() { // draws the current time, highest time, and enemy count
         if (player.dodger === "jolt") textX = 220;
         else textX = 200;
     }
-    else textX = cnv.width/2
+    else textX = GAME_WIDTH/2
 
     let controls;
     if (lastPressing === "mouse") controls = ["RMB", "MMB"];
@@ -1352,8 +1352,8 @@ function drawText() { // draws the current time, highest time, and enemy count
 
 function createEnemy() { // Creates an individual enemy with unique attributes
     let enemy = {
-        x: (Math.random() * (cnv.width-60))+30,  // between 30 and 770
-        y: (Math.random() * (cnv.height-60))+30,  // between 30 and 520
+        x: (Math.random() * (GAME_WIDTH-60))+30,  // between 30 and 770
+        y: (Math.random() * (GAME_HEIGHT-60))+30,  // between 30 and 520
         r: (Math.random() * 7.5) + 10,  // between 10 and 17.5
         color: "rgb(100, 100, 100)",
         vulnerable: "None",
@@ -1380,8 +1380,8 @@ function createEnemy() { // Creates an individual enemy with unique attributes
 
     // used to prevent the enemy from spawning too close to the player
     while(distFromPlayer < 300) {
-        enemy.x = (Math.random() * (cnv.width-60))+30;
-        enemy.y = (Math.random() * (cnv.height-60))+30;
+        enemy.x = (Math.random() * (GAME_WIDTH-60))+30;
+        enemy.y = (Math.random() * (GAME_HEIGHT-60))+30;
 
         dx = player.x - enemy.x;
         dy = player.y - enemy.y;
@@ -1459,8 +1459,8 @@ function keyboardControls() {
         player.y += dyKB * player.speed;
 
         // Anti-no-clip (wall collisions)
-        player.x = Math.min(Math.max(player.x, player.r), cnv.width-player.r);
-        player.y = Math.min(Math.max(player.y, player.r), cnv.height-player.r);
+        player.x = Math.min(Math.max(player.x, player.r), GAME_WIDTH-player.r);
+        player.y = Math.min(Math.max(player.y, player.r), GAME_HEIGHT-player.r);
     }
 }
 
@@ -1490,8 +1490,8 @@ function mouseMovement() {
         
 
         // Anti-no-clip (wall collisions)
-        player.x = Math.min(Math.max(player.x, player.r+1.5), cnv.width-player.r-1.5); // players lineWidth included
-        player.y = Math.min(Math.max(player.y, player.r+1.5), cnv.height-player.r-1.5);
+        player.x = Math.min(Math.max(player.x, player.r+1.5), GAME_WIDTH-player.r-1.5); // players lineWidth included
+        player.y = Math.min(Math.max(player.y, player.r+1.5), GAME_HEIGHT-player.r-1.5);
     }
 }
 
@@ -1532,10 +1532,10 @@ function moveEnemies() { // Loops through the allEnemies array to move each enem
         enemy.y += enemy.movey;
         
         // Anti-no-clip (wall collisions)
-        enemy.x = Math.min(Math.max(enemy.x, enemy.r), cnv.width-enemy.r);
-        enemy.y = Math.min(Math.max(enemy.y, enemy.r), cnv.height-enemy.r);
-        if (enemy.x === enemy.r || enemy.x === cnv.width-enemy.r) enemy.facingAngle = Math.PI - enemy.facingAngle;
-        if (enemy.y === enemy.r || enemy.y === cnv.height-enemy.r) enemy.facingAngle = -enemy.facingAngle;
+        enemy.x = Math.min(Math.max(enemy.x, enemy.r), GAME_WIDTH-enemy.r);
+        enemy.y = Math.min(Math.max(enemy.y, enemy.r), GAME_HEIGHT-enemy.r);
+        if (enemy.x === enemy.r || enemy.x === GAME_WIDTH-enemy.r) enemy.facingAngle = Math.PI - enemy.facingAngle;
+        if (enemy.y === enemy.r || enemy.y === GAME_HEIGHT-enemy.r) enemy.facingAngle = -enemy.facingAngle;
         
         // Normalize the angle with the ever reliable Math.atan2()
         enemy.facingAngle = Math.atan2(Math.sin(enemy.facingAngle), Math.cos(enemy.facingAngle));
