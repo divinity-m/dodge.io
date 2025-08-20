@@ -6,12 +6,14 @@ const ctx = cnv.getContext('2d');
 // game units
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 650;
-const offsetX = (cnv.width - GAME_WIDTH) / 2;
-const offsetY = (cnv.height - GAME_HEIGHT) / 2 + 100;
+let offsetX = (cnv.width - GAME_WIDTH) / 2;
+let offsetY = (cnv.height - GAME_HEIGHT) / 2 + 100;
 
 function resizeCursorCanvas() {
-  cnv.width = window.innerWidth;
-  cnv.height = window.innerHeight;
+    cnv.width = window.innerWidth;
+    cnv.height = window.innerHeight;
+    offsetX = (cnv.width - GAME_WIDTH) / 2;
+    offsetY = (cnv.height - GAME_HEIGHT) / 2 + 100;
 }
 window.addEventListener("resize", resizeCursorCanvas);
 resizeCursorCanvas();
