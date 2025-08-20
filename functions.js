@@ -1337,12 +1337,12 @@ function drawText() { // draws the current time, highest time, and enemy count
         // Shockwave CD
         let shockwaveCDLeft = ((shockwave.cd - (now - shockwave.lastEnded)) / 1000).toFixed(2);
 
-        if (now - shockwave.lastEnded >= shockwave.cd) { // 3s or 7s
-            shockwave.usable = true;
-            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
-        } else {
+        if (now - shockwave.lastEnded < shockwave.cd && !shockwave.activated) { // 5.5s or 8.5s
             shockwave.usable = false;
             ctx.fillText(`Active: ${shockwave.active} (${shockwaveCDLeft}s) | Swap (${controls[1]})`, textX, 620);
+        } else {
+            shockwave.usable = true;
+            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
         }
     }
 
