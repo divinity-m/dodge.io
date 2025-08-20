@@ -6,6 +6,8 @@ const ctx = cnv.getContext('2d');
 // game units
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 650;
+const offsetX = (cnv.width - GAME_WIDTH) / 2;
+const offsetY = (cnv.height - GAME_HEIGHT) / 2 + 100;
 
 function resizeCursorCanvas() {
   cnv.width = window.innerWidth;
@@ -103,8 +105,6 @@ window.addEventListener('mousemove', (event) => {
     cursorY = screenY;
 
     // offset mouse
-    const offsetX = (cnv.width - GAME_WIDTH) / 2;
-    const offsetY = (cnv.height - GAME_HEIGHT) / 2;
     mouseX = screenX - offsetX;
     mouseY = screenY - offsetY;
 });
@@ -328,10 +328,6 @@ window.addEventListener('beforeunload', () => {
 function draw() {
     now = Date.now()
     ctx.clearRect(0, 0, cnv.width, cnv.height); // resets the canvas so previous drawings dont stay
-
-    // scale so 800×650 game fits the screen
-    const offsetX = (cnv.width - GAME_WIDTH) / 2;
-    const offsetY = (cnv.height - GAME_HEIGHT) / 2;
 
     ctx.save();
     ctx.translate(offsetX, offsetY); // translate to the offset
