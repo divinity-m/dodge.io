@@ -484,7 +484,7 @@ function drawCursor() {
             ctxCursor.strokeStyle = player.subColor;
         }
         ctxCursor.lineWidth = 3;
-        if (lastPressed === "mouse") {
+        if (lastPressing === "mouse") {
           drawCursorCircle(cursorX, cursorY, 7.5, "fill");
           drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
         }
