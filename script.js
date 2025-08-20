@@ -1,5 +1,4 @@
 // DODGE.IO - SCRIPT.JS
-console.log("lag reduction")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
@@ -96,10 +95,6 @@ window.addEventListener('mousemove', (event) => {
 
     cursorX = event.clientX;
     cursorY = event.clientY;
-    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined && trailDensity > 0) {
-        allCursors.push(createCursor()); // doing this in a mousemove event because it creates more at a time than requestAnimationFrame
-        if (allCursors.length > 100) allCursors.shift();
-    }
 });
 
 // Player & Enemies
@@ -427,14 +422,23 @@ function drawCursor() {
     }
     ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
   
-    // Cursor & Cursor Trail
+    let playerColor = player.color.slice(4, player.color.length-1);
+    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
+
+    allCursors = allCursors.filter(c => c.av > 0 && trailDensity > 0); // removes trails with low av's
+    allClicks = allClicks.filter(c => c.av > 0); // removes clicks with low av's
+  
+    // Makes default cursor invisible
     if (settings.customCursor) document.documentElement.classList.add("no-cursor");
     else { document.documentElement.classList.remove("no-cursor"); allCursors = []; }
   
-    for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
-    let playerColor = player.color.slice(4, player.color.length-1);
-    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
+    // Cursor & Cursor Trail
     if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
+        if (trailDensity > 0) {
+            allCursors.push(createCursor());
+            if (allCursors.length > 50) allCursors.shift(); // drop oldest
+        }
+      
         allCursors.forEach(cursor => {
             ctxCursor.fillStyle = cursor.color;
             drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
@@ -471,7 +475,6 @@ function drawCursor() {
     }
   
     // Click Animation
-    for (let i = allClicks.length-1; i >= 0; i--) if (allClicks[i].av < 0) allClicks.splice(i, 1); // removes clicks with low av's
     allClicks.forEach(click => {
         if (click.button === "left" || click.button === "middle") ctxCursor.strokeStyle = click.colorLeft;
         if (click.button === "right") ctxCursor.strokeStyle = click.colorRight;
