@@ -36,10 +36,10 @@ function drawEndLevel() {
     if (timeLeft <= 0 || innerGameState === "musicModeFail") {
         // Rect Variables
         let exitX = 150;
-        let exitY = (cnv.height/2 - 100);
+        let exitY = (GAME_HEIGHT/2 - 100);
         let inExitRect = player.x + player.r <= exitX + 200 && player.x - player.r >= exitX && player.y + player.r <= exitY + 200 && player.y - player.r >= exitY;
         let redoX = 450;
-        let redoY = (cnv.height/2 - 100);
+        let redoY = (GAME_HEIGHT/2 - 100);
         let inRedoRect = player.x + player.r <= redoX + 200 && player.x - player.r >= redoX && player.y + player.r <= redoY + 200 && player.y - player.r >= redoY;
         
         // Exit Rect
@@ -76,8 +76,8 @@ function drawEndLevel() {
         // Exit Rect Conditional
         ctx.fillStyle = "rgb(235, 235, 235)";
         if (inExitRect) {
-            ctx.fillText(`Exiting In`, 250, cnv.height/2 - 25);
-            ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 250, cnv.height/2 + 25);
+            ctx.fillText(`Exiting In`, 250, GAME_HEIGHT/2 - 25);
+            ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 250, GAME_HEIGHT/2 + 25);
             if (now - startTime >= 3000) {
                 dash.lastEnded = 0;
                 shockwave.reset();
@@ -92,21 +92,21 @@ function drawEndLevel() {
             }
         }
         else {
-            ctx.fillText("Level", 250, cnv.height/2 - 25);
-            if (timeLeft <= 0) ctx.fillText("Complete", 250, cnv.height/2 + 25);
-            if (innerGameState === "musicModeFail") ctx.fillText("Failed", 250, cnv.height/2 + 25);
+            ctx.fillText("Level", 250, GAME_HEIGHT/2 - 25);
+            if (timeLeft <= 0) ctx.fillText("Complete", 250, GAME_HEIGHT/2 + 25);
+            if (innerGameState === "musicModeFail") ctx.fillText("Failed", 250, GAME_HEIGHT/2 + 25);
         }
         
         // Redo Rect conditional
         ctx.fillStyle = music.textColor;
         if (inRedoRect) {
-            ctx.fillText(`Restarting In`, 550, cnv.height/2 - 25);
-            ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 550, cnv.height/2 + 25);
+            ctx.fillText(`Restarting In`, 550, GAME_HEIGHT/2 - 25);
+            ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 550, GAME_HEIGHT/2 + 25);
             if (now - startTime >= 3000) restartMusicMode();
         }
         else {
-            ctx.fillText("Restart", 550, cnv.height/2 - 25);
-            ctx.fillText("Level", 550, cnv.height/2 + 25);
+            ctx.fillText("Restart", 550, GAME_HEIGHT/2 - 25);
+            ctx.fillText("Level", 550, GAME_HEIGHT/2 + 25);
         }
         // Reset StartTime
         if (!inExitRect && !inRedoRect) startTime = Date.now();
@@ -118,7 +118,7 @@ function createBeam(variant="none") {
     let beam = {
         type: "beam",
         variant: Math.random(),
-        x: Math.random() * cnv.width, y: Math.random() * cnv.height,
+        x: Math.random() * GAME_WIDTH, y: Math.random() * GAME_HEIGHT,
         w: (Math.random() * 20) + 80, h: (Math.random() * 20) + 50,
         spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
         colorValue: 185,
@@ -148,7 +148,7 @@ function createCircle(variant="none") {
     let circle = {
         type: "circle",
         variant: Math.random(),
-        x: Math.random() * cnv.width, y: Math.random() * cnv.height, r: (Math.random() * 40) + 80,
+        x: Math.random() * GAME_WIDTH, y: Math.random() * GAME_HEIGHT, r: (Math.random() * 40) + 80,
         spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
         colorValue: 185,
         get color() {
@@ -188,8 +188,8 @@ function createSpike() {
         },
         launched: false,
         get reachedWall() {
-            if ((this.x - this.r * 1.5001 < 0 || this.x + this.r * 1.5001 > cnv.width ||
-                this.y - this.r * 1.5001 < 0 || this.y + this.r * 1.5001 > cnv.height) && this.launched) {
+            if ((this.x - this.r * 1.5001 < 0 || this.x + this.r * 1.5001 > GAME_WIDTH ||
+                this.y - this.r * 1.5001 < 0 || this.y + this.r * 1.5001 > GAME_HEIGHT) && this.launched) {
                 return true;
             }
             else return false;
@@ -209,8 +209,8 @@ function createSpike() {
     }
     spike.speed = spike.baseSpeed;
     const radiusSpace = spike.r * 1.501;
-    spike.x = Math.random()*(cnv.width-(radiusSpace*2)) + radiusSpace;
-    spike.y = Math.random()*(cnv.height-(radiusSpace*2)) + radiusSpace;
+    spike.x = Math.random()*(GAME_WIDTH-(radiusSpace*2)) + radiusSpace;
+    spike.y = Math.random()*(GAME_HEIGHT-(radiusSpace*2)) + radiusSpace;
     return spike;
 }
 
@@ -242,12 +242,12 @@ function spawnAndDrawDanger() {
                     if (modifiers?.size) { allDangers[0].w = modifiers.size; allDangers[0].h = modifiers.size; }
                     
                     // determines the beams x value based off the timestamp
-                    let xMulti = Math.floor(timestamp*100/cnv.width);
-                    allDangers[0].x = (timestamp*100)-(cnv.width*xMulti);
+                    let xMulti = Math.floor(timestamp*100/GAME_WIDTH);
+                    allDangers[0].x = (timestamp*100)-(GAME_WIDTH*xMulti);
                     
                     // determines the beams y value based off the timestamp
-                    let yMulti = Math.floor(timestamp*100/cnv.height);
-                    allDangers[0].y = (timestamp*100)-(cnv.height*yMulti);
+                    let yMulti = Math.floor(timestamp*100/GAME_HEIGHT);
+                    allDangers[0].y = (timestamp*100)-(GAME_HEIGHT*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
                     allDangers.push(createCircle(dangerType));
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
@@ -267,15 +267,15 @@ function spawnAndDrawDanger() {
                     if (!location) {
                         const rand = Math.random();
                         if (rand < 0.25) allDangers[0].x = radiusSpace;
-                        else if (rand < 0.5) allDangers[0].x = cnv.width - radiusSpace;
+                        else if (rand < 0.5) allDangers[0].x = GAME_WIDTH - radiusSpace;
                         else if (rand < 0.75) allDangers[0].y = radiusSpace;
-                        else if (rand < 1) allDangers[0].y = cnv.height - radiusSpace;
+                        else if (rand < 1) allDangers[0].y = GAME_HEIGHT - radiusSpace;
                     } else {
                         allDangers[0].location = location;
-                        locations = {tl: [radiusSpace, radiusSpace], tr: [cnv.width-radiusSpace, radiusSpace],
-                                     bl: [radiusSpace, cnv.height-radiusSpace], br: [cnv.width-radiusSpace, cnv.height-radiusSpace],
-                                     tm: [cnv.width/2, radiusSpace], lm: [radiusSpace, cnv.height/2],
-                                     bm: [cnv.width/2, cnv.height-radiusSpace], rm: [cnv.width-radiusSpace, cnv.height/2]}
+                        locations = {tl: [radiusSpace, radiusSpace], tr: [GAME_WIDTH-radiusSpace, radiusSpace],
+                                     bl: [radiusSpace, GAME_HEIGHT-radiusSpace], br: [GAME_WIDTH-radiusSpace, GAME_HEIGHT-radiusSpace],
+                                     tm: [GAME_WIDTH/2, radiusSpace], lm: [radiusSpace, GAME_HEIGHT/2],
+                                     bm: [GAME_WIDTH/2, GAME_HEIGHT-radiusSpace], rm: [GAME_WIDTH-radiusSpace, GAME_HEIGHT/2]}
                         
                         if (locations?.[location]) {
                             allDangers[0].x = locations[location][0];
@@ -302,8 +302,8 @@ function spawnAndDrawDanger() {
                 else if (modifiers?.despawnRate === 0) allDangers[0].despawnRate = 0;
 
                 // Beam X and Y's
-                if (allDangers[0].variant === "vertical") { allDangers[0].y = 0; allDangers[0].h = cnv.height; }
-                if (allDangers[0].variant === "horizontal") { allDangers[0].x = 0; allDangers[0].w = cnv.width; }
+                if (allDangers[0].variant === "vertical") { allDangers[0].y = 0; allDangers[0].h = GAME_HEIGHT; }
+                if (allDangers[0].variant === "horizontal") { allDangers[0].x = 0; allDangers[0].w = GAME_WIDTH; }
                 
                 // Collision Points
                 if (player.dodger === "jolt" && !modifiers?.invincible) {
@@ -466,10 +466,10 @@ function spawnAndDrawDanger() {
                 danger.baseMoveY = Math.sin(danger.facingAngle);
                 // top and bottom aim
                 if ( (danger.y < danger.r*1.502 && player.y < danger.r*1.501) || 
-                     (danger.y > cnv.height-danger.r*1.502 && player.y > cnv.height-danger.r*1.501) ) danger.baseMoveY = 0;
+                     (danger.y > GAME_HEIGHT-danger.r*1.502 && player.y > GAME_HEIGHT-danger.r*1.501) ) danger.baseMoveY = 0;
                 // left and right aim
                 else if ( (danger.x < danger.r*1.502 && player.x < danger.r*1.501) ||
-                     (danger.x > cnv.width-danger.r*1.502 && player.x > cnv.width-danger.r*1.501) ) danger.baseMoveX = 0;
+                     (danger.x > GAME_WIDTH-danger.r*1.502 && player.x > GAME_WIDTH-danger.r*1.501) ) danger.baseMoveX = 0;
                 danger.launched = true;
                 danger.movex = danger.baseMoveX;
                 danger.movey = danger.baseMoveY;
@@ -482,9 +482,9 @@ function spawnAndDrawDanger() {
 
             if (danger.reachedWall) {
                 if (danger.x - danger.r*1.5 < 0) danger.x = danger.r*1.5;
-                if (danger.x + danger.r*1.5 > cnv.width) danger.x = cnv.width - danger.r*1.5;
+                if (danger.x + danger.r*1.5 > GAME_WIDTH) danger.x = GAME_WIDTH - danger.r*1.5;
                 if (danger.y - danger.r*1.5 < 0) danger.y = danger.r*1.5;
-                if (danger.y + danger.r*1.5 > cnv.height) danger.y = cnv.height - danger.r*1.5;
+                if (danger.y + danger.r*1.5 > GAME_HEIGHT) danger.y = GAME_HEIGHT - danger.r*1.5;
             }
         }
         else if (danger.type === "text") {
