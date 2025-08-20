@@ -22,16 +22,11 @@
                 font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
             }
             #game {
-              z-index: 1;
-            }
-            #cursor {
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 100vw; /* takes up the width and height of the browers visible area so the canvas always streches to fill the screen */
                 height: 100vh;
-                z-index: 2; /* above game canvas */
-                pointer-events: none;
             }
             .no-cursor html,
             .no-cursor body,
@@ -73,7 +68,6 @@
         <br>
 
         <!-- Canvas -->
-        <canvas id="game" width="800" height="650"></canvas>
-        <canvas id="cursor"></canvas>
+        <canvas id="game"></canvas>
     </body>
 </html>
