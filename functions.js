@@ -89,7 +89,7 @@ function recordRightClick(event) {
 function recordMiddleClick() {
     event.preventDefault();
     if (loadingScreen(true)) return;
-
+    lastPressing = "mouse";
     if (gameState !== "endlessOver") {
         if (player.dodger === "jötunn" && absoluteZero.usable) {
             absoluteZero.usable = false;
@@ -105,8 +105,7 @@ function recordMiddleClick() {
 
 function recordLeftClick() {
     if (loadingScreen(true)) return;
-
-    // Variable to keep mouse movement the way it previously was if a button was pressed
+    lastPressing = "mouse";
     previousMM = false;
     
     // Mouse Movement
@@ -615,17 +614,22 @@ function createCursor() {
     return cursor;
 }
 
-function createClick() {
+function createClick(button) {
     let click = {
         r: 1,
         av: 1,
         addR: 24/15, // 1 + 24/15 * 15
         subAv: 1/15, // 1 - 1/15 * 15
+        button: button,
     }
-    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
-    click.color = `rgba(${playerSubColor}, ${click.av})`;
     click.x = cursorX;
     click.y = cursorY;
+    
+    let playerColor = player.color.slice(4, player.color.length-1);
+    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
+    click.colorLeft = `rgba(${playerColor}, ${click.av})`;
+    click.colorRight = `rgba(${playerSubColor}, ${click.av})`;
+    
     return click;
 }
 
