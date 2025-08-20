@@ -133,7 +133,10 @@ function recordLeftClick() {
         // Saves the users settings options when they exit the settings
         if (innerGameState === "settings") {
             userData.settings = settings;
-            localStorage.setItem('localUserData', JSON.stringify(userData));
+            if (now - clickEventSave > 500) {
+                localStorage.setItem('localUserData', JSON.stringify(userData));
+                clickEventSave = Date.now();
+            }
         }
         // Plays 'A New Start' when users are redirected back to the Main Menu
         if (gameState === "endlessOver") {
@@ -179,7 +182,11 @@ function recordLeftClick() {
     
                 // Saves the users settings options
                 userData.settings = settings;
-                localStorage.setItem('localUserData', JSON.stringify(userData));
+
+                if (now - clickEventSave > 500) {
+                    localStorage.setItem('localUserData', JSON.stringify(userData));
+                    clickEventSave = Date.now();
+                }
     
                 if (!settings.disableMM) mouseMovementOn = previousMM;
             }
@@ -213,7 +220,7 @@ function recordLeftClick() {
                         loopedPoints = music.timestamps.slice(1, 16).map(x => [x[0] + 11.5*loopNum, x[1]]);
                         music.timestamps = music.timestamps.concat(loopedPoints);
                     }
-                    music.timestamps = music.timestamps.map(x => [x[0]-0.025, x[1]]); // delay slightly for better visual to audio sync
+                    music.timestamps.forEach(ts => { ts[0] -= 0.025; }); // delay slightly for better visual to audio sync
                 }
                 if (mouseOver?.andromeda) {
                     function solo8Beam(time) {
@@ -329,7 +336,7 @@ function recordLeftClick() {
                     music.timestamps = music.timestamps.concat(doubleTriple(129.431, "8-beam", "bombs"), doubleTriple(136.390, "quintuple", "bombs"));
                     music.timestamps = music.timestamps.concat(doubleTriple(144.438, "8-beam", "bombs"), doubleTriple(151.909, "8-beam", "bombs"));
                     music.timestamps = music.timestamps.concat(ending(159.426));
-                    music.timestamps = music.timestamps.map(x => [x[0]-0.025, x[1]]);
+                    music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                 }
                 if (mouseOver?.euphoria) {
                     const xMid = cnv.width/2;
@@ -511,6 +518,7 @@ function recordLeftClick() {
                     music.timestamps.forEach(ts => { ts[0] -= 0.025; });
                     for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, invincible: true, coords: [xMid, yMid]}]);
                 }
+                music.timestamps.sort((a, b) => a[0] - b[0]);
                 music.backUpTS = [...music.timestamps];
                 mouseMovementOn = previousMM;
                 restartMusicMode();
@@ -553,7 +561,10 @@ function recordLeftClick() {
             mouseMovementOn = previousMM;
             // saves the players values to the local storage to keep track of the players dodger
             userData.player = player;
-            localStorage.setItem('localUserData', JSON.stringify(userData));
+            if (now - clickEventSave > 500) {
+                localStorage.setItem('localUserData', JSON.stringify(userData));
+                clickEventSave = Date.now();
+            }
         }
     }
 }
@@ -1228,9 +1239,9 @@ function drawText() { // draws the current time, highest time, and enemy count
             if (music.name === "Divine") highscore.euphoria = Math.max(highscore.euphoria, percentage);
         }
         
-        // Saves data every second incase the user disconnects/crashes
+        // Saves data every 1.5 seconds incase the user disconnects/crashes
         userData.highscore = highscore;
-        if (now - lastSave > 1000) {
+        if (now - lastSave > 1500) {
             localStorage.setItem('localUserData', JSON.stringify(userData));
             lastSave = Date.now();
         }
