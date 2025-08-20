@@ -238,7 +238,7 @@ function spawnAndDrawDanger() {
             const modifiers = music.timestamps[i][2];
             if (music.var.currentTime >= timestamp) {
                 if (dangerType === "beam" || dangerType === "horizontal" || dangerType === "vertical") {
-                    allDangers.unshift(createBeam(dangerType));
+                    allDangers.push(createBeam(dangerType));
                     if (modifiers?.size) { allDangers[0].w = modifiers.size; allDangers[0].h = modifiers.size; }
                     
                     // determines the beams x value based off the timestamp
@@ -249,7 +249,7 @@ function spawnAndDrawDanger() {
                     let yMulti = Math.floor(timestamp*100/cnv.height);
                     allDangers[0].y = (timestamp*100)-(cnv.height*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
-                    allDangers.unshift(createCircle(dangerType));
+                    allDangers.push(createCircle(dangerType));
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
                     allDangers[0].lineWidth = allDangers[0].r;
                     if (modifiers?.lineWidth) allDangers[0].lineWidth = modifiers.lineWidth;
@@ -258,7 +258,7 @@ function spawnAndDrawDanger() {
                     allDangers[0].x = player.x;
                     allDangers[0].y = player.y;
                 } else if (dangerType === "spike") {
-                    allDangers.unshift(createSpike());
+                    allDangers.push(createSpike());
                     if (modifiers?.size) allDangers[0].r = modifiers.size;
                     const radiusSpace = allDangers[0].r * 1.501;
                     
@@ -285,7 +285,7 @@ function spawnAndDrawDanger() {
                     if (modifiers?.speed) allDangers[0].baseSpeed = modifiers.speed;
                     allDangers[0].speed = allDangers[0].baseSpeed;
                 } else if (dangerType === "text") {
-                    allDangers.unshift(createText());
+                    allDangers.push(createText());
                     if (modifiers?.text) allDangers[0].text = modifiers.text;
                     if (modifiers?.textAlign) allDangers[0].textAlign = modifiers.textAlign;
                     if (modifiers?.font) allDangers[0].font = modifiers.font;
@@ -365,7 +365,9 @@ function spawnAndDrawDanger() {
         }
     }
     // Danger Drawing
-    allDangers.forEach(danger => {
+    for (let i = allDangers.length - 1; i >= 0; i--) {
+        let danger = allDangers[i];
+        
         ctx.fillStyle = danger.color;
         ctx.strokeStyle = danger.color;
         let joltEffectColor = `rgba(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
@@ -490,7 +492,7 @@ function spawnAndDrawDanger() {
             ctx.font = danger.font;
             ctx.fillText(danger.text, danger.x, danger.y);
         }
-    })
+    }
     // Danger Rearranging
     allDangers.sort((a, b) => a.colorValue - b.colorValue);
     // Danger Deleting
