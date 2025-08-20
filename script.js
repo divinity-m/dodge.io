@@ -1,5 +1,4 @@
 // DODGE.IO - SCRIPT.JS
-console.log("negative rad")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
@@ -502,11 +501,11 @@ function drawCursor() {
         if (click.button === "left" || click.button === "middle") ctxCursor.strokeStyle = click.colorLeft;
         if (click.button === "right") ctxCursor.strokeStyle = click.colorRight;
       
-        ctxCursor.lineWidth = 2;
+        ctxCursor.lineWidth = 2.5;
         drawCursorCircle(click.x, click.y, click.r, "stroke");
         if (click.button === "middle") {
             ctxCursor.strokeStyle = click.colorRight;
-            if (click.r-2 > 0) drawCursorCircle(click.x, click.y, click.r-2, "stroke");
+            if (click.r-2.5 > 0) drawCursorCircle(click.x, click.y, click.r-2.5, "stroke");
         }
 
         click.r += click.addR;
