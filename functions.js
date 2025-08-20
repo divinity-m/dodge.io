@@ -1220,7 +1220,7 @@ function drawEnemies() {
 
 function drawText() { // draws the current time, highest time, and enemy count
     // Current time in seconds
-    currentTime = ((now-startTime) / 1000).toFixed(2);
+    if (gameState !== "endlessOver") currentTime = ((now-startTime) / 1000).toFixed(2);
     timeLeft = (music.var.duration - music.var.currentTime).toFixed(2);
     if (gameState === "endlessMode" || gameState === "endlessOver" || gameState === "musicMode") {
         // Difficulty Highscore
