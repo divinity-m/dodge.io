@@ -36,12 +36,14 @@ function recordKeyDown(event) {
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             // activate the shockwave ability and set certain properties
             shockwave.activated = true;
-            shockwave.used = shockwave.active;
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
             shockwave.y = player.y;
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
+            shockwave.used = shockwave.active;
+            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; }
+            else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
         }
     } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
         if (player.dodger === "jötunn" && absoluteZero.usable) {
@@ -67,9 +69,9 @@ function recordKeyUp(event) {
 }
 
 function recordRightClick(event) {
-    event.preventDefault();
+    lastPressing = "mouse";
     if (loadingScreen(true)) return;
-
+    
     // Ability Activations
     if (gameState !== "endlessOver") {
         if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
@@ -86,10 +88,10 @@ function recordRightClick(event) {
     }
 }
 
-function recordMiddleClick() {
-    event.preventDefault();
-    if (loadingScreen(true)) return;
+function recordMiddleClick(event) {
     lastPressing = "mouse";
+    if (loadingScreen(true)) return;
+    
     if (gameState !== "endlessOver") {
         if (player.dodger === "jötunn" && absoluteZero.usable) {
             absoluteZero.usable = false;
@@ -98,14 +100,14 @@ function recordMiddleClick() {
             else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
             else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
         }
+        if (player.dodger === "jolt" && shockwave.active === "Shockwave") shockwave.active = "Shockray";
+        else if (player.dodger === "jolt" && shockwave.active === "Shockray") shockwave.active = "Shockwave";
     }
-    if (player.dodger === "jolt" && shockwave.active === "Shockwave") shockwave.active = "Shockray";
-    else if (player.dodger === "jolt" && shockwave.active === "Shockray") shockwave.active = "Shockwave";
 }
 
 function recordLeftClick() {
-    if (loadingScreen(true)) return;
     lastPressing = "mouse";
+    if (loadingScreen(true)) return;
     previousMM = false;
     
     // Mouse Movement
@@ -1246,7 +1248,7 @@ function drawText() { // draws the current time, highest time, and enemy count
             lastSave = Date.now();
         }
     }
-    if (gameState === "endlessMode") {
+    if (gameState === "endlessMode" || gameState === "endlessOver") {
         // Draws the times and the enemy count
         ctx.font = "20px Verdana";
         ctx.textAlign = 'center';
@@ -1289,7 +1291,10 @@ function drawText() { // draws the current time, highest time, and enemy count
 
     // The text should be centered unless the gameState is endlessMode or endlessOver
     textX = 200;
-    if (gameState === "endlessMode" || gameState === "endlessOver") textX = 200
+    if (gameState === "endlessMode" || gameState === "endlessOver") {
+        if (player.dodger === "jolt") textX = 220;
+        else textX = 200;
+    }
     else textX = cnv.width/2
 
     let controls;
@@ -1428,27 +1433,26 @@ function spawnEnemyPeriodically() {
 
 // PLAYER AND ENEMY MOVEMENT
 function keyboardControls() {
-    let dxKB = 0;
-    let dyKB = 0;
-
-    if (wPressed) dyKB -= 1;
-    if (sPressed) dyKB += 1;
-    if (aPressed) dxKB -= 1;
-    if (dPressed) dxKB += 1;
-
-    // Normalize diagonal movement
-    if (dxKB !== 0 && dyKB !== 0) {
-        const scale = Math.SQRT1_2; // 1 / √2 ≈ 0.7071
-        dxKB *= scale;
-        dyKB *= scale;
-    }
-    
     // Moves the player with the keyboard
-    if (keyboardMovementOn) {
+    if (keyboardMovementOn && player?.x !== undefined && player?.y !== undefined) {
         lastPressing = "kb";
-        if (!dash.activated){
-            player.speed = player.baseSpeed * shiftPressed * player.slowed;
+
+        let dxKB = 0;
+        let dyKB = 0;
+    
+        if (wPressed) dyKB -= 1;
+        if (sPressed) dyKB += 1;
+        if (aPressed) dxKB -= 1;
+        if (dPressed) dxKB += 1;
+    
+        // Normalize diagonal movement
+        if (dxKB !== 0 && dyKB !== 0) {
+            const scale = Math.SQRT1_2; // 1 / √2 ≈ 0.7071
+            dxKB *= scale;
+            dyKB *= scale;
         }
+        
+        if (!dash.activated) player.speed = player.baseSpeed * shiftPressed * player.slowed;
         if (dxKB !== 0 || dyKB !== 0) player.facingAngle = Math.atan2(dyKB, dxKB);
         
         player.x += dxKB * player.speed;
@@ -1461,16 +1465,15 @@ function keyboardControls() {
 }
 
 function mouseMovement() {
-    const dxMouse = mouseX - player.x;
-    const dyMouse = mouseY - player.y;
-    const mouseDist = Math.hypot(dxMouse, dyMouse);
-    
     // Moves the player towards the cursor
-    if (mouseMovementOn && !keyboardMovementOn) {
+    if (mouseMovementOn && !keyboardMovementOn && player?.x !== undefined && player?.y !== undefined) {
         lastPressing = "mouse";
-        if (!dash.activated) {
-            player.speed = player.baseSpeed * shiftPressed * player.slowed;
-        }
+        
+        const dxMouse = mouseX - player.x;
+        const dyMouse = mouseY - player.y;
+        const mouseDist = Math.hypot(dxMouse, dyMouse);
+        
+        if (!dash.activated) player.speed = player.baseSpeed * shiftPressed * player.slowed;
         player.facingAngle = Math.atan2(dyMouse, dxMouse);
 
         const slowStart = player.r + 40;
@@ -1670,19 +1673,10 @@ function abilities() { // player-specific abilities
         // pauses beam if the player dies
         if (gameState !== "endlessOver") {
             shockwave.radius *= 1.022;
-            if (shockwave.used === "Shockwave") {
-                shockwave.cd = 8500;
-                shockwave.effect = 0.75;
-            }
-            else if (shockwave.used === "Shockray") {
-                shockwave.x += shockwave.movex;
-                shockwave.y += shockwave.movey;
-                shockwave.cd = 5500;
-                shockwave.effect = 0.5;
-            }
+            if (shockwave.used === "Shockray") { shockwave.x += shockwave.movex; shockwave.y += shockwave.movey; }
         }
         
-        // once the radius is greater than 250, end the entire ability
+        // once the radius is big enough, end the entire ability
         if ((shockwave.radius > 1250 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
             shockwave.activated = false;
             shockwave.radius = 25;
