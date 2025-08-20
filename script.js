@@ -100,7 +100,7 @@ window.addEventListener('mousemove', (event) => {
 
     // cursor trails
     cursorX = screenX;
-    cursorY = screenX;
+    cursorY = screenY;
 
     // offset mouse
     const offsetX = (cnv.width - GAME_WIDTH) / 2;
