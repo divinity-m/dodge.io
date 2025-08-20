@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("hovering over links")
+console.log("lag fix attempt")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
@@ -80,7 +80,7 @@ let track = false;
 let cursorX;
 let cursorY;
 let allCursors = [];
-let trailDensity = 1;
+let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
     const cnvRect = cnv.getBoundingClientRect();
     mouseX = event.clientX - cnvRect.left;
@@ -204,8 +204,8 @@ let difficulty = {
 };
 
 // Music
-let musicVolume = 50;
-let sfxVolume = 50;
+let musicVolume = 0;
+let sfxVolume = 0;
 
 let alarm9 = document.createElement("audio");
 alarm9.src = "Audio/Alarm 9 - Blue Cxve.mp3";
@@ -286,6 +286,12 @@ if (localData) {
         player = userData.player;
         highscore = userData.highscore;
         settings = userData.settings;
+        musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
+        sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
+        absoluteZero.av = Math.max(Math.min((settings.aZ_Av - 555) / (705 - 555), 1), 0)
+        trailDensity = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0);
+        music.var.volume = musicVolume;
+        sharpPop.volume = sfxVolume;
     }
 }
 
@@ -427,9 +433,72 @@ function draw() {
         abilities();
         musicCollisions();
     }
+
+    // drawCursor
+    function drawCursorCircle(x, y, r, type) {
+        ctxCursor.beginPath();
+        ctxCursor.arc(x, y, r, Math.PI * 2, 0);
+        if (type === "fill") ctxCursor.fill();
+        if (type === "stroke") ctxCursor.stroke();
+    }
+    ctxCursor.clearRect(0, 0, cnvCursor.width, cnvCursor.height); // resets the canvas so previous drawings dont stay
+  
+    // Cursor & Cursor Trail
+    if (settings.customCursor) document.documentElement.classList.add("no-cursor");
+    else { document.documentElement.classList.remove("no-cursor"); allCursors = []; }
+  
+    for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
+    let playerColor = player.color.slice(4, player.color.length-1);
+    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
+    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
+        allCursors.forEach(cursor => {
+            ctxCursor.fillStyle = cursor.color;
+            drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
+            
+            cursor.r -= cursor.subR;
+            cursor.av -= cursor.subAv;
+        })
+
+        let hovering = false;
+        // Canvas Buttons
+        Object.keys(mouseOver).forEach(hover => {
+          if (mouseOver[hover]) hovering = true;
+        })
+        // Document Hyperlinks
+        let hyperlinks = document.getElementsByTagName('a');
+        for (let i = 0; i < hyperlinks.length; i++) {
+          if (hyperlinks[i].matches(":hover")) hovering = true;
+        }
+        // hoving inverts cursor colors, clicking reduces alpha value
+        if (hovering) {
+            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerSubColor}, 0.75)`;
+            else ctxCursor.fillStyle = player.subColor;
+            ctxCursor.strokeStyle = player.color;
+        } else {
+            if (mouseDown) ctxCursor.fillStyle = `rgba(${playerColor}, 0.75)`;
+            else ctxCursor.fillStyle = player.color;
+            ctxCursor.strokeStyle = player.subColor;
+        }
+        ctxCursor.lineWidth = 3;
+        drawCursorCircle(cursorX, cursorY, 7.5, "fill");
+        drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
+    }
+  
+    // Click Animation
+    for (let i = allClicks.length-1; i >= 0; i--) if (allClicks[i].av < 0) allClicks.splice(i, 1); // removes clicks with low av's
+    allClicks.forEach(click => {
+        ctxCursor.strokeStyle = click.color;
+        ctxCursor.lineWidth = 2;
+        drawCursorCircle(click.x, click.y, click.r, "stroke");
+
+        click.r += click.addR;
+        click.av -= click.subAv;
+    })
+
+  
     requestAnimationFrame(draw);
 }
-
+/*
 function drawCursor() {
     function drawCursorCircle(x, y, r, type) {
         ctxCursor.beginPath();
@@ -492,6 +561,6 @@ function drawCursor() {
     })
     requestAnimationFrame(drawCursor);
 }
-
+*/
 draw();
-drawCursor();
+//drawCursor();
