@@ -1,4 +1,5 @@
 // DODGE.IO - SCRIPT.JS
+console.log("lag reduction")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 const cnvCursor = document.getElementById("cursor");
@@ -95,11 +96,9 @@ window.addEventListener('mousemove', (event) => {
 
     cursorX = event.clientX;
     cursorY = event.clientY;
-    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
-        if (trailDensity > 0) allCursors.push(createCursor()); // wont create new trails if the trail density is 0
-        for (let i = allCursors.length-1; i >= 0; i--) {
-            if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1);
-        }
+    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined && trailDensity > 0) {
+        allCursors.push(createCursor()); // doing this in a mousemove event because it creates more at a time than requestAnimationFrame
+        if (allCursors.length > 100) allCursors.shift();
     }
 });
 
@@ -182,6 +181,7 @@ let allDangers = [];
 
 // Time, Highscore, and Difficulty
 let now = Date.now();
+let clickEventSave = 0;
 
 let loadingGame = Date.now();
 let loadingTextChange = Date.now();
@@ -309,38 +309,13 @@ if (resetLocalData || !localData){
     localStorage.setItem('localUserData', JSON.stringify(userData));
 }
 
-// Crash data to track when the user leaves/crashes
-const localCrashData = localStorage.getItem('localCrashData');
-let crashData;
-let resetCrashData = false;
-
-if (localCrashData) {
-    try { crashData = JSON.parse(localCrashData); }
-    catch (exception) {
-        console.warn('Crash data was invalid, resetting.', exception);
-        localStorage.removeItem('localCrashData');
-        resetCrashData = true;
-    }
-}
-if (!localCrashData || resetCrashData) {
-    crashData = { leaveOnLoading: 0, leaveOnMenu: 0, leaveOnPlay: 0, leaveUnknown: 0, lastLeftOn: "", };
-    localStorage.setItem('localCrashData', JSON.stringify(crashData));
-}
-
 // saves the game if the website is closed
 window.addEventListener('beforeunload', () => {
     if (gameState !== "loading") { // only save user data if they're not on the loading screen
         userData = { player: player, highscore: highscore, settings: settings, };
         localStorage.setItem('localUserData', JSON.stringify(userData));
     }
-    if (gameState === "loading") crashData.leaveOnLoading++;
-    else if (gameState === "startScreen") crashData.leaveOnMenu++;
-    else if (gameState === "endlessMode" || gameState === "endlessOver") crashData.leaveOnPlay++;
-    else crashData.leaveUnknown++;
-    crashData.lastLeftOn = gameState;
-    localStorage.setItem('localCrashData', JSON.stringify(crashData));
 })
-
 
 // Drawing the game
 function draw() {
