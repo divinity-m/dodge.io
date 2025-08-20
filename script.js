@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("html margin")
+console.log("reset cnv only in certain conditions")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
@@ -329,8 +329,8 @@ window.addEventListener('beforeunload', () => {
 // Drawing the game
 function draw() {
     now = Date.now()
-    ctx.clearRect(0, 0, cnv.width, cnv.height); // resets the canvas so previous drawings dont stay
-
+    if (cursorX < offsetX+25 || cursorX > offsetX-25 || cursorY < offsetY+25 || cursorY > offsetY-25) ctx.clearRect(0, 0, cnv.width, cnv.height); // resets the canvas so previous drawings dont stay
+    
     ctx.save();
     ctx.translate(offsetX, offsetY); // translate to the offset
   
