@@ -38,17 +38,19 @@ document.addEventListener("touchend", () => {mouseDown = false});
 document.addEventListener("touchcancel", () => {mouseDown = false});
 
 document.addEventListener("click", () => {
-  allClicks.push(createClick("left"));
-  recordLeftClick();
+    allClicks.push(createClick("left"));
+    recordLeftClick();
 });
 document.addEventListener("contextmenu", (event) => {
-  allClicks.push(createClick("right"));
-  recordRightClick(event);
+    allClicks.push(createClick("right"));
+    event.preventDefault();
+    recordRightClick(event);
 });
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
         allClicks.push(createClick("middle"));
-        recordMiddleClick();
+        event.preventDefault();
+        recordMiddleClick(event);
     }
 });
 let mouseOver = {
