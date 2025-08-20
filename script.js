@@ -436,7 +436,7 @@ function drawCursor() {
     if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
         if (trailDensity > 0) {
             allCursors.push(createCursor());
-            if (allCursors.length > 50) allCursors.shift(); // drop oldest
+            if (allCursors.length > 40) allCursors.shift(); // drop oldest
         }
       
         allCursors.forEach(cursor => {
