@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("canvas Y offset")
+console.log("canvas offset not updating?")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
