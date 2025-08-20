@@ -454,7 +454,7 @@ function drawCursor() {
     for (let i = allCursors.length-1; i >= 0; i--) if (allCursors[i].av < 0 || trailDensity === 0) allCursors.splice(i, 1); // removes trails with low av's
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
-    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined && ) {
+    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
         allCursors.forEach(cursor => {
             ctxCursor.fillStyle = cursor.color;
             drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
