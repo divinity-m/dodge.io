@@ -86,6 +86,7 @@ let track = false;
 let cursorX;
 let cursorY;
 let allCursors = [];
+let lastCursorTrail = 0;
 let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
     const cnvRect = cnv.getBoundingClientRect();
@@ -435,8 +436,12 @@ function drawCursor() {
     // Cursor & Cursor Trail
     if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
         if (trailDensity > 0) {
-            allCursors.push(createCursor());
-            if (allCursors.length > 40) allCursors.shift(); // drop oldest
+            const pNow = performance.now();
+            if (pNow - lastCursorTrail > 16) { // ~60fps cap
+                allCursors.push(createCursor());
+                if (allCursors.length > 40) allCursors.shift(); // drop oldest
+                lastCursorTrail = pNow;
+            }
         }
       
         allCursors.forEach(cursor => {
