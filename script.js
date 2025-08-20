@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("canvas offset fix")
+console.log("html margin")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
