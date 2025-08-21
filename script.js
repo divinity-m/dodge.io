@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("reset cnv only in certain conditions")
+console.log("pointer-events && highscore bold")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
@@ -329,7 +329,13 @@ window.addEventListener('beforeunload', () => {
 // Drawing the game
 function draw() {
     now = Date.now()
-    if (cursorX < offsetX+25 || cursorX > offsetX-25 || cursorY < offsetY+25 || cursorY > offsetY-25) ctx.clearRect(0, 0, cnv.width, cnv.height); // resets the canvas so previous drawings dont stay
+    // resets the canvas
+    ctx.clearRect(0, 0, cnv.width, cnv.height);
+    
+    // pointer-events toggle based on cursor locaction
+    if (cursorX < 0 || cursorX > cnv.width || cursorY < offsetY-10 || cursorY > cnv.height) cnv.style.pointerEvents = "none";
+    else cnv.style.pointerEvents = "auto";
+    
     
     ctx.save();
     ctx.translate(offsetX, offsetY); // translate to the offset
