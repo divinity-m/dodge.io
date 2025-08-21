@@ -364,7 +364,7 @@ function spawnAndDrawDanger() {
             }
         }
     }
-    // Danger Rearranging
+    // Danger Rearranging | dangers with the highest color values are put at the start of the array
     allDangers.sort((a, b) => a.colorValue - b.colorValue);
     
     // Danger Drawing
