@@ -1576,8 +1576,6 @@ function collisions() { // Keeps track of when the player touches any enemy in t
         if (!dash.activated && now - dash.lastEnded > 250 && !player.invincible) {
             if (enemyDist < player.r + enemy.r) {
                 pauseAudio(music.promise, music.var);
-                highscoreColor = "rgb(87, 87, 87)";
-                difficulty.color = "rgb(87, 87, 87)";
                 gameState = "endlessOver";
                 // Saves data once the user dies
                 userData.highscore = highscore;
