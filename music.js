@@ -236,81 +236,86 @@ function spawnAndDrawDanger() {
             const timestamp = music.timestamps[i][0];
             const dangerType = music.timestamps[i][1];
             const modifiers = music.timestamps[i][2];
+            let danger;
             if (music.var.currentTime >= timestamp) {
                 if (dangerType === "beam" || dangerType === "horizontal" || dangerType === "vertical") {
                     allDangers.push(createBeam(dangerType));
-                    if (modifiers?.size) { allDangers[0].w = modifiers.size; allDangers[0].h = modifiers.size; }
+                    danger = allDangers[allDangers.length-1];
+                    if (modifiers?.size) { danger.w = modifiers.size; danger.h = modifiers.size; }
                     
                     // determines the beams x value based off the timestamp
                     let xMulti = Math.floor(timestamp*100/GAME_WIDTH);
-                    allDangers[0].x = (timestamp*100)-(GAME_WIDTH*xMulti);
+                    danger.x = (timestamp*100)-(GAME_WIDTH*xMulti);
                     
                     // determines the beams y value based off the timestamp
                     let yMulti = Math.floor(timestamp*100/GAME_HEIGHT);
-                    allDangers[0].y = (timestamp*100)-(GAME_HEIGHT*yMulti);
+                    danger.y = (timestamp*100)-(GAME_HEIGHT*yMulti);
                 } else if (dangerType === "circle" || dangerType === "bomb" || dangerType === "ring") {
                     allDangers.push(createCircle(dangerType));
-                    if (modifiers?.size) allDangers[0].r = modifiers.size;
-                    allDangers[0].lineWidth = allDangers[0].r;
-                    if (modifiers?.lineWidth) allDangers[0].lineWidth = modifiers.lineWidth;
+                    danger = allDangers[allDangers.length-1];
+                    if (modifiers?.size) danger.r = modifiers.size;
+                    danger.lineWidth = danger.r;
+                    if (modifiers?.lineWidth) danger.lineWidth = modifiers.lineWidth;
         
                     // the circle's x and y will mimic the players
-                    allDangers[0].x = player.x;
-                    allDangers[0].y = player.y;
+                    danger.x = player.x;
+                    danger.y = player.y;
                 } else if (dangerType === "spike") {
                     allDangers.push(createSpike());
-                    if (modifiers?.size) allDangers[0].r = modifiers.size;
-                    const radiusSpace = allDangers[0].r * 1.501;
+                    danger = allDangers[allDangers.length-1];
+                    if (modifiers?.size) danger.r = modifiers.size;
+                    const radiusSpace = danger.r * 1.501;
                     
                     const location = modifiers?.location;
                     // spikes spawn on the edge of the walls
                     if (!location) {
                         const rand = Math.random();
-                        if (rand < 0.25) allDangers[0].x = radiusSpace;
-                        else if (rand < 0.5) allDangers[0].x = GAME_WIDTH - radiusSpace;
-                        else if (rand < 0.75) allDangers[0].y = radiusSpace;
-                        else if (rand < 1) allDangers[0].y = GAME_HEIGHT - radiusSpace;
+                        if (rand < 0.25) danger.x = radiusSpace;
+                        else if (rand < 0.5) danger.x = GAME_WIDTH - radiusSpace;
+                        else if (rand < 0.75) danger.y = radiusSpace;
+                        else if (rand < 1) danger.y = GAME_HEIGHT - radiusSpace;
                     } else {
-                        allDangers[0].location = location;
+                        danger.location = location;
                         locations = {tl: [radiusSpace, radiusSpace], tr: [GAME_WIDTH-radiusSpace, radiusSpace],
                                      bl: [radiusSpace, GAME_HEIGHT-radiusSpace], br: [GAME_WIDTH-radiusSpace, GAME_HEIGHT-radiusSpace],
                                      tm: [GAME_WIDTH/2, radiusSpace], lm: [radiusSpace, GAME_HEIGHT/2],
                                      bm: [GAME_WIDTH/2, GAME_HEIGHT-radiusSpace], rm: [GAME_WIDTH-radiusSpace, GAME_HEIGHT/2]}
                         
                         if (locations?.[location]) {
-                            allDangers[0].x = locations[location][0];
-                            allDangers[0].y = locations[location][1];
+                            danger.x = locations[location][0];
+                            danger.y = locations[location][1];
                         }
                     }
-                    if (modifiers?.speed) allDangers[0].baseSpeed = modifiers.speed;
-                    allDangers[0].speed = allDangers[0].baseSpeed;
+                    if (modifiers?.speed) danger.baseSpeed = modifiers.speed;
+                    danger.speed = danger.baseSpeed;
                 } else if (dangerType === "text") {
                     allDangers.push(createText());
-                    if (modifiers?.text) allDangers[0].text = modifiers.text;
-                    if (modifiers?.textAlign) allDangers[0].textAlign = modifiers.textAlign;
-                    if (modifiers?.font) allDangers[0].font = modifiers.font;
+                    danger = allDangers[allDangers.length-1];
+                    if (modifiers?.text) danger.text = modifiers.text;
+                    if (modifiers?.textAlign) danger.textAlign = modifiers.textAlign;
+                    if (modifiers?.font) danger.font = modifiers.font;
                 }
                 if (modifiers?.coords) {
                     if (modifiers.coords[0] === "player") {
-                        if (allDangers[0].type !== "beam") { allDangers[0].x = player.x; allDangers[0].y = player.y; }
-                        else { allDangers[0].x = player.x - allDangers[0].w/2; allDangers[0].y = player.y - allDangers[0].h/2; }
+                        if (danger.type !== "beam") { danger.x = player.x; danger.y = player.y; }
+                        else { danger.x = player.x - danger.w/2; danger.y = player.y - danger.h/2; }
                     }
-                    else { allDangers[0].x = modifiers.coords[0]; allDangers[0].y = modifiers.coords[1]; }
+                    else { danger.x = modifiers.coords[0]; danger.y = modifiers.coords[1]; }
                 }
-                if (modifiers?.spawnRate) allDangers[0].spawnRate = modifiers.spawnRate;
-                if (modifiers?.despawnRate) allDangers[0].despawnRate = modifiers.despawnRate;
-                else if (modifiers?.despawnRate === 0) allDangers[0].despawnRate = 0;
+                if (modifiers?.spawnRate) danger.spawnRate = modifiers.spawnRate;
+                if (modifiers?.despawnRate) danger.despawnRate = modifiers.despawnRate;
+                else if (modifiers?.despawnRate === 0) danger.despawnRate = 0;
 
                 // Beam X and Y's
-                if (allDangers[0].variant === "vertical") { allDangers[0].y = 0; allDangers[0].h = GAME_HEIGHT; }
-                if (allDangers[0].variant === "horizontal") { allDangers[0].x = 0; allDangers[0].w = GAME_WIDTH; }
+                if (danger.variant === "vertical") { danger.y = 0; danger.h = GAME_HEIGHT; }
+                if (danger.variant === "horizontal") { danger.x = 0; danger.w = GAME_WIDTH; }
                 
                 // Collision Points
                 if (player.dodger === "jolt" && !modifiers?.invincible) {
-                    allDangers[0].reset = 1;
-                    if (allDangers[0].type === "circle" || allDangers[0].type === "spike") {
-                        allDangers[0].baseUnit = allDangers[0].r;
-                        Object.defineProperty(allDangers[0], "collisionPoints", {
+                    danger.reset = 1;
+                    if (danger.type === "circle" || danger.type === "spike") {
+                        danger.baseUnit = danger.r;
+                        Object.defineProperty(danger, "collisionPoints", {
                             get() {
                                 let radius;
                                 if (this.variant === "bomb") radius = this.r;
@@ -344,10 +349,10 @@ function spawnAndDrawDanger() {
                             }
                         })
                     }
-                    else if (allDangers[0].type === "beam") {
-                        if (allDangers[0].variant === "vertical") { allDangers[0].baseUnit = allDangers[0].w; allDangers[0].baseX = allDangers[0].x; }
-                        if (allDangers[0].variant === "horizontal") { allDangers[0].baseUnit = allDangers[0].h; allDangers[0].baseY = allDangers[0].y; }
-                        Object.defineProperty(allDangers[0], "collisionPoints", {
+                    else if (danger.type === "beam") {
+                        if (danger.variant === "vertical") { danger.baseUnit = danger.w; danger.baseX = danger.x; }
+                        if (danger.variant === "horizontal") { danger.baseUnit = danger.h; danger.baseY = danger.y; }
+                        Object.defineProperty(danger, "collisionPoints", {
                             get() {
                                 return [[this.x+this.w/2, this.y+this.h/2],
                                     [this.x, this.y+this.h*0/4], [this.x+this.w/4, this.y+this.h*0/4], [this.x+this.w/2, this.y+this.h*0/4], [this.x+this.w*3/4, this.y+this.h*0/4], [this.x+this.w, this.y+this.h*0/4],
@@ -368,17 +373,16 @@ function spawnAndDrawDanger() {
     allDangers.sort((a, b) => a.colorValue - b.colorValue);
     
     // Danger Drawing
-    for (let i = allDangers.length - 1; i >= 0; i--) {
-        let danger = allDangers[i];
-        
+    allDangers.forEach(danger => {
         ctx.fillStyle = danger.color;
         ctx.strokeStyle = danger.color;
+        
         let joltEffectColor = `rgba(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
         let jötunnEffectColor = `rgba(80, ${198+danger.colorValue/10}, ${229+danger.colorValue/10}, ${danger.azcv})`;
         function joltOrJötunnFillStyle() {
             if (player.dodger === "jolt") return joltEffectColor;
             else if (player.dodger === "jötunn") return jötunnEffectColor;
-            else return "rgb(255, 255, 255, 0)";
+            else return "rgba(255, 255, 255, 0)";
         }
         
         // colorValue
@@ -495,7 +499,7 @@ function spawnAndDrawDanger() {
             ctx.font = danger.font;
             ctx.fillText(danger.text, danger.x, danger.y);
         }
-    }
+    })
     // Danger Deleting
     function keepDanger(danger) {
         if (danger.colorValue <= 185 && (danger?.reachedWall || danger?.despawn)) return false;
