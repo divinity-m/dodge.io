@@ -364,6 +364,9 @@ function spawnAndDrawDanger() {
             }
         }
     }
+    // Danger Rearranging
+    allDangers.sort((a, b) => a.colorValue - b.colorValue);
+    
     // Danger Drawing
     for (let i = allDangers.length - 1; i >= 0; i--) {
         let danger = allDangers[i];
@@ -493,8 +496,6 @@ function spawnAndDrawDanger() {
             ctx.fillText(danger.text, danger.x, danger.y);
         }
     }
-    // Danger Rearranging
-    allDangers.sort((a, b) => a.colorValue - b.colorValue);
     // Danger Deleting
     function keepDanger(danger) {
         if (danger.colorValue <= 185 && (danger?.reachedWall || danger?.despawn)) return false;
