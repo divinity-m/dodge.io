@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("normal mode was broken af")
+console.log("jotunn")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
