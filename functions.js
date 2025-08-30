@@ -1159,9 +1159,16 @@ function drawPlayer() {
             ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
         } else if (gameState === "musicMode") {
             azGradient.addColorStop(0, `rgba(255, 255, 255, ${absoluteZero.av})`);
-            azGradient.addColorStop(1, `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, ${absoluteZero.av})`);
+            if (prevStrokeStyle[0] === "#") {
+                azGradient.addColorStop(1, `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, ${absoluteZero.av})`);
+                ctx.strokeStyle = `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, 0.75)`;
+            } else {
+                let prevRGB = prevStrokeStyle.slice(5, 17);
+                azGradient.addColorStop(1, `rgba(${prevRGB}, ${absoluteZero.av})`);
+                ctx.strokeStyle = `rgba(${prevRGB}, 0.75)`;
+                if (music.var.currentTime < 10) console.log(prevRGB)
+            }
             ctx.fillStyle = azGradient;
-            ctx.strokeStyle = `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, 0.75)`;
         }
         drawCircle(player.x, player.y, absoluteZero.slowStart, "fill");
         ctx.lineWidth = 2;
