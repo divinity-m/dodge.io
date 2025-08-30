@@ -397,12 +397,14 @@ function spawnAndDrawDanger() {
         if (danger.type === "beam") {
             ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
             ctx.fillStyle = joltOrJötunnFillStyle();
+            ctx.strokeStyle = joltOrJötunnFillStyle();
             ctx.fillRect(danger.x, danger.y, danger.w, danger.h);
         }
         else if (danger.type === "circle") {
             if (danger.variant === "bomb") {
                 drawCircle(danger.x, danger.y, danger.r);
                 ctx.fillStyle = joltOrJötunnFillStyle();
+                ctx.strokeStyle = joltOrJötunnFillStyle();
                 drawCircle(danger.x, danger.y, danger.r);
             }
             if (danger.variant === "ring") {
@@ -461,6 +463,7 @@ function spawnAndDrawDanger() {
             }
             drawSpike();
             ctx.fillStyle = joltOrJötunnFillStyle();
+            ctx.strokeStyle = joltOrJötunnFillStyle();
             drawSpike();
             danger.rotate += Math.PI/100;
             
