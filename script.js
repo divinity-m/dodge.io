@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("jotunn")
+console.log("jötunn")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
