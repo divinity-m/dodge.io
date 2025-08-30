@@ -1134,12 +1134,7 @@ function hexToRgb(hex) {
 }
 
 function drawPlayer() {
-    ctx.fillStyle = player.color;
-    drawCircle(player.x, player.y, player.r);
-    ctx.lineWidth = 3;
-    let prevStrokeStyle = ctx.strokeStyle; // for az range
-    ctx.strokeStyle = player.subColor;
-    drawCircle(player.x, player.y, player.r, "stroke");
+    let prevStrokeStyle = ctx.strokeStyle;
     // Draws Absolute Zero's range
     if (player.dodger === "jötunn" && settings.aZ_Range) {
         const azGradient = ctx.createRadialGradient(player.x, player.y, absoluteZero.slowEnd, player.x, player.y, absoluteZero.slowStart);
@@ -1173,6 +1168,14 @@ function drawPlayer() {
         ctx.lineWidth = 2;
         drawCircle(player.x, player.y, absoluteZero.slowStart, "stroke");
     }
+
+    // Draws the player
+    ctx.fillStyle = player.color;
+    drawCircle(player.x, player.y, player.r);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = player.subColor;
+    drawCircle(player.x, player.y, player.r, "stroke");
+    
     // Draws player lives
     if (gameState === "musicMode") {
         ctx.textAlign = "center";
