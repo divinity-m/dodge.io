@@ -1166,7 +1166,6 @@ function drawPlayer() {
                 let prevRGB = prevStrokeStyle.slice(5, 17);
                 azGradient.addColorStop(1, `rgba(${prevRGB}, ${absoluteZero.av})`);
                 ctx.strokeStyle = `rgba(${prevRGB}, 0.75)`;
-                if (music.var.currentTime < 10) console.log(prevRGB)
             }
             ctx.fillStyle = azGradient;
         }
