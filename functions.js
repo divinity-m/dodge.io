@@ -1750,10 +1750,9 @@ function abilities() { // player-specific abilities
             } else {
                 if (now - amplify.accelRate > 1000) {
                     amplify.speed += amplify.accel;
-                    amplify.speed = Math.min(amplify.limit - amplify.baseSpeed, amplify.speed);
                     amplify.accelRate = Date.now();
                 }
-                player.baseSpeed = amplify.baseSpeed + amplify.speed;
+                player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
             }
         }
         if (musicVolume <= 0) {
