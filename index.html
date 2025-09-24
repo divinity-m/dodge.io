@@ -22,11 +22,9 @@
                 font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
             }
             #game {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100vw; /* takes up the width and height of the browers visible area so the canvas always streches to fill the screen */
-                height: 100vh;
+                width: 800;
+                height: 650;
+                margin: 5px auto;
                 pointer-events: none;
             }
             .no-cursor html,
@@ -53,6 +51,26 @@
             #jsab:hover {
                 color: #FF77A8;
             }
+            #cursor {
+                position: absolute;
+                pointer-events: none;
+                top: -20px;
+                left: -20px;
+                width: 12px;
+                height: 12px;
+                border-radius: 100%;
+                border-style: solid;
+                border-width: 3px;
+                background-color: rgb(255, 255, 255);
+                border-color: rgb(230, 230, 230);
+            }
+            .trail, .click {
+                position: absolute;
+                pointer-events: none;
+                top: -20px;
+                left: -20px;
+                border-radius: 100%;
+            }
         </style>
     </head>
     <body id="bodyEl">        
@@ -60,6 +78,14 @@
             <!-- Images -->
             <img id="gear-filled" src="DodgeImages/gear-filled.png">
             <img id="gear-unfilled" src="DodgeImages/gear-unfilled.png">
+
+            <!-- Audio -->
+            <audio id="alarm9" src="Audio/Alarm 9 - Blue Cxve.mp3" preload="metadata"></audio>
+            <audio id="a-new-start" src="Audio/A New Start - Thygan Buch.mp3" preload="metadata"></audio>
+            <audio id="interstellar" src="Audio/interstellar - pandora., chillwithme, & cødy.mp3" preload="metadata"></audio>
+            <audio id="astral-projection" src="Audio/Astral Projection - Hallmore.mp3" preload="metadata"></audio>
+            <audio id="divine" src="Audio/Divine - SOTAREKO.mp3" preload="metadata"></audio>
+            <audio id="sharp-pop" src="Audio/sharp-pop.mp3" preload="metadata"></audio>
         </div>
 
         <!-- Title & Description -->
@@ -68,9 +94,11 @@
             Inspired by <a id="evades" href="https://www.evades.io" target="_blank">Evades.io</a> and 
             <a id="jsab" href="https://www.justshapesandbeats.com/" target="_blank">Just Shapes & Beats</a>
         </p>
-        <br>
 
         <!-- Canvas -->
         <canvas id="game"></canvas>
+        <div id="cursor-trail"></div>
+        <div id="cursor"></div>
+        <div id="cursor-clicks"></div>
     </body>
 </html>
