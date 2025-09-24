@@ -1198,26 +1198,26 @@ function drawPlayer() {
         ctx.textAlign = "center";
         ctx.font = "17.5px Impact";
         ctx.fillStyle = player.subColor;
-        ctx.fillText(player.lives, player.x, player.y + 5.5);
+        ctx.fillText(player.lives, player.x, player.y + 5.4);
     }
 
     // Determines player invincibility and draws the shield
     if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250) {
         player.invincible = true;
         
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.75;
         ctx.strokeStyle = player.subColor;
     
         ctx.beginPath();
-        ctx.moveTo(player.x-7.5, player.y+2);
-        ctx.lineTo(player.x-7.5, player.y-7.5);
+        ctx.moveTo(player.x-7.5, player.y+2.5);
+        ctx.lineTo(player.x-7.5, player.y-8);
     
-        ctx.quadraticCurveTo(player.x-3.75, player.y-5.5, player.x, player.y-9);
-        ctx.quadraticCurveTo(player.x+3.75, player.y-5.5, player.x+7.5, player.y-7.5);
+        ctx.quadraticCurveTo(player.x-3.75, player.y-6, player.x, player.y-9.5);
+        ctx.quadraticCurveTo(player.x+3.75, player.y-6, player.x+7.5, player.y-8);
     
-        ctx.lineTo(player.x+7.5, player.y+2);
-        ctx.lineTo(player.x, player.y+9);
-        ctx.lineTo(player.x-7.5, player.y+2);
+        ctx.lineTo(player.x+7.5, player.y+3);
+        ctx.lineTo(player.x, player.y+10);
+        ctx.lineTo(player.x-7.5, player.y+3);
         ctx.stroke();
     }
     else player.invincible = false;
