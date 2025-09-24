@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("invincibility shield")
+console.log("invincibility shield rescaled")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
