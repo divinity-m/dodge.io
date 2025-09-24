@@ -1,22 +1,13 @@
 // DODGE.IO - SCRIPT.JS
-console.log("jötunn")
+console.log("invincibility, dash acceleration")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
 // game units
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 650;
-let offsetX = (cnv.width - GAME_WIDTH) / 2;
-let offsetY = (cnv.height - GAME_HEIGHT) / 2 + 25;
-
-function resizeCursorCanvas() {
-    cnv.width = window.innerWidth;
-    cnv.height = window.innerHeight;
-    offsetX = (cnv.width - GAME_WIDTH) / 2;
-    offsetY = (cnv.height - GAME_HEIGHT) / 2 + 25;
-}
-window.addEventListener("resize", resizeCursorCanvas);
-resizeCursorCanvas();
+cnv.width = GAME_WIDTH;
+cnv.height = GAME_HEIGHT;
 
 let gameState = "loading";
 let innerGameState = "loading";
@@ -44,19 +35,19 @@ document.addEventListener("touchend", () => {mouseDown = false});
 document.addEventListener("touchcancel", () => {mouseDown = false});
 
 document.addEventListener("click", () => {
-    allClicks.push(createClick("left"));
     recordLeftClick();
+    allClicks.push(createClick("left"));
 });
 document.addEventListener("contextmenu", (event) => {
-    allClicks.push(createClick("right"));
     event.preventDefault();
     recordRightClick(event);
+    allClicks.push(createClick("right"));
 });
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
-        allClicks.push(createClick("middle"));
         event.preventDefault();
         recordMiddleClick(event);
+        allClicks.push(createClick("middle"));
     }
 });
 let mouseOver = {
@@ -97,18 +88,18 @@ let allCursors = [];
 let lastCursorTrail = 0;
 let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
-    const rect = cnv.getBoundingClientRect();
     const screenX = event.clientX;
     const screenY = event.clientY;
-    if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
-
+    
     // cursor trails
     cursorX = screenX;
     cursorY = screenY;
 
     // offset mouse
-    mouseX = screenX - offsetX;
-    mouseY = screenY - offsetY;
+    const rect = cnv.getBoundingClientRect();
+    mouseX = screenX - rect.left;
+    mouseY = screenY - rect.top;
+    if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
 
 // Player & Enemies
@@ -116,8 +107,8 @@ let player = {
     x: GAME_WIDTH/2,
     y: GAME_HEIGHT/2,
     r: 15,
-    speed: 2.5,
-    baseSpeed: 2.5,
+    speed: 5,
+    baseSpeed: 5,
     slowed: 1,
     dodger: "evader",
     color: "rgb(255, 255, 255)",
@@ -141,7 +132,7 @@ let dash = {
     usable: true,
     activated: false,
     deccelerating: false,
-    speed: 0.5,
+    accel: 1,
     lastEnded: 0,
 };
 
@@ -172,13 +163,13 @@ let shockwave = {
 };
 
 let amplify = {
-    baseSpeed: 2.5,
+    baseSpeed: 5,
     speed: 0,
     accel: 0,
-    limit: 8,
+    limit: 10.5,
     accelRate: Date.now(),
     reset: function () {
-        player.baseSpeed = 2.5;
+        player.baseSpeed = 5;
         this.speed = 0;
         this.accel = 0;
         this.accelRate = Date.now();
@@ -222,10 +213,7 @@ let difficulty = {
 let musicVolume = 0;
 let sfxVolume = 0;
 
-let alarm9 = document.createElement("audio");
-alarm9.src = "Audio/Alarm 9 - Blue Cxve.mp3";
-alarm9.preload = "metadata";
-
+let alarm9 = document.getElementById("alarm9");
 let music = {
     var: alarm9,
     name: "Alarm 9",
@@ -235,26 +223,11 @@ let music = {
     timestamps: [],
     promise: "alarm9.play()",
 }
-
-let aNewStart = document.createElement("audio");
-aNewStart.src = "Audio/A New Start - Thygan Buch.mp3";
-aNewStart.preload = "metadata";
-
-let interstellar = document.createElement("audio");
-interstellar.src = "Audio/interstellar - pandora., chillwithme, & cødy.mp3";
-interstellar.preload = "metadata";
-
-let astralProjection = document.createElement("audio");
-astralProjection.src = "Audio/Astral Projection - Hallmore.mp3";
-astralProjection.preload = "metadata";
-
-let divine = document.createElement("audio");
-divine.src = "Audio/Divine - SOTAREKO.mp3";
-divine.preload = "metadata";
-
-let sharpPop = document.createElement("audio");
-sharpPop.src = "Audio/sharp-pop.mp3";
-sharpPop.preload = "metadata";
+let aNewStart = document.getElementById("a-new-start");
+let interstellar = document.getElementById("interstellar");
+let astralProjection = document.getElementById("astral-projection");
+let divine = document.getElementById("divine");
+let sharpPop = document.getElementById("sharp-pop");
 
 // User Data
 let lastSave = 0; // tracks how often data is saved (during gameplay)
@@ -291,7 +264,7 @@ if (localData) {
             if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
         })
                 
-        userData = {player: {x: GAME_WIDTH/2, y: GAME_HEIGHT/2, r: 15, speed: 2.5, baseSpeed: 2.5, slowed: 1, dodger: p.dodger,
+        userData = {player: {x: GAME_WIDTH/2, y: GAME_HEIGHT/2, r: 15, speed: 5, baseSpeed: 5, slowed: 1, dodger: p.dodger,
                                 color: p.color, subColor: p.subColor, facingAngle: 0, invincible: p.invincible},
                     highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
                                 limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
@@ -328,21 +301,13 @@ window.addEventListener('beforeunload', () => {
 
 // Drawing the game
 function draw() {
-    now = Date.now()
-    // resets the canvas
+    now = Date.now();
+    detectHover();
+    
     ctx.clearRect(0, 0, cnv.width, cnv.height);
     
-    // pointer-events toggle based on cursor locaction
-    if (cursorX < 0 || cursorX > cnv.width || cursorY < offsetY-10 || cursorY > cnv.height) cnv.style.pointerEvents = "none";
-    else cnv.style.pointerEvents = "auto";
-    
-    
-    ctx.save();
-    ctx.translate(offsetX, offsetY); // translate to the offset
-  
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    detectHover(); // checks if the mouse is hovering over a button
 
     // Loading Screen
     if (now - loadingGame <= 5000 && !endLoading) { // Takes 5 seconds to load the game safely
@@ -434,33 +399,35 @@ function draw() {
         abilities();
         musicCollisions();
     }
-  
-    ctx.restore(); // reverse the offset
-    if (gameState === "musicMode") { // clear screen to not show dangers clipping out of the boundaries
-        ctx.fillStyle = "rgb(255, 255, 255)";
-        ctx.fillRect(0, 0, offsetX, cnv.height); // left
-        ctx.fillRect(0, 0, cnv.width, offsetY); // top
-        ctx.fillRect(0, offsetY+GAME_HEIGHT, cnv.width, offsetY-25); // bottom 
-        ctx.fillRect(cnv.width-offsetX, 0, offsetX, cnv.height); // right
-    }
-  
+
     // CURSOR STUFF
-    function drawCursorCircle(x, y, r, type) {
-        ctx.beginPath();
-        ctx.arc(x, y, r, Math.PI * 2, 0);
-        if (type === "fill") ctx.fill();
-        if (type === "stroke") ctx.stroke();
-    }
+    let cursorEl = document.getElementById("cursor");
   
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
 
+    allCursors.forEach(c => { if (c.av <= 0 || trailDensity <= 0) c.div.remove(); })
+    allClicks.forEach(c => {
+        if (c.av <= 0) {
+            c.div.remove();
+            if (c?.divMid) c?.divMid.remove();
+        }
+    })
+    
     allCursors = allCursors.filter(c => c.av > 0 && trailDensity > 0); // removes trails with low av's
     allClicks = allClicks.filter(c => c.av > 0); // removes clicks with low av's
   
     // Makes default cursor invisible
-    if (settings.customCursor) document.documentElement.classList.add("no-cursor");
-    else { document.documentElement.classList.remove("no-cursor"); allCursors = []; }
+    if (settings.customCursor) {
+        document.documentElement.classList.add("no-cursor");
+        cursorEl.style.display = "block";
+    }
+    else {
+        document.documentElement.classList.remove("no-cursor");
+        allCursors = [];
+        cursorEl.style.display = "none";
+    }
+    
   
     // Cursor & Cursor Trail
     if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
@@ -468,14 +435,20 @@ function draw() {
             const pNow = performance.now();
             if (pNow - lastCursorTrail > 16) { // ~60fps cap
                 allCursors.push(createCursor());
-                if (allCursors.length > 40) allCursors.shift(); // drop oldest
+                if (allCursors.length > 40) { // drop oldest
+                    allCursors[0].div.remove();
+                    allCursors.shift();
+                }
                 lastCursorTrail = pNow;
             }
         }
       
         allCursors.forEach(cursor => {
-            ctx.fillStyle = cursor.color;
-            drawCursorCircle(cursor.x, cursor.y, cursor.r, "fill");
+            cursor.div.style.backgroundColor = cursor.color;
+            cursor.div.style.top = `${cursor.y-cursor.r}px`;
+            cursor.div.style.left = `${cursor.x-cursor.r}px`;
+            cursor.div.style.width = `${cursor.r*2}px`;
+            cursor.div.style.height = `${cursor.r*2}px`;
             
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
@@ -491,33 +464,45 @@ function draw() {
         for (let i = 0; i < hyperlinks.length; i++) {
           if (hyperlinks[i].matches(":hover")) hovering = true;
         }
+        
         // hoving inverts cursor colors, clicking reduces alpha value
         if (hovering) {
-            if (mouseDown) ctx.fillStyle = `rgba(${playerSubColor}, 0.75)`;
-            else ctx.fillStyle = player.subColor;
-            ctx.strokeStyle = player.color;
+            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerSubColor}, 0.75)`;
+            else cursorEl.style.backgroundColor = player.subColor;
+            cursorEl.style.borderColor = player.color;
         } else {
-            if (mouseDown) ctx.fillStyle = `rgba(${playerColor}, 0.75)`;
-            else ctx.fillStyle = player.color;
-            ctx.strokeStyle = player.subColor;
+            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerColor}, 0.75)`;
+            else cursorEl.style.backgroundColor = player.color;
+            cursorEl.style.borderColor = player.subColor;
         }
-        ctx.lineWidth = 3;
-        if (lastPressing === "mouse") {
-          drawCursorCircle(cursorX, cursorY, 7.5, "fill");
-          drawCursorCircle(cursorX, cursorY, 7.5, "stroke");
-        }
+        
+        // update cursor position
+        cursorEl.style.top = `${cursorY-8.5}px`;
+        cursorEl.style.left = `${cursorX-8.5}px`;
     }
-  
+      
     // Click Animation
     allClicks.forEach(click => {
-        if (click.button === "left" || click.button === "middle") ctx.strokeStyle = click.colorLeft;
-        if (click.button === "right") ctx.strokeStyle = click.colorRight;
-      
-        ctx.lineWidth = 2.5;
-        drawCursorCircle(click.x, click.y, click.r, "stroke");
+        click.div.style.top = `${click.y-click.r*1.05}px`;
+        click.div.style.left = `${click.x-click.r*1.05}px`;
+        click.div.style.width = `${click.r*2}px`;
+        click.div.style.height = `${click.r*2}px`;
+        click.div.style.border = "2px solid";
+        
+        click.div.style.backgroundColor = "rgba(0, 0, 0, 0)";
+        if (click.button === "left" || click.button === "middle") click.div.style.borderColor = click.colorLeft;
+        if (click.button === "right") click.div.style.borderColor = click.colorRight;
+        
         if (click.button === "middle") {
-            ctx.strokeStyle = click.colorRight;
-            if (click.r-2.5 > 0) drawCursorCircle(click.x, click.y, click.r-2.5, "stroke");
+            click.divMid.style.backgroundColor = "rgba(0, 0, 0, 0)";
+            let newR = click.r-3;
+            if (newR > 0) {
+                click.divMid.style.top = `${click.y-newR*1.05}px`;
+                click.divMid.style.left = `${click.x-newR*1.05}px`;
+                click.divMid.style.width = `${newR*2}px`;
+                click.divMid.style.height = `${newR*2}px`;
+                click.divMid.style.border = `2px solid ${click.colorRight}`;
+            }
         }
 
         click.r += click.addR;
