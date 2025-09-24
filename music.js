@@ -223,7 +223,7 @@ function createText() {
         spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
         colorValue: 185,
         get color() {
-            return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue} 0.95)`;
+            return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
         },
     }
     return text;
@@ -386,6 +386,7 @@ function spawnAndDrawDanger() {
         
         let joltEffectColor = `rgba(${danger.colorValue}, ${danger.colorValue}, 0, ${danger.swcv})`;
         let jötunnEffectColor = `rgba(80, ${198+danger.colorValue/10}, ${229+danger.colorValue/10}, ${danger.azcv})`;
+        
         function joltOrJötunnFillStyle() {
             if (player.dodger === "jolt") return joltEffectColor;
             else if (player.dodger === "jötunn") return jötunnEffectColor;
