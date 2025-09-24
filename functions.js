@@ -1201,7 +1201,7 @@ function drawPlayer() {
         ctx.fillText(player.lives, player.x, player.y + 5.5);
     }
 
-    // Determines player invincibility and draws the sheild
+    // Determines player invincibility and draws the shield
     if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250) {
         player.invincible = true;
         
