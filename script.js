@@ -1,5 +1,5 @@
 // DODGE.IO - SCRIPT.JS
-console.log("invincibility sheild")
+console.log("invincibility shield")
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
