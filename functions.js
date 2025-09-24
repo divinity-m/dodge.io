@@ -528,7 +528,7 @@ function recordLeftClick() {
     
     // Hero Choice
     else if (innerGameState === "selectDodger") {
-        if (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo) {
+        if (!dash.activated && (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo)) {
             if (mouseOver.evader) {
                 player.dodger = "evader";
                 player.color = "rgb(255, 255, 255)";
@@ -1086,7 +1086,7 @@ function drawDodgerSelection() {
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
                     "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
-                    "Top Speed: 12.5 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
+                    "Top Speed: 17.5 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
                     "Dash Cooldown: 2s");
 }
 
@@ -1196,23 +1196,28 @@ function drawPlayer() {
     // Draws player lives
     if (gameState === "musicMode") {
         ctx.textAlign = "center";
-        ctx.font = "20px Impact";
+        ctx.font = "17.5px Impact";
         ctx.fillStyle = player.subColor;
-        ctx.fillText(player.lives, player.x, player.y + 6.5);
+        ctx.fillText(player.lives, player.x, player.y + 5.5);
     }
 
     // Determines player invincibility and draws the sheild
     if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250) {
         player.invincible = true;
         
+        ctx.lineWidth = 2;
         ctx.strokeStyle = player.subColor;
+    
         ctx.beginPath();
-        ctx.moveTo(player.x-5, player.y-5);
-        ctx.lineTo(player.x+5, player.y-5);
-        ctx.lineTo(player.x+5, player.y);
-        ctx.lineTo(player.x, player.y+5);
-        ctx.lineTo(player.x-5, player.y);
-        ctx.lineTo(player.x-5, player.y-5);
+        ctx.moveTo(player.x-7.5, player.y+2);
+        ctx.lineTo(player.x-7.5, player.y-7.5);
+    
+        ctx.quadraticCurveTo(player.x-3.75, player.y-5.5, player.x, player.y-9);
+        ctx.quadraticCurveTo(player.x+3.75, player.y-5.5, player.x+7.5, player.y-7.5);
+    
+        ctx.lineTo(player.x+7.5, player.y+2);
+        ctx.lineTo(player.x, player.y+9);
+        ctx.lineTo(player.x-7.5, player.y+2);
         ctx.stroke();
     }
     else player.invincible = false;
@@ -1634,26 +1639,22 @@ function collisions() { // Keeps track of when the player touches any enemy in t
 function abilities() { // player-specific abilities
     // Dash gives the player a powerful but short-lived burst of speed
     if (dash.activated) {
-        player.color = "rgb(255, 72, 72)";
+        player.color = "rgb(255, 100, 100)";
+        player.subColor = "rgb(230, 100, 100)";
         player.speed += dash.accel;
-        if (player.speed > 12.5) {
+        if (player.speed > 17.5) {
             dash.deccelerating = true;
             dash.accel *= -1;
             player.speed += dash.accel;
         }
         if (player.speed <= player.baseSpeed && dash.deccelerating) {
             player.speed = player.baseSpeed;
+            player.color = "rgb(255, 0, 0)";
+            player.subColor = "rgb(230, 0, 0)";
             dash.activated = false;
             dash.deccelerating = false;
             dash.accel *= -1;
             dash.lastEnded = Date.now();
-
-            // if the player swaps heroes mid dash
-            if (player.dodger === "evader") player.color = "white";
-            if (player.dodger === "j-sab") player.color = "red";
-            if (player.dodger === "jötunn") player.color ="rgb(79, 203, 255)";
-            if (player.dodger === "jolt") player.color = "yellow";
-            if (player.dodger === "crescendo") player.color = "black";
         }
     }
     // Absolute Zero's effect changes enemy speed based on distance
