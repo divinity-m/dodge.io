@@ -74,12 +74,14 @@ function recordRightClick(event) {
         
         else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             shockwave.activated = true;
-            shockwave.used = shockwave.active;
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
             shockwave.y = player.y;
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
+            shockwave.used = shockwave.active;
+            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; }
+            else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
         }
     }
 }
@@ -616,10 +618,16 @@ function createCursor() {
         subR: 7.5/Math.max(1, 30*trailDensity),
         subAv: 1/Math.max(1, 30*trailDensity),
     }
-    let playerColor = player.color.slice(4, player.color.length-1);
-    cursor.color = `rgba(${playerColor}, ${cursor.av})`;
     cursor.x = cursorX;
     cursor.y = cursorY;
+    
+    let playerColor = player.color.slice(4, player.color.length-1);
+    cursor.color = `rgba(${playerColor}, ${cursor.av})`;
+    
+    cursor.div = document.createElement("div");
+    cursor.div.classList.add("trail");
+    document.getElementById("cursor-trail").appendChild(cursor.div);
+                
     return cursor;
 }
 
@@ -638,6 +646,15 @@ function createClick(button) {
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
     click.colorLeft = `rgba(${playerColor}, ${click.av})`;
     click.colorRight = `rgba(${playerSubColor}, ${click.av})`;
+
+    click.div = document.createElement("div");
+    click.div.classList.add("click");
+    document.getElementById("cursor-clicks").appendChild(click.div);
+    if (click.button === "middle") {
+        click.divMid = document.createElement("div");
+        click.divMid.classList.add("click");
+        document.getElementById("cursor-clicks").appendChild(click.divMid);
+    }
     
     return click;
 }
@@ -1046,7 +1063,7 @@ function drawDodgerSelection() {
     drawAbilityDesc(mouseOver.evader, true, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.9)", "rgba(200, 200, 200, 0.7)", "SKILL",
                     "Evaders have no unique abilities or traits; they rely solely on familiarity with their",
                     "adversaries to weave past offensive attacks.",
-                    "Base Speed: 2.5");
+                    "Base Speed: 5");
     drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.9)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
                     "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
                     "unfortunate soul stricken by the electrically infused pluse.",
@@ -1064,12 +1081,12 @@ function drawDodgerSelection() {
                     "Whenever a melody is audible, these dodgers, as if adapting to the rhythm, accelerate",
                     "with the music, continually modifying their cores until they outpace the waves",
                     "themselves.",
-                    "Top Speed: 8");
+                    "Top Speed: 10.5");
     drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.6)", "rgba(210, 0, 0, 0.9)", "rgba(200, 0, 0, 0.7)", "DASH",
                     "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
                     "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
-                    "Top Speed: 10 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
+                    "Top Speed: 12.5 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
                     "Dash Cooldown: 2s");
 }
 
@@ -1183,6 +1200,22 @@ function drawPlayer() {
         ctx.fillStyle = player.subColor;
         ctx.fillText(player.lives, player.x, player.y + 6.5);
     }
+
+    // Determines player invincibility and draws the sheild
+    if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250) {
+        player.invincible = true;
+        
+        ctx.strokeStyle = player.subColor;
+        ctx.beginPath();
+        ctx.moveTo(player.x-5, player.y-5);
+        ctx.lineTo(player.x+5, player.y-5);
+        ctx.lineTo(player.x+5, player.y);
+        ctx.lineTo(player.x, player.y+5);
+        ctx.lineTo(player.x-5, player.y);
+        ctx.lineTo(player.x-5, player.y-5);
+        ctx.stroke();
+    }
+    else player.invincible = false;
 }
 
 function drawEnemies() {
@@ -1371,11 +1404,11 @@ function createEnemy() { // Creates an individual enemy with unique attributes
     // Initializes the enemy's ability and other important values based on their ability
     enemyAbilitiesAndStats(enemy);
     
-    if (difficulty.level === "easy") enemy.speed = Math.random() + 1; // between 1 and 2
-    if (difficulty.level === "medium") enemy.speed = Math.random() + 1.25; // between 1.25 and 2.25
+    if (difficulty.level === "easy") enemy.speed = (Math.random() * 2) + 2; // between 2 and 4
+    if (difficulty.level === "medium") enemy.speed = (Math.random() * 2) + 2.5; // between 2.5 and 4.5
     if (difficulty.level === "hard") {
-        if (enemy.ability === "homing") enemy.speed = (Math.random() * 0.7) + 1.5; // between 1.5 and 2.2
-        else enemy.speed = Math.random() + 1.5; // between 1.5 and 2.5 (as fast as the player)
+        if (enemy.ability === "homing") enemy.speed = (Math.random() * 1.55) + 2.75; // between 2.75 and 4.3 (homings should be slower than the player)
+        else enemy.speed = (Math.random() * 2) + 3; // between 3 and 5 (as fast as the player)
     }
     enemy.baseSpeed = enemy.speed;
 
@@ -1581,8 +1614,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
     let underAura = 0;
     allEnemies.forEach(enemy => {
         const enemyDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-        // Gives the player some time to get out of an enemy they dashed onto (0.25s)
-        if (!dash.activated && now - dash.lastEnded > 250 && !player.invincible) {
+        if (!player.invincible) {
             if (enemyDist < player.r + enemy.r) {
                 pauseAudio(music.promise, music.var);
                 gameState = "endlessOver";
@@ -1603,17 +1635,17 @@ function abilities() { // player-specific abilities
     // Dash gives the player a powerful but short-lived burst of speed
     if (dash.activated) {
         player.color = "rgb(255, 72, 72)";
-        player.speed += dash.speed;
-        if (player.speed > 10) {
+        player.speed += dash.accel;
+        if (player.speed > 12.5) {
             dash.deccelerating = true;
-            dash.speed *= -1;
-            player.speed += dash.speed;
+            dash.accel *= -1;
+            player.speed += dash.accel;
         }
         if (player.speed <= player.baseSpeed && dash.deccelerating) {
             player.speed = player.baseSpeed;
             dash.activated = false;
             dash.deccelerating = false;
-            dash.speed *= -1;
+            dash.accel *= -1;
             dash.lastEnded = Date.now();
 
             // if the player swaps heroes mid dash
@@ -1713,7 +1745,7 @@ function abilities() { // player-specific abilities
         if (musicVolume > 0 && gameState !== "endlessOver") { // only accelerate if the music is audible and we're not in the game over screen
             if (gameState === "musicMode") { // reach your peak speed 78.57%~ into a song
                 amplify.speed = music.var.currentTime/music.var.duration * 7;
-                player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
+                player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed); // limit is 10.5
             } else {
                 if (now - amplify.accelRate > 1000) {
                     amplify.speed += amplify.accel;
