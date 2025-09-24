@@ -295,6 +295,8 @@ function spawnAndDrawDanger() {
                     if (modifiers?.textAlign) danger.textAlign = modifiers.textAlign;
                     if (modifiers?.font) danger.font = modifiers.font;
                 }
+
+                // modified spawn location
                 if (modifiers?.coords) {
                     if (modifiers.coords[0] === "player") {
                         if (danger.type !== "beam") { danger.x = player.x; danger.y = player.y; }
@@ -302,9 +304,14 @@ function spawnAndDrawDanger() {
                     }
                     else { danger.x = modifiers.coords[0]; danger.y = modifiers.coords[1]; }
                 }
+
+                // modified spawn rate
                 if (modifiers?.spawnRate) danger.spawnRate = modifiers.spawnRate;
                 if (modifiers?.despawnRate) danger.despawnRate = modifiers.despawnRate;
                 else if (modifiers?.despawnRate === 0) danger.despawnRate = 0;
+                danger.spawnRate *= 2;
+                danger.baseSpawnRate *= 2;
+                danger.despawnRate *= 2;
 
                 // Beam X and Y's
                 if (danger.variant === "vertical") { danger.y = 0; danger.h = GAME_HEIGHT; }
@@ -513,8 +520,7 @@ function spawnAndDrawDanger() {
 
 function musicCollisions() {
     allDangers.forEach(danger => {
-        if (timeLeft > 0 && innerGameState !== "musicModeFail" && danger.colorValue >= 254 &&
-            now-player.hit >= 1500 && !dash.activated && now-dash.lastEnded > 250 && !player.invincible) {
+        if (timeLeft > 0 && innerGameState !== "musicModeFail" && danger.colorValue >= 254 && !player.invincible) {
             let distance = Math.hypot(player.x-danger.x, player.y-danger.y);
             if (danger.type === "beam") {
                 if ((danger.variant === "vertical" && player.x+player.r >= danger.x && player.x-player.r <= danger.x+danger.w) ||
@@ -545,6 +551,11 @@ function musicCollisions() {
             }
         }
 
+        if (player.lives === 0 && innerGameState !== "musicModeFail" && innerGameState !== "mainMenu") {
+            pauseAudio(music.promise, music.var);
+            innerGameState = "musicModeFail";
+        }
+        
         if (player.dodger === "jötunn" && danger.type !== "text") {
             let distance = Math.hypot(player.x-danger.x, player.y-danger.y) - player.r;
             
@@ -634,8 +645,4 @@ function musicCollisions() {
             }
         }
     })
-    if (player.lives === 0 && innerGameState !== "musicModeFail" && innerGameState !== "mainMenu") {
-        pauseAudio(music.promise, music.var);
-        innerGameState = "musicModeFail";
-    }
 }
