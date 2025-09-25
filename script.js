@@ -466,11 +466,11 @@ function draw() {
         
         // hoving inverts cursor colors, clicking reduces alpha value
         if (hovering) {
-            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerSubColor}, 0.75)`;
+            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerSubColor}, 0)`;
             else cursorEl.style.backgroundColor = player.subColor;
             cursorEl.style.borderColor = player.color;
         } else {
-            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerColor}, 0.75)`;
+            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerColor}, 0)`;
             else cursorEl.style.backgroundColor = player.color;
             cursorEl.style.borderColor = player.subColor;
         }
