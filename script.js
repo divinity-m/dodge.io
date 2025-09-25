@@ -434,7 +434,7 @@ function draw() {
             const pNow = performance.now();
             if (pNow - lastCursorTrail > 16) { // ~60fps cap
                 allCursors.push(createCursor());
-                if (allCursors.length > 40) { // drop oldest
+                if (allCursors.length > 100) { // drop oldest
                     allCursors[0].div.remove();
                     allCursors.shift();
                 }
