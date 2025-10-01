@@ -64,6 +64,16 @@
                 background-color: rgb(255, 255, 255);
                 border-color: rgb(230, 230, 230);
             }
+            #cursor-overlay {
+                position: absolute;
+                pointer-events: none;
+                top: -20px;
+                left: -20px;
+                width: 12px;
+                height: 12px;
+                border-radius: 100%;
+                background-color: rgba(255, 255, 255, 0.3);
+            }
             .trail, .click {
                 position: absolute;
                 pointer-events: none;
@@ -99,6 +109,7 @@
         <canvas id="game"></canvas>
         <div id="cursor-trail"></div>
         <div id="cursor"></div>
+        <div id="cursor-overlay"></div>
         <div id="cursor-clicks"></div>
     </body>
 </html>
