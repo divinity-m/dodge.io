@@ -401,6 +401,7 @@ function draw() {
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
+    let overlayEl = document.getElementById("cursor-overlay");
   
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
@@ -420,11 +421,13 @@ function draw() {
     if (settings.customCursor) {
         document.documentElement.classList.add("no-cursor");
         cursorEl.style.display = "block";
+        overlayEl.style.display = "block";
     }
     else {
         document.documentElement.classList.remove("no-cursor");
         allCursors = [];
         cursorEl.style.display = "none";
+        overlayEl.style.display = "none";
     }
     
   
@@ -466,18 +469,22 @@ function draw() {
         
         // hoving inverts cursor colors, clicking reduces alpha value
         if (hovering) {
-            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerSubColor}, 0)`;
-            else cursorEl.style.backgroundColor = player.subColor;
+            cursorEl.style.backgroundColor = player.subColor;
             cursorEl.style.borderColor = player.color;
         } else {
-            if (mouseDown) cursorEl.style.backgroundColor = `rgba(${playerColor}, 0)`;
-            else cursorEl.style.backgroundColor = player.color;
+            cursorEl.style.backgroundColor = player.color;
             cursorEl.style.borderColor = player.subColor;
         }
+
+        // clicking brightens the cursor with an overlay
+        if (mouseDown) overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+        else overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0)";
         
         // update cursor position
         cursorEl.style.top = `${cursorY-8.5}px`;
         cursorEl.style.left = `${cursorX-8.5}px`;
+        overlayEl.style.top = `${cursorY-8.5}px`;
+        overlayEl.style.left = `${cursorX-8.5}px`;
     }
       
     // Click Animation
