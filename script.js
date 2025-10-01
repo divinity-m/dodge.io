@@ -482,8 +482,12 @@ function draw() {
             bg = "rgba(255, 255, 255, 0.5)";
             if (player.dodger === "jötunn") bg = "rgba(255, 255, 255, 0.3)";
             if (player.dodger === "crescendo") bg = "rgba(255, 255, 255, 0.3)";
+            overlayEl.style.borderColor = bg;
         }
-        else overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0)";
+        else {
+            overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0)";
+            overlayEl.style.borderColor = "rgba(255, 255, 255, 0)";
+        }
         
         // update cursor position
         cursorEl.style.top = `${cursorY-8.5}px`;
