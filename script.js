@@ -477,7 +477,12 @@ function draw() {
         }
 
         // clicking brightens the cursor with an overlay
-        if (mouseDown) overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+        if (mouseDown) {
+            let bg = overlayEl.style.backgroundColor;
+            bg = "rgba(255, 255, 255, 0.5)";
+            if (player.dodger === "jötunn") bg = "rgba(255, 255, 255, 0.3)";
+            if (player.dodger === "crescendo") bg = "rgba(255, 255, 255, 0.3)";
+        }
         else overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0)";
         
         // update cursor position
