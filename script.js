@@ -11,6 +11,15 @@ cnv.height = GAME_HEIGHT;
 let gameState = "loading";
 let innerGameState = "loading";
 
+let BgTopX = -200;
+let BgBottomX = GAME_WIDTH+200;
+let BgTime = Date.now();
+function resetBgVars() {
+    BgTopX = -200;
+    BgBottomX = GAME_WIDTH+200;
+    BgTime = Date.now();
+}
+
 // Keyboard
 let lastPressing = "mouse";
 document.addEventListener("keydown", recordKeyDown)
@@ -348,6 +357,7 @@ function draw() {
         music.promise = music.var.play();
         gameState = "startScreen";
         innerGameState = "mainMenu";
+        resetBgVars();
     }
 
     // Actual Game
