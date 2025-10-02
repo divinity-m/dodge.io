@@ -118,12 +118,13 @@ function recordLeftClick() {
     }
     
     // Start screen buttons
-    if (innerGameState === "mainMenu") {
+    if (innerGameState === "mainMenu" && (mouseOver.play || mouseOver.settings || mouseOver.selector)) {
         if (mouseOver.play) innerGameState = "selectDifficulty";
         else if (mouseOver.settings) innerGameState = "settings";
         else if (mouseOver.selector) innerGameState = "selectDodger";
 
-        if (mouseOver.play || mouseOver.settings || mouseOver.selector) mouseMovementOn = previousMM;
+        resetBgVars();
+        mouseMovementOn = previousMM;
     }
     // Buttons that redirect back to the start screen
     else if (gameState === "endlessOver" && mouseOver.restart ||
@@ -148,6 +149,7 @@ function recordLeftClick() {
             music.var.currentTime = 0;
             music.promise = music.var.play();
         }
+        resetBgVars();
         gameState = "startScreen";
         innerGameState = "mainMenu";
         mouseMovementOn = previousMM;
@@ -661,6 +663,33 @@ function createClick(button) {
 
 function drawStartScreen() {
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
+        // Main Menu Background
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgb(170, 170, 170)";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(GAME_WIDTH, GAME_HEIGHT);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgb(170, 170, 170)";
+        ctx.font = '150px Arial';
+        ctx.textAlign = 'center';
+
+        let hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
+        ctx.save();
+        ctx.rotate(Math.atan(GAME_HEIGHT/GAME_WIDTH));
+        ctx.fillText("MAIN", BgTopX, 0);
+        ctx.restore();
+        
+        ctx.save();
+        ctx.rotate(Math.atan(GAME_HEIGHT/GAME_WIDTH));
+        ctx.fillText("MENU", BgBottomX, 103);
+        ctx.restore();
+
+        if (BgTopX <= hyp*4/10) BgTopX += 10 * Math.max(0.5, (2 - (now - BgTime)/1000));
+        
+        if (BgBottomX >= hyp*6/10 && now - BgTime > 2000) BgBottomX -= 10 * Math.max(0.5, (4 - (now - BgTime)/1000));
+        
         // Me
         ctx.strokeStyle = player.color;
         ctx.lineWidth = 1.5;
