@@ -13,11 +13,9 @@ let innerGameState = "loading";
 
 let BgTopX;
 let BgBottomX;
-let BgTime;
 function resetBgVars() {
     BgTopX = -500;
     BgBottomX = GAME_WIDTH+500;
-    BgTime = Date.now();
 }
 
 // Keyboard
