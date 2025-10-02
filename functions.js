@@ -688,7 +688,7 @@ function drawStartScreen() {
 
         if (BgTopX <= hyp*4/10) BgTopX += 10 * Math.max(0.5, (2 - (now - BgTime)/1000));
         
-        if (BgBottomX >= hyp*6/10 && now - BgTime > 2000) BgBottomX -= 10 * Math.max(0.5, (4 - (now - BgTime)/1000));
+        if (BgBottomX >= hyp*6/10 && now - BgTime > 1000) BgBottomX -= 10 * Math.max(0.5, (3 - (now - BgTime)/1000));
         
         // Me
         ctx.strokeStyle = player.color;
