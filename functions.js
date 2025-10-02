@@ -663,7 +663,7 @@ function createClick(button) {
 
 function drawStartScreen() {
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
-        // Main Menu Background
+        // Main Menu Background Animation
         ctx.lineWidth = 2;
         ctx.strokeStyle = "rgb(170, 170, 170)";
         ctx.beginPath();
