@@ -11,12 +11,12 @@ cnv.height = GAME_HEIGHT;
 let gameState = "loading";
 let innerGameState = "loading";
 
-let BgTopX = -200;
-let BgBottomX = GAME_WIDTH+200;
-let BgTime = Date.now();
+let BgTopX;
+let BgBottomX;
+let BgTime;
 function resetBgVars() {
-    BgTopX = -200;
-    BgBottomX = GAME_WIDTH+200;
+    BgTopX = -500;
+    BgBottomX = GAME_WIDTH+500;
     BgTime = Date.now();
 }
 
