@@ -17,7 +17,7 @@ function resetBgVars() {
     if (innerGameState === "mainMenu") {
         [bgTopText, bgBottomText] = ["MAIN", "MENU"];
         [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
-        [bgTopMax, bgBottomMax] = [hyp*7/10, hyp*3/10];
+        [bgTopMax, bgBottomMax] = [hyp*3/10, hyp*7/10];
     }
     if (innerGameState === "selectDifficulty") {
         [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
