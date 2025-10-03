@@ -30,9 +30,9 @@ function resetBgVars() {
         [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
     }
     if (innerGameState === "settings") {
-        [bgTopText, bgBottomText] = ["SETTINGS", ""];
-        [bgTopX, bgBottomX] = [-1000, 2];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, 1];
+        [bgTopText, bgBottomText] = ["GAME", "SETTINGS"];
+        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+1000];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
     }
 }
 
