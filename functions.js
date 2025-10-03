@@ -688,8 +688,8 @@ function drawStartScreen() {
     ctx.restore();
 
     // Subtracs the current X from the destination, then divides that number by the destination and multiplies it by 100
-    let dBgTopX = 75 * Math.max(0.01, (bgTopMax - bgTopX) / bgTopMax);
-    let dBgBottomX = 75 * Math.min(-0.01, (bgBottomMax - bgBottomX) / bgBottomMax);
+    let dBgTopX = 75 * Math.max(0.001, (bgTopMax - bgTopX) / bgTopMax);
+    let dBgBottomX = 75 * Math.min(-0.001, (bgBottomMax - bgBottomX) / bgBottomMax);
     
     if (bgTopX <= bgTopMax) bgTopX += dBgTopX;
     if (bgBottomX >= bgBottomMax && bgTopX >= bgTopMax - 25) bgBottomX += dBgBottomX;
