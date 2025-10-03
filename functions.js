@@ -689,7 +689,7 @@ function drawStartScreen() {
 
     // Subtracs the current X from the destination, then divides that number by the destination and multiplies it by 100
     let dBgTopX = 100 * Math.max(0.01, (bgTopMax - bgTopX) / bgTopMax);
-    let dBgBottomX = 100 * Math.mix(-0.01, (bgBottomMax - bgBottomX) / bgBottomMax);
+    let dBgBottomX = 100 * Math.min(-0.01, (bgBottomMax - bgBottomX) / bgBottomMax);
     
     if (bgTopX <= hyp*4/10) bgTopX += dBgTopX;
     if (bgBottomX >= hyp*6/10 && bgTopX <= hyp*4/10 - 25) bgBottomX += dBgBottomX;
