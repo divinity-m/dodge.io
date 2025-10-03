@@ -3,37 +3,47 @@ const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
 // game units
-const GAME_WIDTH = 800;
-const GAME_HEIGHT = 650;
+const GAME_WIDTH = 800, GAME_HEIGHT = 650;
 cnv.width = GAME_WIDTH;
 cnv.height = GAME_HEIGHT;
 
 let gameState = "loading";
 let innerGameState = "loading";
 
-let BgTopX;
-let BgBottomX;
+let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
 function resetBgVars() {
-    BgTopX = -500;
-    BgBottomX = GAME_WIDTH+500;
+    const hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
+    
+    if (innerGameState === "mainMenu") {
+        [bgTopText, bgBottomText] = ["MAIN", "MENU"];
+        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
+        [bgTopMax, bgBottomMax] = [hyp*4/10, hyp*6/10];
+    }
+    if (innerGameState === "selectDifficulty") {
+        [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
+        [bgTopX, bgBottomX] = [-625, GAME_WIDTH+1125];
+        [bgTopMax, bgBottomMax] = [hyp*3.75/10, hyp*4.5/10];
+    }
+    if (innerGameState === "selectDodger") {
+        [bgTopText, bgBottomText] = ["DODGER", "SELECTION"];
+        [bgTopX, bgBottomX] = [-750, GAME_WIDTH+1125];
+        [bgTopMax, bgBottomMax] = [hyp*3.5/10, hyp*4.5/10];
+    }
+    if (innerGameState === "settings") {
+        [bgTopText, bgBottomText] = ["SETTINGS", ""];
+        [bgTopX, bgBottomX] = [-1000, 2];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, 1];
+    }
 }
 
 // Keyboard
 let lastPressing = "mouse";
-document.addEventListener("keydown", recordKeyDown)
-document.addEventListener("keyup", recordKeyUp)
-let keyboardMovementOn = false;
-let wPressed = false;
-let aPressed = false;
-let sPressed = false;
-let dPressed = false;
-let shiftPressed = 1;
+let keyboardMovementOn = false, wPressed = false, aPressed = false, sPressed = false, dPressed = false, shiftPressed = 1;
+document.addEventListener("keydown", recordKeyDown);
+document.addEventListener("keyup", recordKeyUp);
 
 // Mouse
-let mouseDown = false;
-let allClicks = [];
-let mouseMovementOn = false;
-let previousMM = false;
+let mouseDown = false, mouseMovementOn = false, previousMM = false, allClicks = [];
 document.addEventListener("mousedown", () => {mouseDown = true});
 document.addEventListener("mouseup", () => {mouseDown = false});
 document.addEventListener("touchstart", () => {mouseDown = true; recordLeftClick();});
@@ -85,11 +95,8 @@ let mouseOver = {
     cursorTrailSlider: false,
 };
 
-let mouseX;
-let mouseY;
+let mouseX, mouseY, cursorX, cursorY;
 let track = false;
-let cursorX;
-let cursorY;
 let allCursors = [];
 let lastCursorTrail = 0;
 let trailDensity = 0;
@@ -182,24 +189,19 @@ let amplify = {
     },
 }
 
-let allEnemies = [];
-let allDangers = [];
+let allEnemies = [], allDangers = [];
 
 // Time, Highscore, and Difficulty
 let now = Date.now();
 let clickEventSave = 0;
 
-let loadingGame = Date.now();
-let loadingTextChange = Date.now();
+let loadingGame = Date.now(), loadingTextChange = Date.now();
 let LI = 0; // loading index
 let endLoading = false;
 
-let startTime = Date.now();
-let currentTime = ((now-startTime) / 1000).toFixed(2);
-let timeLeft;
+let startTime = Date.now(), currentTime = ((now-startTime) / 1000).toFixed(2), timeLeft;
 
-let enemySpawnPeriod = 3000;
-let lastSpawn = Date.now();
+let enemySpawnPeriod = 3000, lastSpawn = Date.now();
 
 let highscoreColor = "rgb(87, 87, 87)";
 let highscore = {
@@ -216,8 +218,7 @@ let difficulty = {
 };
 
 // Music
-let musicVolume = 0;
-let sfxVolume = 0;
+let musicVolume = 0, sfxVolume = 0;
 
 let alarm9 = document.getElementById("alarm9");
 let music = {
