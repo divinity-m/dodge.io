@@ -17,17 +17,17 @@ function resetBgVars() {
     if (innerGameState === "mainMenu") {
         [bgTopText, bgBottomText] = ["MAIN", "MENU"];
         [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
-        [bgTopMax, bgBottomMax] = [hyp*4/10, hyp*6/10];
+        [bgTopMax, bgBottomMax] = [hyp*7/10, hyp*3/10];
     }
     if (innerGameState === "selectDifficulty") {
         [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
         [bgTopX, bgBottomX] = [-625, GAME_WIDTH+1125];
-        [bgTopMax, bgBottomMax] = [hyp*3.75/10, hyp*4.5/10];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
     }
     if (innerGameState === "selectDodger") {
         [bgTopText, bgBottomText] = ["DODGER", "SELECTION"];
         [bgTopX, bgBottomX] = [-750, GAME_WIDTH+1125];
-        [bgTopMax, bgBottomMax] = [hyp*3.5/10, hyp*4.5/10];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
     }
     if (innerGameState === "settings") {
         [bgTopText, bgBottomText] = ["SETTINGS", ""];
