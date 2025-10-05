@@ -11,16 +11,21 @@ function resizeCnv() {
     [GAME_WIDTH, GAME_HEIGHT] = [cnv.width, cnv.height];
 }
 // mobile screen rotations
-screen.orientation.addEventListener("change", (e) => {
-    if (e.target.type.startsWith("landscape")) resizeCnv();
+screen?.orientation.addEventListener("change", (e) => {
+    if (e?.target?.type.startsWith("landscape")) resizeCnv();
 });
 resizeCnv(); console.log("proper mobile rotation");
 
 // TouchScreen Events
-let inputType = "kbm";
-document.addEventListener("touchstart", () => {mouseDown = true; inputType = "touch"; recordLeftClick();});
-document.addEventListener("touchend", () => {mouseDown = false});
-document.addEventListener("touchcancel", () => {mouseDown = false});
+function isMobile() {
+  const uaCheck = /Mobi|Android/i.test(navigator.userAgent);
+  const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
+  return uaCheck || sizeCheck;
+}
+
+document.addEventListener("touchstart", () => { if (isMobile()) {mouseDown = true; recordLeftClick();} });
+document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
+document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false });
 
 // Keyboard Events
 let lastPressing = "mouse";
@@ -38,19 +43,19 @@ let mouseDown = false;
 let allClicks = [];
 let mouseMovementOn = false;
 let previousMM = false;
-document.addEventListener("mousedown", () => {mouseDown = true});
-document.addEventListener("mouseup", () => {mouseDown = false});
+document.addEventListener("mousedown", () => { if (!isMobile()) mouseDown = true });
+document.addEventListener("mouseup", () => { if (!isMobile()) mouseDown = false });
 document.addEventListener("click", () => {
-    if (inputType === "kbm") { recordLeftClick(); allClicks.push(createClick("left")); }
+    if (!isMobile()) { recordLeftClick(); allClicks.push(createClick("left")); }
 });
 document.addEventListener("contextmenu", (event) => {
     event.preventDefault();
-    if (inputType === "kbm") { recordRightClick(event); allClicks.push(createClick("right")); }
+    if (!isMobile()) { recordRightClick(event); allClicks.push(createClick("right")); }
 });
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
         event.preventDefault();
-        if (inputType === "kbm") {  recordMiddleClick(event); allClicks.push(createClick("middle")); }
+        if (!isMobile()) {  recordMiddleClick(event); allClicks.push(createClick("middle")); }
     }
 });
 
@@ -72,7 +77,6 @@ let allCursors = [];
 let lastCursorTrail = 0;
 let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
-    inputType = "kbm";
     // cursor location
     [cursorX, cursorY] = [event.clientX, event.clientY];
 
