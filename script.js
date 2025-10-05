@@ -37,7 +37,10 @@ function isMobile() {
   return uaCheck || sizeCheck;
 }
 
-document.addEventListener("touchstart", () => { if (isMobile()) {mouseDown = true; recordLeftClick();} });
+document.addEventListener("touchstart", () => {
+    event.preventDefault();
+    if (isMobile()) { mouseDown = true; recordLeftClick(); }
+});
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
 document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false });
 
