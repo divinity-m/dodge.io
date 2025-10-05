@@ -13,7 +13,7 @@ function resizeCnv(type) {
         cnv.height = 650/window.innerHeight * window.innerHeight;
     } else {
         if (type === "landscape") {
-            cnv.width = 406/window.innerWidth * window.innerWidth;
+            cnv.width = 200/window.innerWidth * window.innerWidth;
             cnv.height = 500/window.innerHeight * window.innerHeight;
         } else if (type === "portrait") {
             cnv.width = 800/window.innerWidth * window.innerWidth;
