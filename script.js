@@ -126,7 +126,7 @@ let absoluteZero = {
     passive: "Absolute Zero",
     slowStart: 273.15, slowEnd: 75,
     lastEnded: 0,
-}
+};
 
 let shockwave = {
     usable: true, active: "Shockwave", used: "Shockwave", activated: false,
@@ -147,7 +147,7 @@ let amplify = {
         this.accel = 0;
         this.accelRate = Date.now();
     },
-}
+};
 
 let allEnemies = [], allDangers = [];
 
@@ -208,10 +208,12 @@ if (localData) {
         ["dodger", "color", "subColor", "invincible"].forEach(attribute => {
             if (userData?.player?.[attribute] !== undefined) p[attribute] = userData.player[attribute];
         })
+        
         let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0};
         ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
             if (userData?.highscore?.[score] !== undefined) hs[score] = userData.highscore[score];
         })
+        
         let s = {enemyOutlines: true, disableMM: false, musicSliderX: 640, sfxSliderX: 627, aZ_Range: true, aZ_Av: 650, customCursor: true, cursorTrail: 715};
         ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "aZ_Av", "customCursor", "cursorTrail"].forEach(setting => {
             if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
