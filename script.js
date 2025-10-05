@@ -10,8 +10,8 @@ function resizeCnv() { console.log("aspect ratio"); // comment
         cnv.width = 800/window.innerWidth * window.innerWidth;
         cnv.height = 650/window.innerHeight * window.innerHeight;
     } else {
-        cnv.width = 369/window.innerWidth * window.innerWidth;
-        cnv.height = 300/window.innerHeight * window.innerHeight;
+        cnv.height = 800/window.innerHeight * window.innerHeight;
+        cnv.width = 650/window.innerWidth * window.innerWidth;
     }
     [GAME_WIDTH, GAME_HEIGHT] = [cnv.width, cnv.height];
 }
