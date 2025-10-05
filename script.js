@@ -105,7 +105,6 @@ document.addEventListener('mousemove', (event) => {
 });
 document.addEventListener("touchmove", (event) => { updateCursor(event.touches[0]); });
 document.addEventListener("touchstart", () => {
-    event.preventDefault();
     updateCursor(event.touches[0]);
     if (isMobile()) { mouseDown = true; recordLeftClick(); }
 });
