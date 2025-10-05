@@ -4,7 +4,7 @@ const ctx = cnv.getContext('2d');
 
 // Game Units
 let gameState = "loading", innerGameState = "loading";
-let GAME_WIDTH , GAME_HEIGHT;
+let GAME_WIDTH, GAME_HEIGHT;
 
 // Screen Orientations
 function resizeCnv(type) { console.log("window rotation accomodation"); // comment
