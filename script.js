@@ -5,7 +5,7 @@ const ctx = cnv.getContext('2d');
 // game units
 let gameState = "loading", innerGameState = "loading";
 let GAME_WIDTH , GAME_HEIGHT;
-function resizeCnv() { console.log("aspect ratio"); // comment
+function resizeCnv() { console.log("aspect ratio was backwards"); // comment
     if (!isMobile()) { // aspect ratio of 16:13
         cnv.width = 800/window.innerWidth * window.innerWidth;
         cnv.height = 650/window.innerHeight * window.innerHeight;
