@@ -1,4 +1,4 @@
-console.log("resize")
+console.log("scale")
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -6,31 +6,20 @@ const ctx = cnv.getContext('2d');
 
 // Game Units
 let gameState = "loading", innerGameState = "loading";
-let GAME_WIDTH, GAME_HEIGHT;
+const GAME_WIDTH = 800, GAME_HEIGHT = 650;
 
 // Screen Orientations
-function resizeCnv(type) {
-    if (!isMobile()) { // aspect ratio of 16:13
-        cnv.width = 800/window.innerWidth * window.innerWidth;
-        cnv.height = 650/window.innerHeight * window.innerHeight;
-    } else {
-        if (type === "landscape") {
-            cnv.width = 200/window.innerWidth * window.innerWidth;
-            cnv.height = 500/window.innerHeight * window.innerHeight;
-        } else if (type === "portrait") {
-            cnv.width = 800/window.innerWidth * window.innerWidth;
-            cnv.height = 650/window.innerHeight * window.innerHeight;
-        }
-    }
-    [GAME_WIDTH, GAME_HEIGHT] = [cnv.width, cnv.height];
-}
+function resizeCnv() {
+    // Pick a scale factor based on window size
+    const scale = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
 
-screen?.orientation.addEventListener("change", (e) => {
-    if (e?.target?.type.startsWith("landscape")) resizeCnv("landscape");
-    else if (e?.target?.type.startsWith("portrait")) resizeCnv("portrait");
-});
-if (screen?.orientation?.type.startsWith("portrait")) resizeCnv("portrait");
-else resizeCnv("landscape");
+    // set the canvas drawing resolution
+    cnv.width = GAME_WIDTH * scale;
+    cnv.height = GAME_HEIGHT * scale;
+
+    // return the scale factor to draw()
+    return scale;
+}
 
 // Touchscreen Events
 function isMobile() {
@@ -293,8 +282,9 @@ function resetBgVars() {
 function draw() {
     now = Date.now();
     detectHover();
-    
-    ctx.clearRect(0, 0, cnv.width, cnv.height);
+    const scale = resizeCnv();
+    ctx.save();
+    ctx.scale(scale, scale);
     
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -390,6 +380,7 @@ function draw() {
         abilities();
         musicCollisions();
     }
+    ctx.restore();
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
