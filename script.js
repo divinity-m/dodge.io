@@ -4,7 +4,6 @@ const ctx = cnv.getContext('2d');
 
 // game units
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
-
 let gameState = "loading", innerGameState = "loading";
 
 let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
