@@ -3,133 +3,171 @@ const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
 // game units
-const GAME_WIDTH = 800;
-const GAME_HEIGHT = 650;
+const GAME_WIDTH = 800, GAME_HEIGHT = 650;
 cnv.width = GAME_WIDTH;
 cnv.height = GAME_HEIGHT;
 
 let gameState = "loading";
 let innerGameState = "loading";
 
-let BgTopX;
-let BgBottomX;
-let BgTime;
+let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
 function resetBgVars() {
-    BgTopX = -500;
-    BgBottomX = GAME_WIDTH+500;
-    BgTime = Date.now();
+    const hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
+    
+    if (innerGameState === "mainMenu") {
+        [bgTopText, bgBottomText] = ["MAIN", "MENU"];
+        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
+        [bgTopMax, bgBottomMax] = [hyp*4/10, hyp*6/10];
+    }
+    if (innerGameState === "selectDifficulty") {
+        [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
+        [bgTopX, bgBottomX] = [-625, GAME_WIDTH+1125];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
+    }
+    if (innerGameState === "selectDodger") {
+        [bgTopText, bgBottomText] = ["DODGER", "SELECTION"];
+        [bgTopX, bgBottomX] = [-750, GAME_WIDTH+1125];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
+    }
+    if (innerGameState === "settings") {
+        [bgTopText, bgBottomText] = ["GAME", "SETTINGS"];
+        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+1000];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
+    }
 }
 
-// TouchScreen Events
-let inputType = "kbm";
-document.addEventListener("touchstart", () => {mouseDown = true; inputType = "touch"; recordLeftClick();});
-document.addEventListener("touchend", () => {mouseDown = false});
-document.addEventListener("touchcancel", () => {mouseDown = false});
-
-// Keyboard Events
+// Keyboard
 let lastPressing = "mouse";
-let keyboardMovementOn = false;
-let wPressed = false;
-let aPressed = false;
-let sPressed = false;
-let dPressed = false;
-let shiftPressed = 1;
+let keyboardMovementOn = false, wPressed = false, aPressed = false, sPressed = false, dPressed = false, shiftPressed = 1;
 document.addEventListener("keydown", recordKeyDown);
 document.addEventListener("keyup", recordKeyUp);
 
-// Mouse Events
-let mouseDown = false;
-let allClicks = [];
-let mouseMovementOn = false;
-let previousMM = false;
+// Mouse
+let mouseDown = false, mouseMovementOn = false, previousMM = false, allClicks = [];
 document.addEventListener("mousedown", () => {mouseDown = true});
 document.addEventListener("mouseup", () => {mouseDown = false});
+document.addEventListener("touchstart", () => {mouseDown = true; recordLeftClick();});
+document.addEventListener("touchend", () => {mouseDown = false});
+document.addEventListener("touchcancel", () => {mouseDown = false});
+
 document.addEventListener("click", () => {
-    if (inputType === "kbm") { recordLeftClick(); allClicks.push(createClick("left")); }
+    recordLeftClick();
+    allClicks.push(createClick("left"));
 });
 document.addEventListener("contextmenu", (event) => {
     event.preventDefault();
-    if (inputType === "kbm") { recordRightClick(event); allClicks.push(createClick("right")); }
+    recordRightClick(event);
+    allClicks.push(createClick("right"));
 });
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
         event.preventDefault();
-        if (inputType === "kbm") {  recordMiddleClick(event); allClicks.push(createClick("middle")); }
+        recordMiddleClick(event);
+        allClicks.push(createClick("middle"));
     }
 });
-
-// Input Tracking
 let mouseOver = {
-    play: false, settings: false, selector: false, restart: false,
-    
-    evader: false, j_sab: false, jötunn: false, jolt: false, crescendo: false,
-    
-    easy: false, medium: false, hard: false, limbo: false, andromeda: false, euphoria: false,
-    
-    enemyOutBtn: false, disableMMBtn: false, musicSlider: false, sfxSlider: false,
-    aZ_RangeBtn: false, aZ_AvSlider: false, customCursorBtn: false, cursorTrailSlider: false,
+    play: false,
+    settings: false,
+    selector: false,
+    restart: false,
+
+    evader: false,
+    j_sab: false,
+    jötunn: false,
+    jolt: false,
+    crescendo: false,
+
+    easy: false,
+    medium: false,
+    hard: false,
+    limbo: false,
+    andromeda: false,
+    euphoria: false,
+
+    enemyOutBtn: false,
+    disableMMBtn: false,
+    musicSlider: false,
+    sfxSlider: false,
+    aZ_RangeBtn: false,
+    aZ_AvSlider: false,
+    customCursorBtn: false,
+    cursorTrailSlider: false,
 };
 
-let mouseX;
-let mouseY;
+let mouseX, mouseY, cursorX, cursorY;
 let track = false;
-let cursorX;
-let cursorY;
 let allCursors = [];
 let lastCursorTrail = 0;
 let trailDensity = 0;
 window.addEventListener('mousemove', (event) => {
-    inputType = "kbm";
-    // cursor location
-    [cursorX, cursorY] = [event.clientX, event.clientY];
+    const screenX = event.clientX;
+    const screenY = event.clientY;
+    
+    // cursor trails
+    cursorX = screenX;
+    cursorY = screenY;
 
     // offset mouse
     const rect = cnv.getBoundingClientRect();
-    [mouseX, mouseY] = [cursorX - rect.left, cursorY - rect.top];
+    mouseX = screenX - rect.left;
+    mouseY = screenY - rect.top;
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
 
-window.addEventListener("touchmove", (event) => {
-    // cursor location
-    [cursorX, cursorY] = [event.touches[0].clientX, event.touches[0].clientY];
-
-    // offset mouse
-    const rect = cnv.getBoundingClientRect();
-    [mouseX, mouseY] = [cursorX - rect.left, cursorY - rect.top];
-})
-
 // Player & Enemies
 let player = {
-    x: GAME_WIDTH/2, y: GAME_HEIGHT/2, r: 15,
-    speed: 5, baseSpeed: 5, slowed: 1,
-    dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)",
-    facingAngle: 0, invincible: false,
+    x: GAME_WIDTH/2,
+    y: GAME_HEIGHT/2,
+    r: 15,
+    speed: 5,
+    baseSpeed: 5,
+    slowed: 1,
+    dodger: "evader",
+    color: "rgb(255, 255, 255)",
+    subColor: "rgb(230, 230, 230)",
+    facingAngle: 0,
+    invincible: false,
 };
 
 let settings = {
-    enemyOutlines: true, disableMM: false,
-    musicSliderX: 640, sfxSliderX: 627,
-    aZ_Range: true, aZ_Av: 650,
-    customCursor: true, cursorTrail: 715,
+    enemyOutlines: true,
+    disableMM: false,
+    musicSliderX: 640,
+    sfxSliderX: 627,
+    aZ_Range: true,
+    aZ_Av: 650,
+    customCursor: true,
+    cursorTrail: 715,
 };
 
 let dash = {
-    usable: true, activated: false,
-    deccelerating: false, accel: 1,
+    usable: true,
+    activated: false,
+    deccelerating: false,
+    accel: 1,
     lastEnded: 0,
 };
 
 let absoluteZero = {
-    usable: true, av: 0.5,
+    usable: true,
+    av: 0.5,
     passive: "Absolute Zero",
-    slowStart: 273.15, slowEnd: 75,
+    slowStart: 273.15,
+    slowEnd: 75,
     lastEnded: 0,
 }
 
 let shockwave = {
-    usable: true, active: "Shockwave", used: "Shockwave", activated: false,
-    radius: 25, path: new Path2D(),
-    lastEnded: 0, cd: 7000, effect: 0.75,
+    usable: true,
+    active: "Shockwave",
+    used: "Shockwave",
+    activated: false,
+    radius: 25,
+    path: new Path2D(),
+    lastEnded: 0,
+    cd: 7000,
+    effect: 0.75,
     reset: function () {
         this.lastEnded = 0;
         this.activated = false;
@@ -138,7 +176,11 @@ let shockwave = {
 };
 
 let amplify = {
-    baseSpeed: 5, speed: 0, accel: 0, limit: 10.5, accelRate: Date.now(),
+    baseSpeed: 5,
+    speed: 0,
+    accel: 0,
+    limit: 10.5,
+    accelRate: Date.now(),
     reset: function () {
         player.baseSpeed = 5;
         this.speed = 0;
@@ -147,24 +189,19 @@ let amplify = {
     },
 }
 
-let allEnemies = [];
-let allDangers = [];
+let allEnemies = [], allDangers = [];
 
 // Time, Highscore, and Difficulty
 let now = Date.now();
 let clickEventSave = 0;
 
-let loadingGame = Date.now();
-let loadingTextChange = Date.now();
+let loadingGame = Date.now(), loadingTextChange = Date.now();
 let LI = 0; // loading index
 let endLoading = false;
 
-let startTime = Date.now();
-let currentTime = ((now-startTime) / 1000).toFixed(2);
-let timeLeft;
+let startTime = Date.now(), currentTime = ((now-startTime) / 1000).toFixed(2), timeLeft;
 
-let enemySpawnPeriod = 3000;
-let lastSpawn = Date.now();
+let enemySpawnPeriod = 3000, lastSpawn = Date.now();
 
 let highscoreColor = "rgb(87, 87, 87)";
 let highscore = {
@@ -181,8 +218,7 @@ let difficulty = {
 };
 
 // Music
-let musicVolume = 0;
-let sfxVolume = 0;
+let musicVolume = 0, sfxVolume = 0;
 
 let alarm9 = document.getElementById("alarm9");
 let music = {
