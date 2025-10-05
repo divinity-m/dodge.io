@@ -569,6 +569,9 @@ function recordLeftClick() {
             }
         }
     }
+
+    // Mobile MM stays on
+    if (isMobile()) mouseMovementOn = true;
 }
 
 function detectHover() {
