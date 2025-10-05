@@ -7,7 +7,7 @@ let gameState = "loading", innerGameState = "loading";
 let GAME_WIDTH, GAME_HEIGHT;
 
 // Screen Orientations
-function resizeCnv(type) { console.log("window rotation accomodation"); // comment
+function resizeCnv(type) {
     if (!isMobile()) { // aspect ratio of 16:13
         cnv.width = 800/window.innerWidth * window.innerWidth;
         cnv.height = 650/window.innerHeight * window.innerHeight;
@@ -37,10 +37,6 @@ function isMobile() {
   return uaCheck || sizeCheck;
 }
 
-document.addEventListener("touchstart", () => {
-    event.preventDefault();
-    if (isMobile()) { mouseDown = true; recordLeftClick(); }
-});
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
 document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false });
 
@@ -93,24 +89,26 @@ let track = false;
 let allCursors = [];
 let lastCursorTrail = 0;
 let trailDensity = 0;
-window.addEventListener('mousemove', (event) => {
+
+function updateCursor(eventObject) {
     // cursor location
-    [cursorX, cursorY] = [event.clientX, event.clientY];
+    [cursorX, cursorY] = [eventObject.clientX, eventObject.clientY];
 
     // offset mouse
     const rect = cnv.getBoundingClientRect();
     [mouseX, mouseY] = [cursorX - rect.left, cursorY - rect.top];
+}
+
+document.addEventListener('mousemove', (event) => {
+    updateCursor(event);
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
-
-window.addEventListener("touchmove", (event) => {
-    // cursor location
-    [cursorX, cursorY] = [event.touches[0].clientX, event.touches[0].clientY];
-
-    // offset mouse
-    const rect = cnv.getBoundingClientRect();
-    [mouseX, mouseY] = [cursorX - rect.left, cursorY - rect.top];
-})
+document.addEventListener("touchmove", (event) => { updateCursor(event.touches[0]); });
+document.addEventListener("touchstart", () => {
+    event.preventDefault();
+    updateCursor(event.touches[0]);
+    if (isMobile()) { mouseDown = true; recordLeftClick(); }
+});
 
 // Player & Enemies
 let player = {
