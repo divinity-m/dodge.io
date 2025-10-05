@@ -3,6 +3,7 @@ const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
 // game units
+let gameState = "loading", innerGameState = "loading";
 let GAME_WIDTH , GAME_HEIGHT;
 function resizeCnv() {
     cnv.width = 800/window.innerWidth * window.innerWidth;
@@ -14,33 +15,6 @@ screen.orientation.addEventListener("change", (e) => {
     if (e.target.type.startsWith("landscape")) resizeCnv();
 });
 resizeCnv(); console.log("proper mobile rotation");
-
-let gameState = "loading", innerGameState = "loading";
-
-let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
-function resetBgVars() {
-    const hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
-    if (innerGameState === "mainMenu") {
-        [bgTopText, bgBottomText] = ["MAIN", "MENU"];
-        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
-        [bgTopMax, bgBottomMax] = [hyp*4/10, hyp*6/10];
-    }
-    if (innerGameState === "selectDifficulty") {
-        [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
-        [bgTopX, bgBottomX] = [-625, GAME_WIDTH+1125];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
-    }
-    if (innerGameState === "selectDodger") {
-        [bgTopText, bgBottomText] = ["DODGER", "SELECTION"];
-        [bgTopX, bgBottomX] = [-750, GAME_WIDTH+1125];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
-    }
-    if (innerGameState === "settings") {
-        [bgTopText, bgBottomText] = ["GAME", "SETTINGS"];
-        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+1000];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
-    }
-}
 
 // TouchScreen Events
 let inputType = "kbm";
@@ -268,6 +242,32 @@ window.addEventListener('beforeunload', () => {
         localStorage.setItem('localUserData', JSON.stringify(userData));
     }
 })
+
+// cool background stuff
+let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
+function resetBgVars() {
+    const hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
+    if (innerGameState === "mainMenu") {
+        [bgTopText, bgBottomText] = ["MAIN", "MENU"];
+        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
+        [bgTopMax, bgBottomMax] = [hyp*4/10, hyp*6/10];
+    }
+    if (innerGameState === "selectDifficulty") {
+        [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
+        [bgTopX, bgBottomX] = [-625, GAME_WIDTH+1125];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
+    }
+    if (innerGameState === "selectDodger") {
+        [bgTopText, bgBottomText] = ["DODGER", "SELECTION"];
+        [bgTopX, bgBottomX] = [-750, GAME_WIDTH+1125];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
+    }
+    if (innerGameState === "settings") {
+        [bgTopText, bgBottomText] = ["GAME", "SETTINGS"];
+        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+1000];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
+    }
+}
 
 // Drawing the game
 function draw() {
