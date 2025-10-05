@@ -1,3 +1,5 @@
+console.log("resize")
+
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
