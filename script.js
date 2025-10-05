@@ -9,8 +9,11 @@ function resizeCnv() {
     cnv.height = 650/window.innerHeight * window.innerHeight;
     [GAME_WIDTH, GAME_HEIGHT] = [cnv.width, cnv.height];
 }
-screen.orientation.addEventListener("change", resizeCnv); // for mobile screen rotations
-resizeCnv(); console.log("resize");
+// mobile screen rotations
+screen.orientation.addEventListener("change", (e) => {
+    if (e.target.type.startsWith("landscape")) resizeCnv();
+});
+resizeCnv(); console.log("proper mobile rotation");
 
 let gameState = "loading", innerGameState = "loading";
 
