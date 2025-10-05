@@ -4,7 +4,6 @@ const ctx = cnv.getContext('2d');
 
 // game units
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
-[cnv.width, cnv.height] = [GAME_WIDTH, GAME_HEIGHT];
 
 let gameState = "loading", innerGameState = "loading";
 
