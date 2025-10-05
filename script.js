@@ -5,16 +5,21 @@ const ctx = cnv.getContext('2d');
 // game units
 let gameState = "loading", innerGameState = "loading";
 let GAME_WIDTH , GAME_HEIGHT;
-function resizeCnv() {
-    cnv.width = 800/window.innerWidth * window.innerWidth;
-    cnv.height = 650/window.innerHeight * window.innerHeight;
+function resizeCnv() { console.log("aspect ratio"); // comment
+    if (!isMobile()) { // aspect ratio of 16:13
+        cnv.width = 800/window.innerWidth * window.innerWidth;
+        cnv.height = 650/window.innerHeight * window.innerHeight;
+    } else {
+        cnv.width = 369/window.innerWidth * window.innerWidth;
+        cnv.height = 300/window.innerHeight * window.innerHeight;
+    }
     [GAME_WIDTH, GAME_HEIGHT] = [cnv.width, cnv.height];
 }
 // mobile screen rotations
 screen?.orientation.addEventListener("change", (e) => {
     if (e?.target?.type.startsWith("landscape")) resizeCnv();
 });
-resizeCnv(); console.log("proper mobile rotation");
+resizeCnv();
 
 // TouchScreen Events
 function isMobile() {
