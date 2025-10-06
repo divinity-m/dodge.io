@@ -415,27 +415,27 @@ function draw() {
     
   
     // Cursor & Cursor Trail
-    if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
+    if (cursorX !== undefined && cursorY !== undefined) {
         // Trail Density
-        if (trailDensity > 0) {
-            const pNow = performance.now();
-            if (pNow - lastCursorTrail > 16) { // ~60fps cap
-                allCursors.push(createCursor());
-                if (allCursors.length > 100) { // drop oldest
-                    allCursors[0].div.remove();
-                    allCursors.shift();
-                }
-                lastCursorTrail = pNow;
+        const pNow = performance.now();
+        if (settings.customCursor && trailDensity > 0 && pNow - lastCursorTrail > 16) { // ~60fps cap
+            allCursors.push(createCursor());
+            if (allCursors.length > 100) { // drop oldest
+                allCursors[0].div.remove();
+                allCursors.shift();
             }
+            lastCursorTrail = pNow;
         }
 
         // Trail Drawing
         allCursors.forEach(cursor => {
-            cursor.div.style.backgroundColor = cursor.color;
-            cursor.div.style.top = `${cursor.y-cursor.r}px`;
-            cursor.div.style.left = `${cursor.x-cursor.r}px`;
             cursor.div.style.width = `${cursor.r*2}px`;
             cursor.div.style.height = `${cursor.r*2}px`;
+            cursor.div.style.backgroundColor = cursor.color;
+
+            cursor.div.style.transform = "translate(-50%, -50%)";
+            cursor.div.style.top = `${cursor.y}px`;
+            cursor.div.style.left = `${cursor.x}px`;
             
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
@@ -444,11 +444,13 @@ function draw() {
         // Cursor Itself
         // base drawing stats for the cursor and overlay
         cursorEl.style.width = `${window.innerWidth * (12/1397)}px`;
-        cursorEl.style.height = cursorEl.style.width;
+        cursorEl.style.height = `${window.innerWidth * (12/1397)}px`;
         cursorEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
-        overlayEl.style.width = cursorEl.style.width;
-        overlayEl.style.height = cursorEl.style.height;
-        overlayEl.style.borderWidth = cursorEl.style.borderWidth;
+        
+        overlayEl.style.width = `${window.innerWidth * (12/1397)}px`;
+        overlayEl.style.height = `${window.innerWidth * (12/1397)}px`;
+        overlayEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
+        
         
         let hovering = false;
         // covers hovering over canvas buttons
@@ -484,18 +486,17 @@ function draw() {
         }
         
         // update cursor position
-        let cursorRad = (window.innerWidth * (15/1397)) / 2;
-        let offset = cursorRad * (8.5/7.5); // basically the radius / (8.5/7.5)
-        cursorEl.style.top = `${cursorY-offset}px`;
-        cursorEl.style.left = `${cursorX-offset}px`;
-        overlayEl.style.top = `${cursorY-offset}px`;
-        overlayEl.style.left = `${cursorX-offset}px`;
+        cursorEl.style.transform = "translate(-50%, -50%)";
+        cursorEl.style.top = `${cursorY}px`;
+        cursorEl.style.left = `${cursorX}px`;
+
+        overlayEl.style.transform = "translate(-50%, -50%)";
+        overlayEl.style.top = cursorEl.style.top;
+        overlayEl.style.left = cursorEl.style.left;
     }
       
     // Click Animation
     allClicks.forEach(click => {
-        click.div.style.top = `${click.y-click.r*1.05}px`;
-        click.div.style.left = `${click.x-click.r*1.05}px`;
         click.div.style.width = `${click.r*2}px`;
         click.div.style.height = `${click.r*2}px`;
         click.div.style.border = "2px solid";
@@ -504,15 +505,22 @@ function draw() {
         if (click.button === "left" || click.button === "middle") click.div.style.borderColor = click.colorLeft;
         if (click.button === "right") click.div.style.borderColor = click.colorRight;
         
+        click.div.style.transform = "translate(-50%, -50%)";
+        click.div.style.top = `${click.y}px`;
+        click.div.style.left = `${click.x}px`;
+        
+        
         if (click.button === "middle") {
             click.divMid.style.backgroundColor = "rgba(0, 0, 0, 0)";
             let newR = click.r-3;
             if (newR > 0) {
-                click.divMid.style.top = `${click.y-newR*1.05}px`;
-                click.divMid.style.left = `${click.x-newR*1.05}px`;
                 click.divMid.style.width = `${newR*2}px`;
                 click.divMid.style.height = `${newR*2}px`;
                 click.divMid.style.border = `2px solid ${click.colorRight}`;
+
+                click.divMid.style.transform = "translate(-50%, -50%)";
+                click.divMid.style.top = `${click.y}px`;
+                click.divMid.style.left = `${click.x}px`;
             }
         }
 
