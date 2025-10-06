@@ -1,4 +1,4 @@
-console.log("resolution");
+console.log("200px by 162.5px");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
