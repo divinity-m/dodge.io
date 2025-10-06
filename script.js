@@ -1,4 +1,4 @@
-console.log("bringing it back");
+console.log("removing it again lol");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
