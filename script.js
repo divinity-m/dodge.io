@@ -1,4 +1,5 @@
-console.log("padding and orientation fix");
+console.log("padding replaced with top
+");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -22,7 +23,7 @@ if (isMobile()) {
 function resize() {
     if (isMobile()) {
         cnv.style.width = "400px";
-        cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`;
+        cnv.style.top = `${(window.innerHeight - 325)/2}px`;
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener('resize', resize);
@@ -90,12 +91,11 @@ function updateCursor(eventObject) {
     // update mouse
     const rect = cnv.getBoundingClientRect();
   
-    const scaleX = Math.round(cnv.width / rect.width);
-    const scaleY = Math.round(cnv.height / rect.height);
+    const scaleX = cnv.width / rect.width
+    const scaleY = cnv.height / rect.height
   
     mouseX = (cursorX - rect.left) * scaleX;
-    if (!isMobile()) mouseY = (cursorY - rect.top) * scaleY;
-    else mouseY = (cursorY - rect.top) * scaleY + (window.innerHeight - 325)/2; // accounts for the canvas padding
+    mouseY = (cursorY - rect.top) * scaleY;
 }
 function addCursorTrail() {
     if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
