@@ -1,4 +1,4 @@
-console.log("removed resize and used css");
+console.log("bringing it back");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -7,7 +7,6 @@ const ctx = cnv.getContext('2d');
 // Game Units
 let gameState = "loading", innerGameState = "loading";
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
-cnv.width = 800, cnv.height = 650;
 
 // Screen Orientations
 function isMobile() {
@@ -15,27 +14,20 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
-/*
-let scale;
+
+let scale, offsetX, offsetY;
 function resizeCnv() {
-    // Pick a scale factor based on view width and view height
-    const viewW = document.documentElement.clientWidth;
-    const viewH = document.documentElement.clientHeight;
+    cnv.width = window.innerWidth;
+    cnv.height = window.innerHeight;
+  
+    scale = Math.min(cnv.width / GAME_WIDTH, cnv.height / GAME_HEIGHT);
 
-    let factor;
-    if (!isMobile()) factor = Math.min(viewW / GAME_WIDTH, viewH / GAME_HEIGHT);
-    else factor = Math.min(viewW / GAME_HEIGHT, viewH / GAME_WIDTH);
-
-    // set the canvas drawing resolution
-    cnv.width = GAME_WIDTH * factor;
-    cnv.height = GAME_HEIGHT * factor;
-
-    // set the scale factor for draw()
-    scale = factor;
+    offsetX = (cnv.width - GAME_WIDTH * scale) / 2;
+    offsetY = (cnv.height - GAME_HEIGHT * scale) / 2;
 }
 window.addEventListener("resize", resizeCnv);
 window.addEventListener("orientationchange", resizeCnv);
-resizeCnv();*/
+resizeCnv();
 
 // Touchscreen Events
 if (isMobile()) {
@@ -299,8 +291,10 @@ function resetBgVars() {
 function draw() {
     now = Date.now();
     detectHover();
-   /* ctx.save();
-    ctx.scale(scale, scale);*/
+  
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    ctx.scale(scale, scale);
     
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -396,7 +390,7 @@ function draw() {
         abilities();
         musicCollisions();
     }
-    /*ctx.restore();*/
+    ctx.restore();
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
