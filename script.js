@@ -1,4 +1,4 @@
-console.log("cursorEl");
+console.log("margin and padding");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
