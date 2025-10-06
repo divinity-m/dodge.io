@@ -1,4 +1,4 @@
-console.log("mouse X and Y adjustment");
+console.log("an offset cuz yes");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -470,10 +470,11 @@ function draw() {
         }
         
         // update cursor position
-        cursorEl.style.top = `${cursorY-8.5}px`;
-        cursorEl.style.left = `${cursorX-8.5}px`;
-        overlayEl.style.top = `${cursorY-8.5}px`;
-        overlayEl.style.left = `${cursorX-8.5}px`;
+        let offset = (cursrEl.style.width + cursrEl.style.borderWidth)/2 * (8.5/7.5); // basically the radius / (8.5/7.5)
+        cursorEl.style.top = `${cursorY-offset}px`;
+        cursorEl.style.left = `${cursorX-offset}px`;
+        overlayEl.style.top = `${cursorY-offset}px`;
+        overlayEl.style.left = `${cursorX-offset}px`;
     }
       
     // Click Animation
