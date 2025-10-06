@@ -1,4 +1,4 @@
-console.log("scale");
+console.log("revamped resizeCnv");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -9,17 +9,20 @@ let gameState = "loading", innerGameState = "loading";
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
 
 // Screen Orientations
+let scale;
 function resizeCnv() {
     // Pick a scale factor based on window size
-    const scale = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
+    const factor = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
 
     // set the canvas drawing resolution
-    cnv.width = GAME_WIDTH * scale;
-    cnv.height = GAME_HEIGHT * scale;
+    cnv.width = GAME_WIDTH * factor;
+    cnv.height = GAME_HEIGHT * factor;
 
-    // return the scale factor to draw()
-    return scale;
+    // set the scale factor for draw()
+    scale = factor;
 }
+window.addEventListener("resize", resizeCnv);
+window.addEventListener("orientationchange", resizeCnv);
 
 // Touchscreen Events
 function isMobile() {
@@ -288,7 +291,6 @@ function resetBgVars() {
 function draw() {
     now = Date.now();
     detectHover();
-    const scale = resizeCnv();
     ctx.save();
     ctx.scale(scale, scale);
     
