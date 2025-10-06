@@ -7,6 +7,8 @@ const ctx = cnv.getContext('2d');
 // Game Units
 let gameState = "loading", innerGameState = "loading";
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
+cnv.width = 800;
+cnv.height = 650;
 
 // Screen Orientations
 function isMobile() {
@@ -14,20 +16,6 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
-
-let scale, offsetX, offsetY;
-function resizeCnv() {
-    cnv.width = window.innerWidth;
-    cnv.height = window.innerHeight;
-  
-    scale = Math.min(cnv.width / GAME_WIDTH, cnv.height / GAME_HEIGHT);
-
-    offsetX = (cnv.width - GAME_WIDTH * scale) / 2;
-    offsetY = (cnv.height - GAME_HEIGHT * scale) / 2;
-}
-window.addEventListener("resize", resizeCnv);
-window.addEventListener("orientationchange", resizeCnv);
-resizeCnv();
 
 // Touchscreen Events
 if (isMobile()) {
@@ -292,10 +280,6 @@ function draw() {
     now = Date.now();
     detectHover();
   
-    ctx.save();
-    ctx.translate(offsetX, offsetY);
-    ctx.scale(scale, scale);
-    
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
@@ -390,7 +374,6 @@ function draw() {
         abilities();
         musicCollisions();
     }
-    ctx.restore();
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
