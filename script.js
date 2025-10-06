@@ -385,6 +385,7 @@ function draw() {
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
 
+    // clears trails and clicks
     allCursors.forEach(c => { if (c.av <= 0 || trailDensity <= 0) c.div.remove(); })
     allClicks.forEach(c => {
         if (c.av <= 0) {
@@ -402,7 +403,7 @@ function draw() {
         cursorEl.style.display = "block";
         overlayEl.style.display = "block";
     }
-    else {
+    if (!settings.customCursor || isMobile()) {
         document.documentElement.classList.remove("no-cursor");
         allCursors = [];
         cursorEl.style.display = "none";
