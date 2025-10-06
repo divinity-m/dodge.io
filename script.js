@@ -281,8 +281,10 @@ function draw() {
     now = Date.now();
     detectHover();
 
-    ctx.save();
-    ctx.scale(0.5, 0.5);
+    if (isMobile()) {
+        ctx.save();
+        ctx.scale(0.5, 0.5);
+    }
   
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -378,7 +380,7 @@ function draw() {
         abilities();
         musicCollisions();
     }
-    ctx.restore();
+    if (isMobile()) ctx.restore();
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
