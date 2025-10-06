@@ -16,7 +16,6 @@ function isMobile() {
   return uaCheck || sizeCheck;
 }
 
-// Touchscreen Events
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
@@ -24,6 +23,7 @@ if (isMobile()) {
     cnv.width = 400, cnv.height = 325;
 }
 
+// Touchscreen Events
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
 document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false });
 
