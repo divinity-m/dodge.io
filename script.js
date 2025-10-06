@@ -1,4 +1,4 @@
-console.log("scale(0.375, 0.375), const bug");
+console.log("resolution");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -19,8 +19,6 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    GAME_WIDTH = 300, GAME_HEIGHT = 244;
-    cnv.width = 300, cnv.height = 244;
 }
 
 // Touchscreen Events
@@ -280,11 +278,6 @@ function resetBgVars() {
 function draw() {
     now = Date.now();
     detectHover();
-
-    if (isMobile()) {
-        ctx.save();
-        ctx.scale(0.375, 0.375);
-    }
   
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -380,7 +373,6 @@ function draw() {
         abilities();
         musicCollisions();
     }
-    if (isMobile()) ctx.restore();
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
