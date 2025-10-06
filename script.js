@@ -19,6 +19,8 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
+    let GAME_WIDTH = 200, GAME_HEIGHT = 162.5;
+    cnv.width = 200, cnv.height = 162.5;
 }
 
 // Touchscreen Events
