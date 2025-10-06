@@ -6,8 +6,8 @@ const ctx = cnv.getContext('2d');
 
 // Game Units
 let gameState = "loading", innerGameState = "loading";
-let GAME_WIDTH = 800, GAME_HEIGHT = 650;
 cnv.width = 800, cnv.height = 650;
+let GAME_WIDTH = 800, GAME_HEIGHT = 650;
 
 // Screen Orientations
 function isMobile() {
@@ -19,8 +19,8 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    GAME_WIDTH = 200, GAME_HEIGHT = 162.5;
     cnv.width = 200, cnv.height = 162.5;
+    GAME_WIDTH = 200, GAME_HEIGHT = 162.5;
 }
 
 // Touchscreen Events
