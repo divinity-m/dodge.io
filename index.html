@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" class="no-cursor">
     <head>
+        <!-- prevents zooming in -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
         <title>Dodge.io</title>
         <link rel="icon" type="image/x-icon" href="DodgeImages/dodgeIcon.png" />
 
+        <!-- JAVASCRIPT -->
         <script defer src="functions.js"></script>
         <script defer src="music.js"></script>
         <script defer src="script.js"></script>
@@ -15,6 +19,8 @@
                 padding: 0;
                 height: 100%;
                 overflow: hidden;
+                touch-action: none; /* disable gestures like pinch or pan */
+                overscroll-behavior: none; /* prevent edge bounce */
             }
             body {
                 background-color: rgb(255, 255, 255);
@@ -27,6 +33,8 @@
                 display: block;
                 margin: 0 auto;
                 pointer-events: none;
+                -webkit-user-select: none;
+                user-select: none;
             }
             .no-cursor html,
             .no-cursor body,
