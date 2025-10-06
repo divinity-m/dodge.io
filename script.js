@@ -85,7 +85,7 @@ function updateCursor(eventObject) {
     
     const scaleX = cnv.width / rect.width; // if the user is on mobile, the rect shrinks with the canvas
     const scaleY = cnv.height / rect.height; // so you gotta double the X and Y to match
-    [mouseX, mouseY] = [(cursorX - rect.left) * 2, (cursorY - rect.top) * 2];
+    [mouseX, mouseY] = [(cursorX - rect.left) * scaleX, (cursorY - rect.top) * scaleY];
 }
 
 document.addEventListener('mousemove', (event) => {
