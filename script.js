@@ -1,4 +1,4 @@
-console.log("scale(0.375, 0.375);");
+console.log("scale(0.375, 0.375), const bug");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -6,7 +6,7 @@ const ctx = cnv.getContext('2d');
 
 // Game Units
 let gameState = "loading", innerGameState = "loading";
-const GAME_WIDTH = 800, GAME_HEIGHT = 650;
+let GAME_WIDTH = 800, GAME_HEIGHT = 650;
 cnv.width = 800, cnv.height = 650;
 
 // Screen Orientations
