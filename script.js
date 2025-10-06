@@ -27,6 +27,10 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
+if (isMobile()) {
+    document.getElementById("titleEl").remove();
+    document.getElementById("inspirationEl").remove();
+}
 
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
 document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false });
