@@ -1,4 +1,4 @@
-console.log("syntax bug");
+console.log("translate(-50%, -50%)");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
