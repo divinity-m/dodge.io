@@ -1,4 +1,4 @@
-console.log("an offset cuz yes");
+console.log("fixed a dumb bug");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
