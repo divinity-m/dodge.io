@@ -1,4 +1,4 @@
-console.log("revamped resizeCnv");
+console.log("viewW and viewH");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -11,8 +11,11 @@ const GAME_WIDTH = 800, GAME_HEIGHT = 650;
 // Screen Orientations
 let scale;
 function resizeCnv() {
-    // Pick a scale factor based on window size
-    const factor = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
+    // Pick a scale factor based on view width and view height
+    const viewW = document.documentElement.clientWidth;
+    const viewH = document.documentElement.clientHeight;
+
+    const factor = Math.min(viewW / GAME_WIDTH, viewH / GAME_HEIGHT);
 
     // set the canvas drawing resolution
     cnv.width = GAME_WIDTH * factor;
