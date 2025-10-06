@@ -619,7 +619,7 @@ function decideFillStyle(bool, color1, color2) {
 function createCursor() {
     let rad;
     if (isMobile()) rad = 7.5/2;
-    else rad = 7.5;
+    else rad = window.innerWidth * (7.5/1397);
     let cursor = {
         r: rad,
         av: 1,
@@ -642,7 +642,7 @@ function createCursor() {
 function createClick(button) {
     let rad;
     if (isMobile()) rad = 12.5;
-    else rad = 25;
+    else rad = window.innerWidth * (25/1397);
     let click = {
         r: 0,
         av: 1,
