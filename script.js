@@ -128,6 +128,7 @@ document.addEventListener("touchmove", (event) => {
 document.addEventListener("touchstart", (event) => {
     updateCursor(event.touches[0]);
     if (isMobile()) {recordLeftClick(); allClicks.push(createClick("left")); }
+    if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
 
 // Player & Enemies
