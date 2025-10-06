@@ -1,4 +1,4 @@
-console.log("max-height: 300px");
+console.log("cnv.style");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -19,6 +19,8 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
+    cnv.style.width = "400px";
+    cnv.style.height = "325px";
 }
 
 // Touchscreen Events
