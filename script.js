@@ -89,11 +89,13 @@ function updateCursor(eventObject) {
 
     // update mouse
     const rect = cnv.getBoundingClientRect();
+  
     const scaleX = Math.round(cnv.width / rect.width);
     const scaleY = Math.round(cnv.height / rect.height);
   
-    mouseX = (cursorX - rect.left) * scale;
-    mouseY = (cursorY - rect.top) * scale + (window.innerHeight - 325)/2; // gotta add the padding
+    mouseX = (cursorX - rect.left) * scaleX;
+    if (!isMobile()) mouseY = (cursorY - rect.top) * scaleY;
+    else mouseY = (cursorY - rect.top) * scaleY + (window.innerHeight - 325)/2; // accounts for the canvas padding
 }
 function addCursorTrail() {
     if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
