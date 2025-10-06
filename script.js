@@ -1,4 +1,4 @@
-console.log("margin and padding");
+console.log("margin, padding and more");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -19,9 +19,10 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    cnv.style.width = "400px", cnv.style.height = "325px";
+    cnv.style.width = "400px"
     cnv.style.paddingTop = `${(window.innerHeight - Number(cnv.style.height.slice(0, 3)))/2}px`
-}
+} else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`,
+
 
 // Touchscreen Events
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
