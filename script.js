@@ -1,4 +1,4 @@
-console.log("margin, padding and more");
+console.log("cursor stuff and resize");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -15,14 +15,16 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
-
-if (isMobile()) {
-    document.getElementById("titleEl").remove();
-    document.getElementById("inspirationEl").remove();
-    cnv.style.width = "400px";
-    cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`
-} else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`,
-
+function resize() {
+    if (isMobile()) {
+        document.getElementById("titleEl").remove();
+        document.getElementById("inspirationEl").remove();
+        cnv.style.width = "400px";
+        cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`
+    } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`,
+}
+window.addEventListener('resize', resize());
+resize();
 
 // Touchscreen Events
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
@@ -414,6 +416,7 @@ function draw() {
   
     // Cursor & Cursor Trail
     if (settings?.customCursor && cursorX !== undefined && cursorY !== undefined) {
+        // Trail Density
         if (trailDensity > 0) {
             const pNow = performance.now();
             if (pNow - lastCursorTrail > 16) { // ~60fps cap
@@ -425,7 +428,8 @@ function draw() {
                 lastCursorTrail = pNow;
             }
         }
-      
+
+        // Trail Drawing
         allCursors.forEach(cursor => {
             cursor.div.style.backgroundColor = cursor.color;
             cursor.div.style.top = `${cursor.y-cursor.r}px`;
@@ -436,19 +440,28 @@ function draw() {
             cursor.r -= cursor.subR;
             cursor.av -= cursor.subAv;
         })
-
+    
+        // Cursor Itself
+        // base drawing stats for the cursor and overlay
+        cursorEl.style.width = `${window.innerWidth * (12/1397)}px`;
+        cursorEl.style.height = cursorEl.style.width;
+        cursorEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
+        overlayEl.style.width = cursorEl.style.width;
+        overlayEl.style.height = cursorEl.style.height;
+        overlayEl.style.borderWidth = cursorEl.style.borderWidth;
+        
         let hovering = false;
-        // Canvas Buttons
+        // covers hovering over canvas buttons
         Object.keys(mouseOver).forEach(hover => {
           if (mouseOver[hover]) hovering = true;
         })
-        // Document Hyperlinks
+        // covers hovering over hyperlinks
         let hyperlinks = document.getElementsByTagName('a');
         for (let i = 0; i < hyperlinks.length; i++) {
           if (hyperlinks[i].matches(":hover")) hovering = true;
         }
         
-        // hoving inverts cursor colors, clicking reduces alpha value
+        // hovering inverts cursor colors
         if (hovering) {
             cursorEl.style.backgroundColor = player.subColor;
             cursorEl.style.borderColor = player.color;
@@ -471,7 +484,8 @@ function draw() {
         }
         
         // update cursor position
-        let offset = (cursorEl.style.width + cursorEl.style.borderWidth)/2 * (8.5/7.5); // basically the radius / (8.5/7.5)
+        let cursorRad = (window.innerWidth * (15/1397)) / 2;
+        let offset = cursorRad * (8.5/7.5); // basically the radius / (8.5/7.5)
         cursorEl.style.top = `${cursorY-offset}px`;
         cursorEl.style.left = `${cursorX-offset}px`;
         overlayEl.style.top = `${cursorY-offset}px`;
