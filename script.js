@@ -1,4 +1,4 @@
-console.log("cursor stuff and resize");
+console.log("syntax bug");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -23,7 +23,7 @@ function resize() {
         cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`;
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
-window.addEventListener('resize', resize());
+window.addEventListener('resize', resize);
 resize();
 
 // Touchscreen Events
