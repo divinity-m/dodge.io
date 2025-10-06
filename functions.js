@@ -605,8 +605,8 @@ function detectHover() {
 
 // FUNCTIONS THAT DRAWS STUFF TO THE SCREEN
 function drawCircle(x = 0, y = 0, r = 12.5, type = "fill") {
-    ctx.beginPath()
-    ctx.arc(x, y, r, Math.PI * 2, 0)
+    ctx.beginPath();
+    ctx.arc(x, y, r, Math.PI * 2, 0);
     if (type === "fill") ctx.fill();
     else if (type === "stroke") ctx.stroke();
 }
@@ -640,8 +640,8 @@ function createClick(button) {
     let click = {
         r: 1,
         av: 1,
-        addR: 24/15, // 1 + 24/15 * 15
-        subAv: 1/15, // 1 - 1/15 * 15
+        addR: 11.5/15, // add a 15th of whatever number i want it to reach (but subtract 1 from it)
+        subAv: 1/15, // subtract a 15th of 1 until it reaches 0 (then deletes itself cuz its invisible)
         button: button,
     }
     click.x = cursorX;
