@@ -20,6 +20,7 @@ if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
     cnv.style.width = "400px", cnv.style.height = "325px";
+    cnv.style.paddingTop = `${(window.innerHeight - Number(cnv.style.height.slice(0, 3)))/2}px`
 }
 
 // Touchscreen Events
