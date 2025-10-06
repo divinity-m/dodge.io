@@ -1,4 +1,4 @@
-console.log("200px by 162.5px");
+console.log("let");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -19,7 +19,7 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    let GAME_WIDTH = 200, GAME_HEIGHT = 162.5;
+    GAME_WIDTH = 200, GAME_HEIGHT = 162.5;
     cnv.width = 200, cnv.height = 162.5;
 }
 
