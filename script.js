@@ -1,4 +1,4 @@
-console.log("removing it again lol");
+console.log("@media");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
