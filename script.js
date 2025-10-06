@@ -1,4 +1,4 @@
-console.log("@media 300px width");
+console.log("scale(0.5, 0.5)");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -7,8 +7,7 @@ const ctx = cnv.getContext('2d');
 // Game Units
 let gameState = "loading", innerGameState = "loading";
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
-cnv.width = 800;
-cnv.height = 650;
+cnv.width = 800, cnv.height = 650;
 
 // Screen Orientations
 function isMobile() {
@@ -21,6 +20,8 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
+    GAME_WIDTH = 400, GAME_HEIGHT = 325;
+    cnv.width = 400, cnv.height = 325;
 }
 
 document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
@@ -279,6 +280,9 @@ function resetBgVars() {
 function draw() {
     now = Date.now();
     detectHover();
+
+    ctx.save();
+    ctx.scale(0.5, 0.5);
   
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -374,6 +378,7 @@ function draw() {
         abilities();
         musicCollisions();
     }
+    ctx.restore();
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
