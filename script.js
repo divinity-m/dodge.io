@@ -1,4 +1,4 @@
-console.log("resize window, fixed touchstart, fixed trails");
+console.log("screen?.orientation, fixed touchstart");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -24,7 +24,7 @@ function resize() {
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener('resize', resize);
-window.addEventListener("orientationchange", resize);
+screen?.orientation.addEventListener("orientationchange", resize);
 resize();
 
 // Touchscreen Events
@@ -88,8 +88,8 @@ function updateCursor(eventObject) {
     // offset mouse
     const rect = cnv.getBoundingClientRect();
     
-    const scaleX = cnv.width / rect.width; // if the user is on mobile, the rect shrinks with the canvas
-    const scaleY = cnv.height / rect.height; // so you gotta double the X and Y to match
+    const scaleX = Math.round(cnv.width / rect.width); // if the user is on mobile, the rect shrinks with the canvas
+    const scaleY = Math.round(cnv.height / rect.height); // so you gotta double the X and Y to match
     [mouseX, mouseY] = [(cursorX - rect.left) * scaleX, (cursorY - rect.top) * scaleY];
 }
 function addCursorTrail() {
