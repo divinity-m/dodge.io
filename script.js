@@ -1,4 +1,4 @@
-console.log("isMobile");
+console.log("removed resize and used css");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -14,7 +14,7 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
-
+/*
 let scale;
 function resizeCnv() {
     // Pick a scale factor based on view width and view height
@@ -34,7 +34,7 @@ function resizeCnv() {
 }
 window.addEventListener("resize", resizeCnv);
 window.addEventListener("orientationchange", resizeCnv);
-resizeCnv();
+resizeCnv();*/
 
 // Touchscreen Events
 if (isMobile()) {
@@ -298,8 +298,8 @@ function resetBgVars() {
 function draw() {
     now = Date.now();
     detectHover();
-    ctx.save();
-    ctx.scale(scale, scale);
+   /* ctx.save();
+    ctx.scale(scale, scale);*/
     
     ctx.fillStyle = "rgb(185, 185, 185)";
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -395,7 +395,7 @@ function draw() {
         abilities();
         musicCollisions();
     }
-    ctx.restore();
+    /*ctx.restore();*/
 
     // CURSOR STUFF
     let cursorEl = document.getElementById("cursor");
