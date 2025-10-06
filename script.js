@@ -1,4 +1,4 @@
-console.log("cnv.style");
+console.log("mouse X and Y adjustment");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -95,7 +95,7 @@ document.addEventListener('mousemove', (event) => {
 document.addEventListener("touchmove", (event) => { updateCursor(event.touches[0]); });
 document.addEventListener("touchstart", () => {
     updateCursor(event.touches[0]);
-    if (isMobile()) { mouseDown = true; recordLeftClick(); }
+    if (isMobile()) { mouseDown = true; recordLeftClick(); allClicks.push(createClick("left")); }
 });
 
 // Player & Enemies
