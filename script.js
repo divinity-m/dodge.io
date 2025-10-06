@@ -1,5 +1,4 @@
-console.log("padding replaced with top
-");
+console.log("padding replaced with top");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
