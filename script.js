@@ -21,7 +21,7 @@ function resize() {
         document.getElementById("inspirationEl").remove();
         cnv.style.width = "400px";
         cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`
-    } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`,
+    } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener('resize', resize());
 resize();
