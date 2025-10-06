@@ -710,6 +710,14 @@ function drawStartScreen() {
         ctx.font = '30px Roboto';
         ctx.textAlign = 'left';
         ctx.strokeText("Vasto", 5, 30);
+
+        // Credits for mobile players
+        if (isMobile()) {
+            ctx.fillStyle = player.color;
+            ctx.font = "12.5px Verdana";
+            ctx.textAlign = "right";
+            ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", GAME_WIDTH-10, 10);
+        }
     }
 
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
