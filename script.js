@@ -1,4 +1,4 @@
-console.log("let");
+console.log("max-height: 300px");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
