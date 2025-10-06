@@ -1,4 +1,4 @@
-console.log("scale(0.5, 0.5)");
+console.log("scale(0.5, 0.5);");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
