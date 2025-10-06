@@ -1,4 +1,4 @@
-console.log("screen?.orientation, fixed touchstart");
+console.log("cursor accuracy");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -82,15 +82,15 @@ let lastCursorTrail = 0;
 let trailDensity = 0;
 
 function updateCursor(eventObject) {
-    // cursor location
+    // update cursor
     [cursorX, cursorY] = [eventObject.clientX, eventObject.clientY];
 
-    // offset mouse
+    // update mouse
     const rect = cnv.getBoundingClientRect();
-    
-    const scaleX = Math.round(cnv.width / rect.width); // if the user is on mobile, the rect shrinks with the canvas
-    const scaleY = Math.round(cnv.height / rect.height); // so you gotta double the X and Y to match
-    [mouseX, mouseY] = [(cursorX - rect.left) * scaleX, (cursorY - rect.top) * scaleY];
+    let scale = 1;
+    if (isMobile()) scale = 2;
+  
+    [mouseX, mouseY] = [(cursorX - rect.left) * scale, (cursorY - rect.top) * scale];
 }
 function addCursorTrail() {
     if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
@@ -106,7 +106,7 @@ function addCursorTrail() {
         }
     }
 }
-
+// cursor update event listeners
 document.addEventListener('mousemove', (event) => {
     updateCursor(event);
     addCursorTrail();
