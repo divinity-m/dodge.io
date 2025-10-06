@@ -24,19 +24,10 @@
             #game {
                 width: 100%;
                 height: auto;
-                max-width: 800px;
                 display: block;
                 margin: 0 auto;
                 pointer-events: none;
             }
-            @media (max-width: 768px) {
-                #game {
-                    max-width: 400px;
-                    margin: 0 auto;
-                }
-            }
-
-            
             .no-cursor html,
             .no-cursor body,
             .no-cursor * {
@@ -62,6 +53,7 @@
                 color: #FF77A8;
             }
             #cursor, #cursor-overlay {
+                display: none;
                 position: absolute;
                 pointer-events: none;
                 top: -20px;
@@ -71,8 +63,8 @@
                 border-radius: 100%;
                 border-style: solid;
                 border-width: 3px;
-                background-color: rgb(255, 255, 255);
-                border-color: rgb(230, 230, 230);
+                background-color: rgba(255, 255, 255, 0);
+                border-color: rgba(230, 230, 230, 0);
             }
             .trail, .click {
                 position: absolute;
