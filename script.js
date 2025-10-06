@@ -19,8 +19,8 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    cnv.style.width = "400px"
-    cnv.style.paddingTop = `${(window.innerHeight - Number(cnv.style.height.slice(0, 3)))/2}px`
+    cnv.style.width = "400px";
+    cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`
 } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`,
 
 
