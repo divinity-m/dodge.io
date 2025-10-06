@@ -1,4 +1,4 @@
-console.log("cursor accuracy");
+console.log("padding issues and probably a non-existent element error");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -15,10 +15,12 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
+if (isMobile()) {
+    document.getElementById("titleEl").remove();
+    document.getElementById("inspirationEl").remove();
+}
 function resize() {
     if (isMobile()) {
-        document.getElementById("titleEl").remove();
-        document.getElementById("inspirationEl").remove();
         cnv.style.width = "400px";
         cnv.style.paddingTop = `${(window.innerHeight - 325)/2}px`;
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
@@ -87,10 +89,11 @@ function updateCursor(eventObject) {
 
     // update mouse
     const rect = cnv.getBoundingClientRect();
-    let scale = 1;
-    if (isMobile()) scale = 2;
+    const scaleX = Math.round(cnv.width / rect.width);
+    const scaleY = Math.round(cnv.height / rect.height);
   
-    [mouseX, mouseY] = [(cursorX - rect.left) * scale, (cursorY - rect.top) * scale];
+    mouseX = (cursorX - rect.left) * scale;
+    mouseY = (cursorY - rect.top) * scale + (window.innerHeight - 325)/2; // gotta add the padding
 }
 function addCursorTrail() {
     if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
