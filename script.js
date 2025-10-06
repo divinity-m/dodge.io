@@ -19,8 +19,7 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    cnv.style.width = "400px";
-    cnv.style.height = "325px";
+    cnv.style.width = "400px", cnv.style.height = "325px";
 }
 
 // Touchscreen Events
@@ -83,7 +82,10 @@ function updateCursor(eventObject) {
 
     // offset mouse
     const rect = cnv.getBoundingClientRect();
-    [mouseX, mouseY] = [cursorX - rect.left, cursorY - rect.top];
+    
+    const scaleX = cnv.width / rect.width; // if the user is on mobile, the rect shrinks with the canvas
+    const scaleY = cnv.height / rect.height; // so you gotta double the X and Y to match
+    [mouseX, mouseY] = [(cursorX - rect.left) * 2, (cursorY - rect.top) * 2];
 }
 
 document.addEventListener('mousemove', (event) => {
