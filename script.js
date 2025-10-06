@@ -1,4 +1,4 @@
-console.log("viewW and viewH");
+console.log("isMobile");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
