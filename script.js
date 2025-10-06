@@ -1,4 +1,4 @@
-console.log("translate(-50%, -50%)");
+console.log("center cursor and resize window");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -24,6 +24,7 @@ function resize() {
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener('resize', resize);
+window.addEventListener("orientationchange", resize);
 resize();
 
 // Touchscreen Events
