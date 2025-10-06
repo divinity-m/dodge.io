@@ -1,4 +1,4 @@
-console.log("padding replaced with top, position styling, credits");
+console.log("added measures to prevent zooming");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -33,10 +33,6 @@ window.addEventListener('resize', resize);
 screen?.orientation.addEventListener("orientationchange", resize);
 resize();
 
-// Touchscreen Events
-document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false });
-document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false });
-
 // Keyboard Events
 let lastPressing = "mouse";
 let keyboardMovementOn = false;
@@ -53,8 +49,8 @@ let mouseDown = false;
 let allClicks = [];
 let mouseMovementOn = false;
 let previousMM = false;
-document.addEventListener("mousedown", () => { if (!isMobile()) mouseDown = true });
-document.addEventListener("mouseup", () => { if (!isMobile()) mouseDown = false });
+document.addEventListener("mousedown", () => { if (!isMobile()) mouseDown = true; });
+document.addEventListener("mouseup", () => { if (!isMobile()) mouseDown = false; });
 document.addEventListener("click", () => {
     if (!isMobile()) { recordLeftClick(); allClicks.push(createClick("left")); }
 });
@@ -68,6 +64,10 @@ document.addEventListener("auxclick", (event) => {
         if (!isMobile()) {  recordMiddleClick(event); allClicks.push(createClick("middle")); }
     }
 });
+
+// Touchscreen Events
+document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false; });
+document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false; });
 
 // Input Tracking
 let mouseOver = {
@@ -122,11 +122,12 @@ document.addEventListener('mousemove', (event) => {
 });
 document.addEventListener("touchmove", (event) => {
     updateCursor(event.touches[0]);
+    mouseDown = true;
     addCursorTrail();
 });
 document.addEventListener("touchstart", (event) => {
     updateCursor(event.touches[0]);
-    if (isMobile()) { mouseDown = true; recordLeftClick(); allClicks.push(createClick("left")); }
+    if (isMobile()) {recordLeftClick(); allClicks.push(createClick("left")); }
 });
 
 // Player & Enemies
