@@ -23,6 +23,7 @@ function resizeCnv() {
 }
 window.addEventListener("resize", resizeCnv);
 window.addEventListener("orientationchange", resizeCnv);
+resizeCnv();
 
 // Touchscreen Events
 function isMobile() {
