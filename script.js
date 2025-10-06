@@ -7,6 +7,7 @@ const ctx = cnv.getContext('2d');
 // Game Units
 let gameState = "loading", innerGameState = "loading";
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
+cnv.width = 800, cnv.height = 650;
 
 // Screen Orientations
 function isMobile() {
