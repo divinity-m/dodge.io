@@ -9,13 +9,21 @@ let gameState = "loading", innerGameState = "loading";
 const GAME_WIDTH = 800, GAME_HEIGHT = 650;
 
 // Screen Orientations
+function isMobile() {
+  const uaCheck = /Mobi|Android/i.test(navigator.userAgent);
+  const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
+  return uaCheck || sizeCheck;
+}
+
 let scale;
 function resizeCnv() {
     // Pick a scale factor based on view width and view height
     const viewW = document.documentElement.clientWidth;
     const viewH = document.documentElement.clientHeight;
 
-    const factor = Math.min(viewW / GAME_WIDTH, viewH / GAME_HEIGHT);
+    let factor;
+    if (!isMobile()) factor = Math.min(viewW / GAME_WIDTH, viewH / GAME_HEIGHT);
+    else factor = Math.min(viewW / GAME_HEIGHT, viewH / GAME_WIDTH);
 
     // set the canvas drawing resolution
     cnv.width = GAME_WIDTH * factor;
@@ -29,11 +37,6 @@ window.addEventListener("orientationchange", resizeCnv);
 resizeCnv();
 
 // Touchscreen Events
-function isMobile() {
-  const uaCheck = /Mobi|Android/i.test(navigator.userAgent);
-  const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
-  return uaCheck || sizeCheck;
-}
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
