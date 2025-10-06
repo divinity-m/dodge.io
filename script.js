@@ -1,4 +1,4 @@
-console.log("padding replaced with top");
+console.log("padding replaced with top, position styling, credits");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -16,12 +16,16 @@ function isMobile() {
   return uaCheck || sizeCheck;
 }
 if (isMobile()) {
+    // remove the title and paragraph for phones
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
 }
 function resize() {
     if (isMobile()) {
         cnv.style.width = "400px";
+        // center the canvas on the screen for phones
+        cnv.style.position = "absolute";
+        cnv.style.left = `${(window.innerWidth - 400)/2}px`;
         cnv.style.top = `${(window.innerHeight - 325)/2}px`;
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
