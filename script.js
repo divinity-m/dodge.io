@@ -1,4 +1,4 @@
-console.log("added measures to prevent zooming");
+console.log("added measures to prevent zooming, track");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
