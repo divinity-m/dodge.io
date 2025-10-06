@@ -22,12 +22,20 @@
                 font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
             }
             #game {
-                width: 400px;
-                height: 325px;
+                width: 800px;
+                height: 650px;
                 display: block;
                 margin: 0 auto;
                 pointer-events: none;
             }
+            @media (max-width: 740px) {
+                #game {
+                    width: 400px; /* half size */
+                    height: 325px;
+                }
+            }
+
+            
             .no-cursor html,
             .no-cursor body,
             .no-cursor * {
