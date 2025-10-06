@@ -405,7 +405,6 @@ function draw() {
     }
     if (!settings.customCursor || isMobile()) {
         document.documentElement.classList.remove("no-cursor");
-        allCursors = [];
         cursorEl.style.display = "none";
         overlayEl.style.display = "none";
     }
@@ -470,7 +469,7 @@ function draw() {
         }
         
         // update cursor position
-        let offset = (cursrEl.style.width + cursrEl.style.borderWidth)/2 * (8.5/7.5); // basically the radius / (8.5/7.5)
+        let offset = (cursorEl.style.width + cursrEl.style.borderWidth)/2 * (8.5/7.5); // basically the radius / (8.5/7.5)
         cursorEl.style.top = `${cursorY-offset}px`;
         cursorEl.style.left = `${cursorX-offset}px`;
         overlayEl.style.top = `${cursorY-offset}px`;
