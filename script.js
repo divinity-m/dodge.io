@@ -1,4 +1,4 @@
-console.log("scale(0.5, 0.5);");
+console.log("scale(0.375, 0.375);");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -19,8 +19,8 @@ function isMobile() {
 if (isMobile()) {
     document.getElementById("titleEl").remove();
     document.getElementById("inspirationEl").remove();
-    GAME_WIDTH = 400, GAME_HEIGHT = 325;
-    cnv.width = 400, cnv.height = 325;
+    GAME_WIDTH = 300, GAME_HEIGHT = 244;
+    cnv.width = 300, cnv.height = 244;
 }
 
 // Touchscreen Events
@@ -283,7 +283,7 @@ function draw() {
 
     if (isMobile()) {
         ctx.save();
-        ctx.scale(0.5, 0.5);
+        ctx.scale(0.375, 0.375);
     }
   
     ctx.fillStyle = "rgb(185, 185, 185)";
