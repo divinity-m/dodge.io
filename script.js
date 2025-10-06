@@ -1,4 +1,4 @@
-console.log("center cursor and resize window");
+console.log("resize window, fixed touchstart, fixed trails");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -92,13 +92,31 @@ function updateCursor(eventObject) {
     const scaleY = cnv.height / rect.height; // so you gotta double the X and Y to match
     [mouseX, mouseY] = [(cursorX - rect.left) * scaleX, (cursorY - rect.top) * scaleY];
 }
+function addCursorTrail() {
+    if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
+        // Trail Density
+        const pNow = performance.now();
+        if (pNow - lastCursorTrail > 16) { // ~60fps cap
+            allCursors.push(createCursor());
+            if (allCursors.length > 100) { // drop oldest
+                allCursors[0].div.remove();
+                allCursors.shift();
+            }
+            lastCursorTrail = pNow;
+        }
+    }
+}
 
 document.addEventListener('mousemove', (event) => {
     updateCursor(event);
+    addCursorTrail();
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
-document.addEventListener("touchmove", (event) => { updateCursor(event.touches[0]); });
-document.addEventListener("touchstart", () => {
+document.addEventListener("touchmove", (event) => {
+    updateCursor(event.touches[0]);
+    addCursorTrail();
+});
+document.addEventListener("touchstart", (event) => {
     updateCursor(event.touches[0]);
     if (isMobile()) { mouseDown = true; recordLeftClick(); allClicks.push(createClick("left")); }
 });
@@ -390,25 +408,25 @@ function draw() {
     let playerColor = player.color.slice(4, player.color.length-1);
     let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
 
-    // clears trails and clicks
-    allCursors.forEach(c => { if (c.av <= 0 || trailDensity <= 0) c.div.remove(); })
-    allClicks.forEach(c => {
-        if (c.av <= 0) {
-            c.div.remove();
-            if (c?.divMid) c?.divMid.remove();
+    // filters trails and clicks divs
+    allCursors.forEach(trail => { if (trail.av <= 0 || trailDensity <= 0) trail.div.remove(); })
+    allClicks.forEach(click => {
+        if (click.av <= 0) {
+            click.div.remove();
+            if (click?.divMid) click?.divMid.remove(); // need to acocunt for middle click
         }
     })
-    
+
+    // filters trails and clicks from array
     allCursors = allCursors.filter(c => c.av > 0 && trailDensity > 0); // removes trails with low av's
     allClicks = allClicks.filter(c => c.av > 0); // removes clicks with low av's
   
     // Makes default cursor invisible
-    if (settings.customCursor) {
+    if (settings.customCursor && !isMobile()) {
         document.documentElement.classList.add("no-cursor");
         cursorEl.style.display = "block";
         overlayEl.style.display = "block";
-    }
-    if (!settings.customCursor || isMobile()) {
+    } else {
         document.documentElement.classList.remove("no-cursor");
         cursorEl.style.display = "none";
         overlayEl.style.display = "none";
@@ -417,33 +435,24 @@ function draw() {
   
     // Cursor & Cursor Trail
     if (cursorX !== undefined && cursorY !== undefined) {
-        // Trail Density
-        const pNow = performance.now();
-        if (settings.customCursor && trailDensity > 0 && pNow - lastCursorTrail > 16) { // ~60fps cap
-            allCursors.push(createCursor());
-            if (allCursors.length > 100) { // drop oldest
-                allCursors[0].div.remove();
-                allCursors.shift();
-            }
-            lastCursorTrail = pNow;
-        }
+        // Draws Trail
+        allCursors.forEach(trail => {
+            // draws trails dimensions and color
+            trail.div.style.width = `${trail.r*2}px`;
+            trail.div.style.height = `${trail.r*2}px`;
+            trail.div.style.backgroundColor = trail.color;
 
-        // Trail Drawing
-        allCursors.forEach(cursor => {
-            cursor.div.style.width = `${cursor.r*2}px`;
-            cursor.div.style.height = `${cursor.r*2}px`;
-            cursor.div.style.backgroundColor = cursor.color;
+            // places trail
+            trail.div.style.transform = "translate(-50%, -50%)";
+            trail.div.style.top = `${trail.y}px`;
+            trail.div.style.left = `${trail.x}px`;
 
-            cursor.div.style.transform = "translate(-50%, -50%)";
-            cursor.div.style.top = `${cursor.y}px`;
-            cursor.div.style.left = `${cursor.x}px`;
-            
-            cursor.r -= cursor.subR;
-            cursor.av -= cursor.subAv;
+            // changes trails radius and alpha value to animate it
+            trail.r -= trail.subR;
+            trail.av -= trail.subAv;
         })
     
-        // Cursor Itself
-        // base drawing stats for the cursor and overlay
+        // Draws Cursor
         cursorEl.style.width = `${window.innerWidth * (12/1397)}px`;
         cursorEl.style.height = `${window.innerWidth * (12/1397)}px`;
         cursorEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
@@ -452,12 +461,14 @@ function draw() {
         overlayEl.style.height = `${window.innerWidth * (12/1397)}px`;
         overlayEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
         
-        
+        // Handles hoverings
         let hovering = false;
+        
         // covers hovering over canvas buttons
         Object.keys(mouseOver).forEach(hover => {
           if (mouseOver[hover]) hovering = true;
         })
+        
         // covers hovering over hyperlinks
         let hyperlinks = document.getElementsByTagName('a');
         for (let i = 0; i < hyperlinks.length; i++) {
@@ -491,6 +502,7 @@ function draw() {
         cursorEl.style.top = `${cursorY}px`;
         cursorEl.style.left = `${cursorX}px`;
 
+        // update overlay position
         overlayEl.style.transform = "translate(-50%, -50%)";
         overlayEl.style.top = cursorEl.style.top;
         overlayEl.style.left = cursorEl.style.left;
@@ -498,6 +510,7 @@ function draw() {
       
     // Click Animation
     allClicks.forEach(click => {
+        // draws clicks dimensions and color
         click.div.style.width = `${click.r*2}px`;
         click.div.style.height = `${click.r*2}px`;
         click.div.style.border = "2px solid";
@@ -505,12 +518,13 @@ function draw() {
         click.div.style.backgroundColor = "rgba(0, 0, 0, 0)";
         if (click.button === "left" || click.button === "middle") click.div.style.borderColor = click.colorLeft;
         if (click.button === "right") click.div.style.borderColor = click.colorRight;
-        
+
+        // places click
         click.div.style.transform = "translate(-50%, -50%)";
         click.div.style.top = `${click.y}px`;
         click.div.style.left = `${click.x}px`;
         
-        
+        // determines middle clicks dimensions, color, and placement
         if (click.button === "middle") {
             click.divMid.style.backgroundColor = "rgba(0, 0, 0, 0)";
             let newR = click.r-3;
@@ -525,6 +539,7 @@ function draw() {
             }
         }
 
+        // changes clicks radius and alpha value to animate it
         click.r += click.addR;
         click.av -= click.subAv;
     })
