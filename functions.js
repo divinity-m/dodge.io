@@ -617,10 +617,13 @@ function decideFillStyle(bool, color1, color2) {
 }
 
 function createCursor() {
+    let rad;
+    if (isMobile()) rad = 7.5/2;
+    else rad = 7.5;
     let cursor = {
-        r: 7.5,
+        r: rad,
         av: 1,
-        subR: 7.5/Math.max(1, 30*trailDensity),
+        subR: rad/Math.max(1, 30*trailDensity),
         subAv: 1/Math.max(1, 30*trailDensity),
     }
     cursor.x = cursorX;
@@ -637,10 +640,13 @@ function createCursor() {
 }
 
 function createClick(button) {
+    let rad;
+    if (isMobile()) rad = 12.5;
+    else rad = 25;
     let click = {
-        r: 1,
+        r: 0,
         av: 1,
-        addR: 11.5/15, // add a 15th of whatever number i want it to reach (but subtract 1 from it)
+        addR: rad/15, // add a 15th of whatever number i want it to reach
         subAv: 1/15, // subtract a 15th of 1 until it reaches 0 (then deletes itself cuz its invisible)
         button: button,
     }
