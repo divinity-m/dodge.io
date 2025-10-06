@@ -1,4 +1,4 @@
-console.log("@media");
+console.log("@media 300px width");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
