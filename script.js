@@ -1,4 +1,4 @@
-console.log("padding issues and probably a non-existent element error");
+console.log("padding and orientation fix");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
