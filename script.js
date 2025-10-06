@@ -1,4 +1,4 @@
-console.log("fixed a dumb bug");
+console.log("cursorEl");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -469,7 +469,7 @@ function draw() {
         }
         
         // update cursor position
-        let offset = (cursorEl.style.width + cursrEl.style.borderWidth)/2 * (8.5/7.5); // basically the radius / (8.5/7.5)
+        let offset = (cursorEl.style.width + cursorEl.style.borderWidth)/2 * (8.5/7.5); // basically the radius / (8.5/7.5)
         cursorEl.style.top = `${cursorY-offset}px`;
         cursorEl.style.left = `${cursorX-offset}px`;
         overlayEl.style.top = `${cursorY-offset}px`;
