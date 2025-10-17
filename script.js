@@ -1,4 +1,4 @@
-console.log("added measures to prevent zooming, track");
+console.log("ui for difficulties");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
