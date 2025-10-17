@@ -1368,9 +1368,9 @@ function drawText() { // draws the current time, highest time, and enemy count
         // Level Percentage
         let percentage = Math.floor(music.var.currentTime / music.var.duration * 100);
         if (gameState === "musicMode") {
-            if (music.name === "Alarm 9") highscore.limbo = Math.max(highscore.limbo, percentage);
-            if (music.name === "Astral Projection") highscore.andromeda = Math.max(highscore.andromeda, percentage);
-            if (music.name === "Divine") highscore.euphoria = Math.max(highscore.euphoria, percentage);
+            if (music.name === "Alarm 9") highscore.limbo = Math.min(Math.max(highscore.limbo, percentage), 100);
+            if (music.name === "Astral Projection") highscore.andromeda = Math.min(Math.max(highscore.andromeda, percentage), 100);
+            if (music.name === "Divine") highscore.euphoria = Math.min(Math.max(highscore.euphoria, percentage), 100);
         }
         
         // Saves data every 1.5 seconds incase the user disconnects/crashes
