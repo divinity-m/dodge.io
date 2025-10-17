@@ -1,4 +1,4 @@
-console.log("ui for difficulties");
+console.log("requirements for difficulties");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
