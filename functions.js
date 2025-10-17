@@ -195,22 +195,73 @@ function recordLeftClick() {
         })
     }
 
+    // Hero Choice
+    else if (innerGameState === "selectDodger") {
+        if (!dash.activated && (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo)) {
+            if (mouseOver.evader) {
+                player.dodger = "evader";
+                player.color = "rgb(255, 255, 255)";
+                player.subColor = "rgb(230, 230, 230)";
+                amplify.reset();
+            }
+            else if (mouseOver.j_sab && highscore.andromeda === 100) {
+                player.dodger = "j-sab";
+                player.color = "rgb(255, 0, 0)";
+                player.subColor = "rgb(230, 0, 0)";
+                amplify.reset();
+            }
+            else if (mouseOver.jötunn && highscore.limbo === 100) {
+                player.dodger = "jötunn";
+                player.color = "rgb(79, 203, 255)";
+                player.subColor = "rgb(70, 186, 235)";
+                amplify.reset();
+            }
+            else if (mouseOver.jolt && highscore.medium >= 30) {
+                player.dodger = "jolt";
+                player.color = "rgb(255, 255, 0)";
+                player.subColor = "rgb(230, 230, 0)";
+                amplify.reset();
+            }
+            else if (mouseOver.crescendo && highscore.hard >= 60) {
+                player.dodger = "crescendo";
+                player.color = "rgb(0, 0, 0)";
+                player.subColor = "rgb(40, 40, 40)";
+            }
+            mouseMovementOn = previousMM;
+            // saves the players values to the local storage to keep track of the players dodger
+            userData.player = player;
+            if (now - clickEventSave > 500) {
+                localStorage.setItem('localUserData', JSON.stringify(userData));
+                clickEventSave = Date.now();
+            }
+        }
+    }
+        
     // Difficulty Choice
     else if (innerGameState === "selectDifficulty" && mouseOver) {
+        let locked = false;
+        if (mouseOver?.medium && highscore?.easy < 45) locked = true;
+        if (mouseOver?.hard && highscore?.medium < 45) locked = true;
+        if (mouseOver?.limbo && highscore?.easy < 30) locked = true;
+        if (mouseOver?.andromeda && highscore?.limbo < 75) locked = true;
+        if (mouseOver?.euphoria && highscore?.andromeda < 75) locked = true;
+
+        
         ["easy", "medium", "hard"].forEach(level => {
-            if (mouseOver?.[level]) {
+            if (mouseOver?.[level]) mouseMovementOn = previousMM;
+            if (mouseOver?.[level] && !locked) {
                 pauseAudio(music.promise, music.var);
                 if (mouseOver?.easy) difficulty = {level: "easy", color: "rgb(0, 225, 255)"};
                 if (mouseOver?.medium) difficulty = {level: "medium", color: "rgb(255, 255, 0)"};
                 if (mouseOver?.hard) difficulty = {level: "hard", color: "rgb(0, 0, 0)"};
                 music = {var: interstellar, name: "interstellar", artist: "pandora., chillwithme, & cødy",
                          color: "rgb(105, 105, 105)", subColor: "rgb(115, 115, 115)",};
-                mouseMovementOn = previousMM;
                 restartEndless();
             }
         });
         ["limbo", "andromeda", "euphoria"].forEach(level => {
-            if (mouseOver?.[level]) {
+            if (mouseOver?.[level]) mouseMovementOn = previousMM;
+            if (mouseOver?.[level] && !locked) {
                 pauseAudio(music.promise, music.var);
                 if (mouseOver?.limbo) {
                     music = {var: alarm9, name: "Alarm 9", artist: "Blue Cxve",
@@ -522,52 +573,9 @@ function recordLeftClick() {
                 }
                 music.timestamps.sort((a, b) => a[0] - b[0]);
                 music.backUpTS = [...music.timestamps];
-                mouseMovementOn = previousMM;
                 restartMusicMode();
             }
         })
-    }
-    
-    // Hero Choice
-    else if (innerGameState === "selectDodger") {
-        if (!dash.activated && (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo)) {
-            if (mouseOver.evader) {
-                player.dodger = "evader";
-                player.color = "rgb(255, 255, 255)";
-                player.subColor = "rgb(230, 230, 230)";
-                amplify.reset();
-            }
-            else if (mouseOver.j_sab && highscore.andromeda === 100) {
-                player.dodger = "j-sab";
-                player.color = "rgb(255, 0, 0)";
-                player.subColor = "rgb(230, 0, 0)";
-                amplify.reset();
-            }
-            else if (mouseOver.jötunn && highscore.limbo === 100) {
-                player.dodger = "jötunn";
-                player.color = "rgb(79, 203, 255)";
-                player.subColor = "rgb(70, 186, 235)";
-                amplify.reset();
-            }
-            else if (mouseOver.jolt && highscore.medium >= 30) {
-                player.dodger = "jolt";
-                player.color = "rgb(255, 255, 0)";
-                player.subColor = "rgb(230, 230, 0)";
-                amplify.reset();
-            }
-            else if (mouseOver.crescendo && highscore.hard >= 60) {
-                player.dodger = "crescendo";
-                player.color = "rgb(0, 0, 0)";
-                player.subColor = "rgb(40, 40, 40)";
-            }
-            mouseMovementOn = previousMM;
-            // saves the players values to the local storage to keep track of the players dodger
-            userData.player = player;
-            if (now - clickEventSave > 500) {
-                localStorage.setItem('localUserData', JSON.stringify(userData));
-                clickEventSave = Date.now();
-            }
-        }
     }
 
     // Mobile MM stays on
@@ -575,32 +583,35 @@ function recordLeftClick() {
 }
 
 function detectHover() {
-    mouseOver.play = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150; // const playBtn = { x: 250, y: 50, w: 300, h: 100, };
-    mouseOver.selector = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDodger") && mouseX > 250 && mouseX < 550 && mouseY > 475 && mouseY < 575; // const selectorBtn = { x: 250, y: 475, w: 300, h: 100, };
+    mouseOver.play = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
+    mouseOver.selector = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDodger") && mouseX > 250 && mouseX < 550 && mouseY > 475 && mouseY < 575;
     mouseOver.settings = gameState === "startScreen" && Math.hypot(770 - mouseX, 620 - mouseY) < 30;
     mouseOver.restart = gameState === "endlessOver" && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
 
-    mouseOver.evader = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
-    mouseOver.j_sab = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 425 && mouseX < 625 && mouseY > 150 && mouseY < 250;
-    mouseOver.jötunn = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
-    mouseOver.jolt = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 300 && mouseX < 500 && mouseY > 25 && mouseY < 125;
-    mouseOver.crescendo = gameState === "startScreen" && innerGameState === "selectDodger" && mouseX > 175 && mouseX < 375 && mouseY > 150 && mouseY < 250;
+    let dodgerSelection = gameState === "startScreen" && innerGameState === "selectDodger";
+    mouseOver.evader = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
+    mouseOver.j_sab = dodgerSelection && mouseX > 425 && mouseX < 625 && mouseY > 150 && mouseY < 250;
+    mouseOver.jötunn = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
+    mouseOver.jolt = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 25 && mouseY < 125;
+    mouseOver.crescendo = dodgerSelection && mouseX > 175 && mouseX < 375 && mouseY > 150 && mouseY < 250;
 
-    mouseOver.easy = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
-    mouseOver.medium = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
-    mouseOver.hard = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
-    mouseOver.limbo = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
-    mouseOver.andromeda = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
-    mouseOver.euphoria = gameState === "startScreen" && innerGameState === "selectDifficulty" && mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
+    let difficultySelection = gameState === "startScreen" && innerGameState === "selectDifficulty";
+    mouseOver.easy = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
+    mouseOver.medium = difficultySelection && mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
+    mouseOver.hard = difficultySelection && mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
+    mouseOver.limbo = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
+    mouseOver.andromeda = difficultySelection && mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
+    mouseOver.euphoria = difficultySelection && mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
 
-    mouseOver.enemyOutBtn = gameState === "startScreen" && innerGameState === "settings" && mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
-    mouseOver.disableMMBtn = gameState === "startScreen" && innerGameState === "settings" && mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
-    mouseOver.musicSlider = gameState === "startScreen" && innerGameState === "settings" && mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
-    mouseOver.sfxSlider = gameState === "startScreen" && innerGameState === "settings" && mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
-    mouseOver.aZ_RangeBtn = gameState === "startScreen" && innerGameState === "settings" && mouseX > 266 && mouseX < 286 && mouseY > 135 && mouseY < 155;
-    mouseOver.aZ_AvSlider = gameState === "startScreen" && innerGameState === "settings" && mouseX >= 545 && mouseX <= 715 && mouseY >= 130 && mouseY <= 160;
-    mouseOver.customCursorBtn = gameState === "startScreen" && innerGameState === "settings" && mouseX > 167 && mouseX < 187 && mouseY > 185 && mouseY < 205;
-    mouseOver.cursorTrailSlider = gameState === "startScreen" && innerGameState === "settings" && mouseX >= 540 && mouseX <= 710 && mouseY >= 180 && mouseY <= 210;
+    let settingsMenu = gameState === "startScreen" && innerGameState === "settings";
+    mouseOver.enemyOutBtn = settingsMenu && mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
+    mouseOver.disableMMBtn = settingsMenu && mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
+    mouseOver.musicSlider = settingsMenu && mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
+    mouseOver.sfxSlider = settingsMenu && mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
+    mouseOver.aZ_RangeBtn = settingsMenu && mouseX > 266 && mouseX < 286 && mouseY > 135 && mouseY < 155;
+    mouseOver.aZ_AvSlider = settingsMenu && mouseX >= 545 && mouseX <= 715 && mouseY >= 130 && mouseY <= 160;
+    mouseOver.customCursorBtn = settingsMenu && mouseX > 167 && mouseX < 187 && mouseY > 185 && mouseY < 205;
+    mouseOver.cursorTrailSlider = settingsMenu && mouseX >= 540 && mouseX <= 710 && mouseY >= 180 && mouseY <= 210;
 }
 
 // FUNCTIONS THAT DRAWS STUFF TO THE SCREEN
@@ -934,24 +945,46 @@ function drawSettings() {
 
 function drawDifficultySelection() {
     // Nested functions cuz fuck doing this shit over and over again
-    function drawDifficultyInfo(x, y, color, difficultyName, score, adversary, ...description) {
+    function drawDifficultyCard(mouseOver, unlocked, x, y, colors, difficultyName, score, requirement, adversary, ...description) {
+        // Rect
+        decideFillStyle(mouseOver, colors[0], colors[1]);
+        ctx.fillRect(x, y, 200, 100);
+        
         // Level Name
-        ctx.fillStyle = color;
+        ctx.fillStyle = colors[2];
         ctx.textAlign = "left";
         ctx.font = "bold 19px 'Lucida Console'";
-        ctx.fillText(difficultyName, x, y);
+        ctx.fillText(difficultyName, x+10, y+30);
 
         // Level Score
         if (score !== "none") {
             ctx.textAlign = "right";
-            ctx.fillText(score, x + 180, y);
+            ctx.fillText(score, x + 190, y+30);
         }
 
         // Level Description
         ctx.textAlign = "left";
         ctx.font = "15.5px 'Lucida Console'";
-        ctx.fillText(`${adversary}:  ${description[0]}`, x, y + 25);
-        if (description[1]) ctx.fillText(description[1], x, y + 50);
+        ctx.fillText(`${adversary}:  ${description[0]}`, x+10, y + 55);
+        if (description[1]) ctx.fillText(description[1], x+10, y + 80);
+
+        if (!unlocked) {
+            if (difficultyName === "HARD") ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            else if (difficultyName === "ANDROMEDA") ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+            else ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+            ctx.fillRect(x, y, 200, 100);
+
+            ctx.lineWidth = 1.25;
+            ctx.textAlign = "center";
+
+            ctx.strokeStyle = "rgb(255, 255, 255)";
+            ctx.font = "bold 20px Arial";
+            ctx.strokeText(requirement, x + 100, y + 55);
+            
+            ctx.strokeStyle = colors[2];
+            ctx.font = "bold 19.5px Arial";
+            ctx.strokeText(requirement, x + 100, y + 55);
+        }
     }
     function drawPercentCompleted(x, y, color, percent) {
         ctx.strokeStyle = "rgb(255, 255, 255)";
@@ -959,9 +992,9 @@ function drawDifficultySelection() {
         if (percent === 100) ctx.strokeStyle = color;
 
         // 50 + 200 + 50 = 300 || 1/6 + 2/3 + 1/6 = 1
-        let left = Math.min(1/6*100, percent) * 3; // 1/6
-        let middle = Math.max(Math.min(5/6*100-1/6*100, percent-1/6*100), 0) * 3; // 1/6 + 2/3
-        let right = Math.max(percent-(5/6*100), 0) * 3; // 1/6 + 2/3 + 1/6
+        let left = Math.min(1/6*100, percent) * 3; // 0 to 1/6
+        let middle = Math.max(Math.min(5/6*100-1/6*100, percent-1/6*100), 0) * 3; // 1/6 to 2/3
+        let right = Math.max(percent-(5/6*100), 0) * 3; // 2/3 to 1
         
         ctx.beginPath();
         ctx.moveTo(x, y+50);
@@ -996,36 +1029,37 @@ function drawDifficultySelection() {
     ctx.fillStyle = "grey";
     
     ctx.font = "bold 30px Arial";
-    ctx.fillText("NORMAL LEVELS", GAME_WIDTH/2, 220);
-    ctx.fillText("ENDLESS LEVELS", GAME_WIDTH/2, 420);
+    ctx.fillText("ENDLESS LEVELS", GAME_WIDTH/2, 220);
+    ctx.fillText("FINITE LEVELS", GAME_WIDTH/2, 420);
 
     // Levels
-    decideFillStyle(mouseOver.limbo, "rgb(128, 0, 128)", "rgb(100, 0, 100)");
-    ctx.fillRect(50, 250, 200, 100);
-    drawDifficultyInfo(60, 280, "rgb(163, 0, 163)", "LIMBO", `${highscore.limbo}%`, "Dangers", "Beams");
-    drawPercentCompleted(50, 250, "rgb(163, 0, 163)", highscore.limbo);
+    drawDifficultyCard(mouseOver.easy, true, 50, 250,
+                       ["rgb(0, 191, 216)", "rgb(0, 171, 194)", "rgb(0, 225, 255)"],
+                       "EASY", `${highscore.easy}s`, "None", "Enemies", "Normals");
     
-    decideFillStyle(mouseOver.andromeda, "rgb(240, 240, 240)", "rgb(220, 220, 220)");
-    ctx.fillRect(300, 250, 200, 100);
-    drawDifficultyInfo(310, 280, "rgb(0, 0, 0)", "ANDROMEDA", `${highscore.andromeda}%`, "Dangers", "Beams  Bombs", "Rings");
-    drawPercentCompleted(300, 250, "rgb(0, 0, 0)", highscore.andromeda);
-
-    decideFillStyle(mouseOver.euphoria, "rgb(224, 255, 232)", "rgb(223, 255, 156)");
-    ctx.fillRect(550, 250, 200, 100);
-    drawDifficultyInfo(560, 280, "rgb(255, 165, 252)", "EUPHORIA", `${highscore.euphoria}%`, "Dangers", "Beams  Bombs", "Rings  Spikes");
-    drawPercentCompleted(550, 250, "rgb(255, 165, 252)", highscore.euphoria);
-
-    decideFillStyle(mouseOver.easy, "rgb(0, 191, 216)", "rgb(0, 171, 194)");
-    ctx.fillRect(50, 450, 200, 100);
-    drawDifficultyInfo(60, 480, "rgb(0, 225, 255)", "EASY", `${highscore.easy}s`, "Enemies", "Normals");
+    drawDifficultyCard(mouseOver.medium, highscore.easy >= 45, 300, 250,
+                       ["rgb(220, 220, 0)", "rgb(200, 200, 0)", "rgb(255, 255, 0)"],
+                       "MEDIUM", `${highscore.medium}s`, "EASY 45S", "Enemies", "Normals", "Decelerators");
     
-    decideFillStyle(mouseOver.medium, "rgb(220, 220, 0)", "rgb(200, 200, 0)");
-    ctx.fillRect(300, 450, 200, 100);
-    drawDifficultyInfo(310, 480, "rgb(255, 255, 0)", "MEDIUM", `${highscore.medium}s`, "Enemies", "Normals", "Decelerators");
+    drawDifficultyCard(mouseOver.hard, highscore.medium >= 45, 550, 250,
+                       ["rgb(40, 40, 40)", "rgb(50, 50, 50)", "rgb(0, 0, 0)"],
+                       "HARD", `${highscore.hard}s`, "MEDIUM 45S", "Enemies", "Normals", "Decelerators  Homings");
+    
+    drawDifficultyCard(mouseOver.limbo, highscore.easy >= 30, 50, 450,
+                       ["rgb(128, 0, 128)", "rgb(100, 0, 100)", "rgb(163, 0, 163)"],
+                       "LIMBO", `${highscore.limbo}%`, "EASY 30S", "Dangers", "Beams");
+    
+    drawDifficultyCard(mouseOver.andromeda, highscore.limbo >= 75, 300, 450,
+                       ["rgb(240, 240, 240)", "rgb(220, 220, 220)", "rgb(0, 0, 0)"],
+                       "ANDROMEDA", `${highscore.andromeda}%`, "LIMBO 75%", "Dangers", "Beams  Bombs", "Rings");
+    
+    drawDifficultyCard(mouseOver.euphoria, highscore.andromeda >= 75, 550, 450,
+                       ["rgb(224, 255, 232)", "rgb(223, 255, 156)", "rgb(255, 165, 252)"],
+                       "EUPHORIA", `${highscore.euphoria}%`, "ANDROMEDA 75%", "Dangers", "Beams  Bombs", "Rings  Spikes");
 
-    decideFillStyle(mouseOver.hard, "rgb(40, 40, 40)", "rgb(50, 50, 50)");
-    ctx.fillRect(550, 450, 200, 100);
-    drawDifficultyInfo(560, 480, "rgb(0, 0, 0)", "HARD", `${highscore.hard}s`, "Enemies", "Normals", "Decelerators  Homings");
+    drawPercentCompleted(50, 450, "rgb(163, 0, 163)", highscore.limbo);
+    drawPercentCompleted(300, 450, "rgb(0, 0, 0)", highscore.andromeda);
+    drawPercentCompleted(550, 450, "rgb(255, 165, 252)", highscore.euphoria);
 }
 
 function drawDodgerSelection() {
@@ -1051,6 +1085,7 @@ function drawDodgerSelection() {
             if (dodgerName !== "CRESCENDO") ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
             else ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
             ctx.fillRect(dodger.x, dodger.y, 200, 100);
+            
             ctx.lineWidth = 1.25;
             ctx.textAlign = "center";
 
@@ -1084,9 +1119,10 @@ function drawDodgerSelection() {
                 if (abilityName !== "AMPLIFY") ctx.fillStyle = "rgba(0, 0, 0, 0.825)";
                 else ctx.fillStyle = "rgba(0, 0, 0, 0.525)";
                 ctx.fillRect(50, 275, 700, 175);
+                
                 ctx.lineWidth = 2;
                 ctx.textAlign = "center";
-
+                
                 ctx.strokeStyle = "rgb(255, 255, 255)";
                 ctx.font = "bold 71px Arial";
                 ctx.strokeText("LOCKED", GAME_WIDTH/2, 387);
