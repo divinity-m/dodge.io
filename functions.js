@@ -587,6 +587,8 @@ function detectHover() {
     mouseOver.selector = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDodger") && mouseX > 250 && mouseX < 550 && mouseY > 475 && mouseY < 575;
     mouseOver.settings = gameState === "startScreen" && Math.hypot(770 - mouseX, 620 - mouseY) < 30;
     mouseOver.restart = gameState === "endlessOver" && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
+    mouseOver.evades = gameState === "startScreen" && innerGameState === "mainMenu" && mouseX > 485 && mouseX < 570 && mouseY > 11 && mouseY < 28;
+    mouseOver.jsab = gameState === "startScreen" && innerGameState === "mainMenu" && mouseX > 612 && mouseX < 795 && mouseY > 11 && mouseY < 28;
 
     let dodgerSelection = gameState === "startScreen" && innerGameState === "selectDodger";
     mouseOver.evader = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
@@ -722,12 +724,37 @@ function drawStartScreen() {
         ctx.textAlign = 'left';
         ctx.strokeText("Vasto", 5, 30);
 
-        // Credits for mobile players
+        // Credits
         if (isMobile()) {
             ctx.fillStyle = player.color;
             ctx.font = "12.5px Verdana";
             ctx.textAlign = "right";
             ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", GAME_WIDTH-10, 10);
+        } else {
+            ctx.fillStyle = "rgb(0, 0, 0)";
+            ctx.font = "bold 16px Verdana";
+            ctx.textAlign = "left";
+            ctx.fillText("Inspired by                 and", 378, 25);
+            
+            if (mouseOver?.evades) ctx.fillStyle = "#8ED5FF";
+            else ctx.fillStyle = "#80d0ff";
+            ctx.fillText("Evades.io", 485, 25);
+            /*ctx.lineWidth = 1;
+            ctx.strokeStyle = "#80d0ff";
+            ctx.beginPath();
+            ctx.moveTo(485, 27);
+            ctx.lineTo(570, 27);
+            ctx.stroke();*/
+
+            if (mouseOver?.jsab) ctx.fillStyle = "#FF77A8";
+            else ctx.fillStyle = "#ff2f7a";
+            ctx.textAlign = "right";
+            ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
+            /*ctx.strokeStyle = "#ff2f7a";
+            ctx.beginPath();
+            ctx.moveTo(612.5, 27);
+            ctx.lineTo(795, 27);
+            ctx.stroke();*/
         }
     }
 
