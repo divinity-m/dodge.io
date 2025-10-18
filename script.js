@@ -1,4 +1,4 @@
-console.log("mousedown and hovering");
+console.log("interface");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -71,7 +71,7 @@ document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = fal
 
 // Input Tracking
 let mouseOver = {
-    play: false, settings: false, selector: false, restart: false,
+    play: false, settings: false, selector: false, restart: false, evades: false, jsab: false,
     
     evader: false, j_sab: false, jötunn: false, jolt: false, crescendo: false,
     
@@ -94,8 +94,8 @@ function updateCursor(eventObject) {
     // update mouse
     const rect = cnv.getBoundingClientRect();
   
-    const scaleX = cnv.width / rect.width
-    const scaleY = cnv.height / rect.height
+    const scaleX = cnv.width / rect.width;
+    const scaleY = cnv.height / rect.height;
   
     mouseX = (cursorX - rect.left) * scaleX;
     mouseY = (cursorY - rect.top) * scaleY;
@@ -290,9 +290,9 @@ let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
 function resetBgVars() {
     const hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
     if (innerGameState === "mainMenu") {
-        [bgTopText, bgBottomText] = ["MAIN", "MENU"];
-        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+500];
-        [bgTopMax, bgBottomMax] = [hyp*4/10, hyp*6/10];
+        [bgTopText, bgBottomText] = ["DODGE.IO", "HIT PLAY"];
+        [bgTopX, bgBottomX] = [-1000, GAME_WIDTH+1000];
+        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
     }
     if (innerGameState === "selectDifficulty") {
         [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
