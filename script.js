@@ -30,7 +30,7 @@ function resize() {
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener('resize', resize);
-screen?.orientation.addEventListener("orientationchange", resize);
+screen?.orientation.addEventListener("change", resize);
 resize();
 
 // Keyboard Events
