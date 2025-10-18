@@ -118,28 +118,27 @@ function recordLeftClick() {
     }
     
     // Start screen buttons
-    if (innerGameState === "mainMenu" && (mouseOver.play || mouseOver.settings || mouseOver.selector)) {
+    if (innerGameState === "mainMenu" && (mouseOver.play || mouseOver.selector)) {
         if (mouseOver.play) innerGameState = "selectDifficulty";
-        else if (mouseOver.settings) innerGameState = "settings";
         else if (mouseOver.selector) innerGameState = "selectDodger";
-
         resetBgVars();
         mouseMovementOn = previousMM;
     }
+    
+    // Gear button
+    else if (gameState === "startScreen" && innerGameState != "settings" && mouseOver.settings) {
+        previousGameState = innerGameState;
+        innerGameState = "settings";
+        resetBgVars();
+        mouseMovementOn = previousMM;
+    }
+        
     // Buttons that redirect back to the start screen
     else if (gameState === "endlessOver" && mouseOver.restart ||
             innerGameState === "settings" && mouseOver.settings ||
             innerGameState === "selectDodger" && mouseOver.selector ||
             innerGameState === "selectDifficulty" && mouseOver.play) {
-        // Saves the users settings options when they exit the settings
-        if (innerGameState === "settings") {
-            userData.settings = settings;
-            if (now - clickEventSave > 500) {
-                localStorage.setItem('localUserData', JSON.stringify(userData));
-                clickEventSave = Date.now();
-            }
-        }
-        // Plays 'A New Start' when users are redirected back to the Main Menu
+        // Plays 'A New Start' when users are redirected back to the Main Menu from endless mode
         if (gameState === "endlessOver") {
             allEnemies = [];
             dash.lastEnded = 0;
@@ -149,8 +148,17 @@ function recordLeftClick() {
             music.var.currentTime = 0;
             music.promise = music.var.play();
         }
+        // Saves the users settings options when they exit the settings
+        if (innerGameState === "settings") {
+            userData.settings = settings;
+            if (now - clickEventSave > 500) {
+                localStorage.setItem('localUserData', JSON.stringify(userData));
+                clickEventSave = Date.now();
+            }
+            innerGameState = previousGameState;
+        }
+        else innerGameState = "mainMenu";
         gameState = "startScreen";
-        innerGameState = "mainMenu";
         resetBgVars();
         mouseMovementOn = previousMM;
     }
@@ -878,9 +886,7 @@ function drawSettings() {
     music.var.volume = musicVolume;
     sharpPop.volume = sfxVolume;
 
-    if (innerGameState === "mainMenu"||
-        innerGameState === "selectDifficulty" ||
-        innerGameState === "selectDodger") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
+    if (gameState === "startScreen" && innerGameState != "settings") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
     else if (innerGameState === "settings") {
         ctx.drawImage(document.getElementById("gear-unfilled"), gear.x, gear.y, 40, 40);
         
