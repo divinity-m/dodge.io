@@ -736,8 +736,8 @@ function drawStartScreen() {
             ctx.textAlign = "left";
             ctx.fillText("Inspired by                 and", 378, 25);
             
-            if (mouseOver?.evades) ctx.fillStyle = "#b5e4ff";
-            else ctx.fillStyle = "#80d0ff";
+            if (mouseOver?.evades) ctx.fillStyle = "#8ad3ff";
+            else ctx.fillStyle = "#6bc6ff";
             ctx.fillText("Evades.io", 485, 25);
             /*ctx.lineWidth = 1;
             ctx.strokeStyle = "#80d0ff";
