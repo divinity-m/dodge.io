@@ -716,7 +716,7 @@ function drawStartScreen() {
     if (bgTopX <= bgTopMax) bgTopX += dBgTopX;
     if (bgBottomX >= bgBottomMax && bgTopX >= bgTopMax - 25) bgBottomX += dBgBottomX;
 
-    if (innerGameState === "mainMenu") {
+    if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
         // Me
         ctx.strokeStyle = player.color;
         ctx.lineWidth = 1.5;
@@ -725,40 +725,20 @@ function drawStartScreen() {
         ctx.strokeText("Vasto", 5, 30);
 
         // Credits
-        if (isMobile()) {
-            ctx.fillStyle = player.color;
-            ctx.font = "12.5px Verdana";
-            ctx.textAlign = "right";
-            ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", GAME_WIDTH-10, 10);
-        } else {
-            ctx.fillStyle = "rgb(0, 0, 0)";
-            ctx.font = "bold 16px Verdana";
-            ctx.textAlign = "left";
-            ctx.fillText("Inspired by                 and", 378, 25);
+        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.font = "bold 16px Verdana";
+        ctx.textAlign = "left";
+        ctx.fillText("Inspired by                 and", 378, 25);
             
-            if (mouseOver?.evades) ctx.fillStyle = "#8ad3ff";
-            else ctx.fillStyle = "#6bc6ff";
-            ctx.fillText("Evades.io", 485, 25);
-            /*ctx.lineWidth = 1;
-            ctx.strokeStyle = "#80d0ff";
-            ctx.beginPath();
-            ctx.moveTo(485, 27);
-            ctx.lineTo(570, 27);
-            ctx.stroke();*/
+        if (mouseOver?.evades) ctx.fillStyle = "#8ad3ff";
+        else ctx.fillStyle = "#6bc6ff";
+        ctx.fillText("Evades.io", 485, 25);
 
-            if (mouseOver?.jsab) ctx.fillStyle = "#ff699f";
-            else ctx.fillStyle = "#ff2f7a";
-            ctx.textAlign = "right";
-            ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
-            /*ctx.strokeStyle = "#ff2f7a";
-            ctx.beginPath();
-            ctx.moveTo(612.5, 27);
-            ctx.lineTo(795, 27);
-            ctx.stroke();*/
-        }
-    }
-
-    if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
+        if (mouseOver?.jsab) ctx.fillStyle = "#ff699f";
+        else ctx.fillStyle = "#ff2f7a";
+        ctx.textAlign = "right";
+        ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
+        
         // PLAY BUTTON //
         const playBtn = {
             x: 250,
