@@ -15,23 +15,22 @@
         <!-- CSS -->
         <style>
             html, body {
-                margin: 0;
-                padding: 0;
                 height: 100%;
+                margin: 0;
                 overflow: hidden;
                 touch-action: none; /* disable gestures like pinch or pan */
                 overscroll-behavior: none; /* prevent edge bounce */
             }
             body {
+                display: flex;
+                justify-content: center; /* Center horizontally */
+                align-items: center; /* Center vertically */
                 background-color: rgb(255, 255, 255);
-                text-align: center;
-                font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
             }
             #game {
                 width: 100%;
                 height: auto;
                 display: block;
-                margin: 0 auto;
                 pointer-events: none;
                 -webkit-user-select: none;
                 user-select: none;
@@ -40,25 +39,6 @@
             .no-cursor body,
             .no-cursor * {
                 cursor: none !important;
-            }
-            h1 {
-                margin-top: 0.25rem;
-                margin-bottom: -0.5rem;
-            }
-            p {
-                font-weight: bold;
-            }
-            #evades {
-                color: #8ED5FF;
-            }
-            #evades:hover {
-                color: #B8E4FF;
-            }
-            #jsab {
-                color: #FF2F7A;
-            }
-            #jsab:hover {
-                color: #FF77A8;
             }
             #cursor, #cursor-overlay {
                 display: none;
@@ -92,13 +72,6 @@
             <audio id="divine" src="Audio/Divine - SOTAREKO.mp3" preload="metadata"></audio>
             <audio id="sharp-pop" src="Audio/sharp-pop.mp3" preload="metadata"></audio>
         </div>
-
-        <!-- Title & Description -->
-        <h1 id="titleEl">Dodge.io</h1>
-        <p id="inspirationEl">
-            Inspired by <a id="evades" href="https://www.evades.io" target="_blank">Evades.io</a> and 
-            <a id="jsab" href="https://www.justshapesandbeats.com/" target="_blank">Just Shapes & Beats</a>
-        </p>
 
         <!-- Canvas -->
         <canvas id="game"></canvas>
