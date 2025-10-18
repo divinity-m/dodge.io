@@ -1,4 +1,4 @@
-console.log("interface");
+console.log("centering canvas");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -24,9 +24,9 @@ function resize() {
     if (isMobile()) {
         cnv.style.width = "400px";
         // center the canvas on the screen for phones
-        cnv.style.position = "absolute";
-        cnv.style.left = `${(window.innerWidth - 400)/2}px`;
-        cnv.style.top = `${(window.innerHeight - 325)/2}px`;
+        // cnv.style.position = "absolute";
+        // cnv.style.left = `${(window.innerWidth - 400)/2}px`;
+        // cnv.style.top = `${(window.innerHeight - 325)/2}px`;
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener('resize', resize);
