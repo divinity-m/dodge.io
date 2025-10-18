@@ -1,4 +1,4 @@
-console.log("requirements for difficulties");
+console.log("mousedown and hovering");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -496,11 +496,14 @@ function draw() {
 
         // clicking brightens the cursor with an overlay
         if (mouseDown) {
-            let bg = overlayEl.style.backgroundColor;
-            bg = "rgba(255, 255, 255, 0.5)";
-            if (player.dodger === "jötunn") bg = "rgba(255, 255, 255, 0.3)";
-            if (player.dodger === "crescendo") bg = "rgba(255, 255, 255, 0.3)";
-            overlayEl.style.borderColor = bg;
+            let av = 0.25; // alpha value
+            if (player.dodger === "jötunn") av = 0.05;
+            if (player.dodger === "crescendo") av = 0.1;
+            if (player.dodger === "j-sab") av = 0.1;
+
+            if (hovering) av *= 1.2;
+            overlayEl.style.backgroundColor = `rgba(255, 255, 255, ${av})`;
+            overlayEl.style.borderColor = `rgba(255, 255, 255, ${av})`;
         }
         else {
             overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0)";
