@@ -5,7 +5,7 @@ const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
 // Game Units
-let gameState = "loading", innerGameState = "loading";
+let gameState = "loading", innerGameState = "loading", previousGameState = "loading";
 cnv.width = 800, cnv.height = 650;
 let GAME_WIDTH = 800, GAME_HEIGHT = 650;
 
