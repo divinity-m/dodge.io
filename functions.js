@@ -878,7 +878,9 @@ function drawSettings() {
     music.var.volume = musicVolume;
     sharpPop.volume = sfxVolume;
 
-    if (innerGameState === "mainMenu") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
+    if (innerGameState === "mainMenu"||
+        innerGameState === "selectDifficulty" ||
+        innerGameState === "selectDodger") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
     else if (innerGameState === "settings") {
         ctx.drawImage(document.getElementById("gear-unfilled"), gear.x, gear.y, 40, 40);
         
