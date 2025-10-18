@@ -736,7 +736,7 @@ function drawStartScreen() {
             ctx.textAlign = "left";
             ctx.fillText("Inspired by                 and", 378, 25);
             
-            if (mouseOver?.evades) ctx.fillStyle = "#8ED5FF";
+            if (mouseOver?.evades) ctx.fillStyle = "#b5e4ff";
             else ctx.fillStyle = "#80d0ff";
             ctx.fillText("Evades.io", 485, 25);
             /*ctx.lineWidth = 1;
@@ -746,7 +746,7 @@ function drawStartScreen() {
             ctx.lineTo(570, 27);
             ctx.stroke();*/
 
-            if (mouseOver?.jsab) ctx.fillStyle = "#FF77A8";
+            if (mouseOver?.jsab) ctx.fillStyle = "#ff699f";
             else ctx.fillStyle = "#ff2f7a";
             ctx.textAlign = "right";
             ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
