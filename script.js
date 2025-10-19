@@ -1,4 +1,4 @@
-console.log("centering canvas 2");
+console.log("centering canvas 3");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
