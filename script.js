@@ -15,11 +15,7 @@ function isMobile() {
   const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
   return uaCheck || sizeCheck;
 }
-if (isMobile()) {
-    // remove the title and paragraph for phones
-    document.getElementById("titleEl").remove();
-    document.getElementById("inspirationEl").remove();
-}
+
 function resize() {
     if (isMobile()) {
         cnv.style.width = `${window.innerheight * (GAME_WIDTH/2340)}px`;
