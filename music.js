@@ -10,6 +10,7 @@ function restartMusicMode() {
     dash.lastEnded = 0;
     shockwave.reset();
     amplify.reset();
+    eventHorizon.reset();
     innerGameState = 'inMusicMode';
     gameState = "musicMode";
 }
@@ -83,6 +84,7 @@ function drawEndLevel() {
                 dash.lastEnded = 0;
                 shockwave.reset();
                 amplify.reset();
+                eventHorizon.reset();
                 music.var = aNewStart;
                 music.name = "A New Start";
                 music.artist = "Thygan Buch";
@@ -558,7 +560,7 @@ function musicCollisions() {
             innerGameState = "musicModeFail";
         }
         
-        if (player.dodger === "jötunn" && danger.type !== "text") {
+        if ((player.dodger === "jötunn" || player.dodger === "quasar") && danger.type !== "text") {
             let distance = Math.hypot(player.x-danger.x, player.y-danger.y) - player.r;
             
             // Determines the distance from the edge of the player to the edge of the enemy
@@ -572,24 +574,40 @@ function musicCollisions() {
                 }
             if (danger.type === "spike") distance -= danger.r*1.5;
             if (distance < 0) distance = 0;
-            danger.distance = distance;
-            
-            // limits the lowest possible distance by taking the higher value
-            const maxDist = Math.max(distance, absoluteZero.slowEnd);
-            
-            // limits the highest posible distance by taking the lower value
-            const factor = Math.min(1, (maxDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd));
-            
-            // xFactor = min + max*(factor between 0 and 1)
-            const spawnFactor = 0.8 + 0.2*factor;
-            const slowFactor = 0.3 + 0.7*factor;
-            
-            if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Stagnation") {
-                danger.spawnRate = danger.baseSpawnRate * spawnFactor;
-            } else danger.spawnRate = danger.baseSpawnRate;
-            if (danger.type === "spike") {
-                if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") danger.speed = danger.baseSpeed * slowFactor;
-                else danger.speed = danger.baseSpeed;
+
+            if (player.dodger === "jötunn") {
+                // limits the lowest possible distance by taking the higher value
+                const maxDist = Math.max(distance, absoluteZero.slowEnd);
+                
+                // limits the highest posible distance by taking the lower value
+                const factor = Math.min(1, (maxDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd));
+                
+                // xFactor = min + max*(factor between 0 and 1)
+                const spawnFactor = 0.8 + 0.2*factor;
+                const slowFactor = 0.3 + 0.7*factor;
+                
+                if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Stagnation") {
+                    danger.spawnRate = danger.baseSpawnRate * spawnFactor;
+                } else danger.spawnRate = danger.baseSpawnRate;
+                if (danger.type === "spike") {
+                    if (absoluteZero.passive === "Absolute Zero" || absoluteZero.passive === "Glaciation") danger.speed = danger.baseSpeed * slowFactor;
+                    else danger.speed = danger.baseSpeed;
+                }
+            }
+            if (player.dodger === "quasar" && eventHorizon.activated) {
+                let relativity = 1 + distance/300;
+                let max = danger.baseSpawnRate * relativity;
+
+                if (danger.spawnRate < max && now - eventHorizon.lastUsed < 1000) danger.spawnRate += max/100;
+                if (danger.spawnRate > danger.baseSpawnRate && now - eventHorizon.lastUsed > 4000) danger.spawnRate -= max/100;
+                if (danger.spawnRate < danger.baseSpawnRate - max/100 && now - eventHorizon.lastUsed > 4000) danger.spawnRate = danger.baseSpawnRate;
+
+                if (danger.type === "spike") {
+                    max = danger.baseSpeed * relativity;
+                    if (danger.speed < max && now - eventHorizon.lastUsed < 1000) danger.speed += max/100;
+                    if (danger.speed > danger.baseSpeed && now - eventHorizon.lastUsed > 4000) danger.speed -= max/100;
+                    if (danger.speed < danger.baseSpeed - max/100 && now - eventHorizon.lastUsed > 4000) danger.speed = danger.baseSpeed;
+                }
             }
         }
 
