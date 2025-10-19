@@ -37,8 +37,8 @@ function recordKeyDown(event) {
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
             shockwave.used = shockwave.active;
-            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
-            else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
+            if (shockwave.used === "Shockwave") { shockwave.cd = 7500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
+            else if (shockwave.used === "Shockray") { shockwave.cd = 4500; shockwave.effect = 0.5; }
         }
 
         if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
@@ -86,8 +86,8 @@ function recordRightClick(event) {
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
             shockwave.used = shockwave.active;
-            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
-            else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
+            if (shockwave.used === "Shockwave") { shockwave.cd = 7500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
+            else if (shockwave.used === "Shockray") { shockwave.cd = 4500; shockwave.effect = 0.5; }
         }
 
         if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
@@ -157,6 +157,7 @@ function recordLeftClick() {
             dash.lastEnded = 0;
             shockwave.reset();
             amplify.reset();
+            eventHorizon.reset();
             music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
             music.var.currentTime = 0;
             music.promise = music.var.play();
@@ -1202,7 +1203,7 @@ function drawDodgerSelection() {
                     "unfortunate soul stricken by the electrically infused pluse.",
                     "Shockwave Effect Reduction: 25% | Shockray Effect Reduction: 50%",
                     "Effect Duration: Danger - 2.93s, Enemy - 5.43s",
-                    "Shockwave Cooldown: 5.5s | Shockray Cooldown: 8.5s");
+                    "Shockwave Cooldown: 7.5s | Shockray Cooldown: 4.5s");
     drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.9)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
                     "Jötunns create spasmodic endothermic reactions within their cores, causing their",
                     "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
@@ -1226,7 +1227,7 @@ function drawDodgerSelection() {
                    "indecipherable physics. Sorrounded by an accretion disk and lost within relatavistic",
                    "space-time they not only become impossible to touch, but their event horizon causes",
                    "their surroundings to accelerate indefinitely, meanwhile, they lie stuck in time.",
-                   "Duration: 5s | Cooldown: 8s");
+                   "Duration: 5s | Cooldown: 7s");
 }
 
 function drawGameOver() {
@@ -1519,7 +1520,7 @@ function drawText() { // draws the current time, highest time, and enemy count
         // Shockwave CD
         let shockwaveCDLeft = ((shockwave.cd - (now - shockwave.lastEnded)) / 1000).toFixed(2);
 
-        if (now - shockwave.lastEnded >= shockwave.cd) { // 5.5s or 8.5s
+        if (now - shockwave.lastEnded >= shockwave.cd) { // 7.5s and 4.5s
             shockwave.usable = true;
             ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
         } else {
@@ -1534,9 +1535,9 @@ function drawText() { // draws the current time, highest time, and enemy count
     // Event Horizon
     if (player.dodger === "quasar") {
         // Event Horizon CD
-        let eventHorizonCDLeft = ((8000 - (now - eventHorizon.lastEnded)) / 1000).toFixed(2);
+        let eventHorizonCDLeft = ((7000 - (now - eventHorizon.lastEnded)) / 1000).toFixed(2);
 
-        if (now - eventHorizon.lastEnded >= 8000) {
+        if (now - eventHorizon.lastEnded >= 7000) {
             eventHorizon.usable = true;
             ctx.fillText(`Active: Event Horizon (${controls[0]})`, textX, 620);
         } else {
@@ -1962,10 +1963,10 @@ function abilities() { // player-specific abilities
             let relativity = 1 + dist/300;
             let max = enemy.baseSpeed * relativity;
 
-            if (enemy.speed < max && now - eventHorizon.lastUsed < 1000) enemy.speed += max/100;
-            if (enemy.speed > enemy.baseSpeed && now - eventHorizon.lastUsed > 4000) enemy.speed -= max/100;
+            if (enemy.speed < max && now - eventHorizon.lastUsed < 4200) enemy.speed += max/50;
+            if (enemy.speed > enemy.baseSpeed && now - eventHorizon.lastUsed > 4200) enemy.speed -= max/50;
 
-            if (enemy.speed < enemy.baseSpeed - max/100 && now - eventHorizon.lastUsed > 4000) enemy.speed = enemy.baseSpeed;
+            if (enemy.speed < enemy.baseSpeed - max/50 && now - eventHorizon.lastUsed > 4200) enemy.speed = enemy.baseSpeed;
         })
 
         // Reset and Deactivate Event Horizon
@@ -2009,7 +2010,7 @@ function createAccretionDisk() {
         return dust;
     }
 
-    for (let i = 0; i < 500; i++) accretionDisk.push(createDust());
+    for (let i = 0; i < 750; i++) accretionDisk.push(createDust());
     return accretionDisk;
 }
 
