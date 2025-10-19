@@ -1942,7 +1942,7 @@ function abilities() { // player-specific abilities
             dust.gravity += dust.baseGravity;
         })
         
-        eventHorizon.angle += 0.01;
+        eventHorizon.angle += 0.005;
         
         if (now - eventHorizon.lastUsed >= 5000) {
             player.invincible = true;
