@@ -1,4 +1,4 @@
-console.log("event horizon");
+console.log("leave-mid-use");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
