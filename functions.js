@@ -725,14 +725,15 @@ function drawStartScreen() {
     if (bgBottomX >= bgBottomMax && bgTopX >= bgTopMax - 25) bgBottomX += dBgBottomX;
 
     if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
-        // Me
+        // ME //
         ctx.strokeStyle = player.color;
         ctx.lineWidth = 1.5;
         ctx.font = '30px Roboto';
         ctx.textAlign = 'left';
         ctx.strokeText("Vasto", 5, 30);
+        ctx.drawImage(document.getElementById("instalogo"), 85, 5, 30, 30);
 
-        // Credits
+        // CREDITS //
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.font = "bold 16px Verdana";
         ctx.textAlign = "left";
