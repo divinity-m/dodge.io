@@ -1,4 +1,4 @@
-console.log("centering canvas 3");
+console.log("quasar no quasi");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -69,7 +69,7 @@ document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = fal
 let mouseOver = {
     play: false, settings: false, selector: false, restart: false, evades: false, jsab: false,
     
-    evader: false, j_sab: false, jötunn: false, jolt: false, crescendo: false,
+    evader: false, j_sab: false, jötunn: false, jolt: false, crescendo: false, quasar: false,
     
     easy: false, medium: false, hard: false, limbo: false, andromeda: false, euphoria: false,
     
@@ -175,6 +175,11 @@ let amplify = {
         this.accelRate = Date.now();
     },
 };
+
+let eventHorizon = {
+  usable: true, activated: false,
+  lastUsed: 0, lastEnded: 0,
+}
 
 let allEnemies = [], allDangers = [];
 
@@ -361,12 +366,13 @@ function draw() {
     // Actual Game
     if (gameState === "startScreen") {
         loopAudio();
-        abilities();
         drawText();
+      
         drawStartScreen();
-        
         if (innerGameState === "selectDifficulty") drawDifficultySelection();
         if (innerGameState === "selectDodger") drawDodgerSelection();
+      
+        abilities();
         drawPlayer();
         drawSettings();
         
@@ -376,6 +382,7 @@ function draw() {
     else if (gameState === "endlessMode") {
         loopAudio();
         drawText();
+        abilities();
         drawPlayer();
         drawEnemies();
         
@@ -384,26 +391,26 @@ function draw() {
             
         spawnEnemyPeriodically();
         moveEnemies();
-        abilities();
         collisions();
     }
     else if (gameState === "endlessOver") {
         drawText();
         drawGameOver();
+        abilities();
         drawPlayer();
         drawEnemies();
-        abilities();
     }
     else if (gameState === "musicMode") {
         drawEndLevel();
         spawnAndDrawDanger();
         drawText();
+
+        abilities();
         drawPlayer();
         
         keyboardControls();
         mouseMovement();
 
-        abilities();
         musicCollisions();
     }
 
