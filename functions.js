@@ -1223,9 +1223,9 @@ function drawDodgerSelection() {
                     "Cooldown: 2s");
     drawAbilityDesc(mouseOver.quasar, highscore.euphoria === 100, "rgba(255, 165, 0, 0.7)", "rgba(230, 153, 11, 0.9)", "rgba(201, 135, 14, 0.9)", "EVENT HORIZON",
                    "Quasars manifest the properties of black holes within their cores to replicate their",
-                   "indecipherable physics. Sorrounded by an accretion disk and lost within relatavistic,",
-                   "space-time they not only become impossible to touch, but their event horizon causes,",
-                   "their surroundings to accelerate indefinitely, while they lie stuck in time.",
+                   "indecipherable physics. Sorrounded by an accretion disk and lost within relatavistic",
+                   "space-time they not only become impossible to touch, but their event horizon causes",
+                   "their surroundings to accelerate indefinitely, meanwhile, they lie stuck in time.",
                    "Duration: 5s | Cooldown: 8s");
 }
 
@@ -1341,7 +1341,7 @@ function drawPlayer() {
     }
 
     // Determines player invincibility and draws the shield
-    if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250) {
+    if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250 || eventHorizon.activated) {
         player.invincible = true;
         
         ctx.lineWidth = 1.75;
@@ -1356,7 +1356,7 @@ function drawPlayer() {
     
         ctx.lineTo(player.x+7.5, player.y+3);
         ctx.lineTo(player.x, player.y+10);
-        ctx.lineTo(player.x-7.5, player.y+3);
+        ctx.lineTo(player.x-7.5, player.y+2.5);
         ctx.stroke();
     }
     else player.invincible = false;
@@ -1822,8 +1822,9 @@ function abilities() { // player-specific abilities
             const slowFactor = 0.3 + 0.7 * factor;
     
             enemy.speed = enemy.baseSpeed * slowFactor;
-            enemy.speed = enemy.baseSpeed * slowFactor;
         })
+    } else if (player.dodger === "jötunn" && absoluteZero.passive === "Stagnation") {
+        allEnemies.forEach(enemy => {enemy.speed = enemy.baseSpeed})
     }
     // Shockwave launches an electromagnetic pulse that stuns and shrinks adversaries
     if (shockwave.activated) {
@@ -1920,9 +1921,10 @@ function abilities() { // player-specific abilities
     // Event Horizon makes the player invincible but speeds up nearby enemies
     if (eventHorizon.activated) {
         // Player Changes
-        player.invincible = true;
         player.color = "rgb(0, 0, 0)";
         player.subColor = "rgb(255, 165, 0)";
+        if (player.baseSpeed > 1 && now - eventHorizon.lastUsed < 1000) player.baseSpeed -= 0.05;
+        if (player.baseSpeed < 5 && now - eventHorizon.lastUsed > 4000) player.baseSpeed += 0.05;
 
         // Event Horizon Gradient
         const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 300);
@@ -1931,10 +1933,11 @@ function abilities() { // player-specific abilities
         eventHorizonGrad.addColorStop(0.66, `rgba(255, 0, 0, ${eventHorizon.av})`);
         eventHorizonGrad.addColorStop(1, `rgba(200, 0, 0, ${eventHorizon.av})`);
 
-        // Background Accretion Disk
+        // Background Accretion Disk, Test the radius for 1586 and 1587
         ctx.fillStyle = eventHorizonGrad;
         drawCircle(player.x, player.y, 300, "fill");
-        ctx.strokeStyle = `rgba(165, 0, 0, ${eventHorizon.av})`
+        ctx.strokeStyle = `rgba(165, 0, 0, ${eventHorizon.av})`;
+        ctx.lineWidth = 2;
         drawCircle(player.x, player.y, 300, "stroke");
 
         // Accretion Disk Dust
@@ -1951,12 +1954,24 @@ function abilities() { // player-specific abilities
             ctx.restore();
         })
 
-        if (now - eventHorizon.lastUsed < 1300 && eventHorizon.av < 0.75) eventHorizon.av += 0.01;
-        else if (now - eventHorizon.lastUsed >= 3700 && eventHorizon.av > 0) eventHorizon.av -= 0.01;
+        if (eventHorizon.av < 0.75 && now - eventHorizon.lastUsed < 1300) eventHorizon.av += 0.01;
+        else if (eventHorizon.av > 0 && now - eventHorizon.lastUsed > 3700) eventHorizon.av -= 0.01;
+
+        // Speed up enemies
+        allEnemies.forEach(enemy => {
+            let dist = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+            let relativity = 1 + dist/300;
+            let max = enemy.baseSpeed * relativity;
+
+            if (enemy.speed < enemy.baseSpeed * max && now - eventHorizon.lastUsed < 1000) enemy.speed += max/100;
+            if (enemy.speed > enemy.baseSpeed && now - eventHorizonlastUsed > 4000) enemy.speed -= max/100;
+
+            if (enemy.speed < enemy.baseSpeed - max/100 && now - eventHorizonlastUsed > 4000) enemy.speed = enemy.baseSpeed;
+        })
 
         // Reset and Deactivate Event Horizon
         if (now - eventHorizon.lastUsed >= 5000) {
-            player.invincible = true;
+            player.baseSpeed = 5;
             player.color = "rgb(255, 165, 0)";
             player.subColor = "rgb(230, 153, 11)";
             eventHorizon.activated = false;
@@ -1965,6 +1980,7 @@ function abilities() { // player-specific abilities
         }
     }
 }
+
 function createAccretionDisk() {
     let accretionDisk = [];
     function createDust() {
@@ -1997,7 +2013,6 @@ function createAccretionDisk() {
     for (let i = 0; i < 300; i++) accretionDisk.push(createDust());
     return accretionDisk;
 }
-           
 
 function enemyAbilitiesAndStats(enemy) {
     num = Math.random();
