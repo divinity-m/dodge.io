@@ -46,6 +46,7 @@ function recordKeyDown(event) {
             eventHorizon.lastUsed = Date.now();
             eventHorizon.av = 0;
             eventHorizon.angle = 0;
+            eventHorizon.accretionDisk = createAccretionDisk();
         }
     } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
         if (player.dodger === "jötunn" && absoluteZero.usable) {
@@ -95,6 +96,7 @@ function recordRightClick(event) {
             eventHorizon.lastUsed = Date.now();
             eventHorizon.av = 0;
             eventHorizon.angle = 0;
+            eventHorizon.accretionDisk = createAccretionDisk();
         }
     }
 }
@@ -1925,18 +1927,18 @@ function abilities() { // player-specific abilities
         
         ctx.fillStyle = `rgba(255, 165, 0, ${eventHorizon.av})`;
         drawCircle(player.x, player.y, 300, "fill");
-        
+
+        ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
         ctx.save();
         ctx.translate(player.x, player.y);
-        ctx.rotate(eventHorizon.angle);
-        ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
-        drawCircle(50, 40, 7, "fill");
-        drawCircle(-30, 40, 12, "fill");
-        drawCircle(80, 40, 13, "fill");
+        eventHorizion.accretionDisk.forEach(dust => {
+            ctx.rotate(dust.gravity/10);
+            drawCircle(dust.x, dust.y, 5, "fill");
+        })
         ctx.restore();
         eventHorizon.av += 0.01;
         eventHorizon.av = Math.min(eventHorizon.av, 0.75)
-        eventHorizon.angle += 0.1;
+        eventHorizon.angle += 0.01;
         
         if (now - eventHorizon.lastUsed >= 5000) {
             player.invincible = true;
@@ -1946,6 +1948,24 @@ function abilities() { // player-specific abilities
             eventHorizon.lastEnded = Date.now();
         }
     }
+}
+function createAccretionDisk() {
+    let accretionDisk = [];
+    function createDust() {
+        let dust = {
+            x: Math.random() * 590 - 295, // between 295 and -295
+            y: Math.random() * 590 - 295,
+        }
+        while (dust.x < 20 && dust.x > -20) dust.x = Math.random() * 590 - 295;
+        while (dust.y < 20 && dust.y > -20) dust.y = Math.random() * 590 - 295;
+
+        // between 28.284271247461902 and 417.1930009000630
+        dust.gravity = (Math.hypot(dust.x, dust.y) - 28.284) / (417.193 - 28.284);
+        return dust;
+    }
+
+    for (let i = 0; i < 100; i++) accretionDisk.push(createDust());
+    return accretionDisk;
 }
            
 
