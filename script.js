@@ -1,4 +1,4 @@
-console.log("leave-mid-use 2");
+console.log("accretionDisk");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -177,7 +177,8 @@ let amplify = {
 };
 
 let eventHorizon = {
-  usable: true, activated: false, av: 0, angle: 0,
+  usable: true, activated: false,
+  av: 0, angle: 0, accretionDisk: [],
   lastUsed: 0, lastEnded: 0,
 }
 
