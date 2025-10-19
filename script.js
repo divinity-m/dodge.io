@@ -1,4 +1,4 @@
-console.log("hover quasar");
+console.log("event horizon");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -177,7 +177,7 @@ let amplify = {
 };
 
 let eventHorizon = {
-  usable: true, activated: false,
+  usable: true, activated: false, av: 0, angle: 0,
   lastUsed: 0, lastEnded: 0,
 }
 
