@@ -1925,12 +1925,18 @@ function abilities() { // player-specific abilities
         player.color = "rgb(0, 0, 0)";
         player.subColor = "rgb(255, 165, 0)";
         
-        ctx.fillStyle = `rgba(255, 165, 0, ${eventHorizon.av})`;
+        const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 300);
+        eventHorizonGrad.addColorStop(0, `rgba(255, 255, 255, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.25, `rgba(255, 165, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.5, `rgba(255, 0, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(1, `rgba(200, 0, 0, ${eventHorizon.av})`);
+        
+        ctx.fillStyle = eventHorizonGrad;
         drawCircle(player.x, player.y, 300, "fill");
+        ctx.strokeStyle = `rgba(165, 0, 0, ${eventHorizon.av})`
+        drawCircle(player.x, player.y, 300, "stroke");
 
         ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
-        eventHorizon.av += 0.01;
-        eventHorizon.av = Math.min(eventHorizon.av, 0.75);
         
         eventHorizon.accretionDisk.forEach(dust => {
             ctx.save();
@@ -1943,6 +1949,9 @@ function abilities() { // player-specific abilities
         })
         
         eventHorizon.angle += 0.005;
+
+        if (now - eventHorizon.lastUsed < 4000 && eventHorizon.av < 0.75) eventHorizon.av += 0.01;
+        else if (now - eventHorizon.lastUsed >= 4000 && eventHorizon.av > 0) eventHorizon.av -= 0.01;
         
         if (now - eventHorizon.lastUsed >= 5000) {
             player.invincible = true;
