@@ -1929,9 +1929,13 @@ function abilities() { // player-specific abilities
         ctx.save();
         ctx.translate(player.x, player.y);
         ctx.rotate(eventHorizon.angle);
-        drawCircle(10, 10, 20, "fill");
+        ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
+        drawCircle(50, 40, 7, "fill");
+        drawCircle(-30, 40, 12, "fill");
+        drawCircle(80, 40, 13, "fill");
         ctx.restore();
-        eventHorizon.av += 0.05;
+        eventHorizon.av += 0.01;
+        eventHorizon.av = Math.min(eventHorizon.av, 0.75)
         eventHorizon.angle += 0.1;
         
         if (now - eventHorizon.lastUsed >= 5000) {
