@@ -1,4 +1,4 @@
-console.log("accretionDisk effect on enemies");
+console.log("event horizon base code done");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -172,9 +172,17 @@ let amplify = {
 };
 
 let eventHorizon = {
-  usable: true, activated: false,
-  av: 0, accretionDisk: [],
-  lastUsed: 0, lastEnded: 0,
+    usable: true, activated: false,
+    av: 0, accretionDisk: [],
+    lastUsed: 0, lastEnded: 0,
+    reset: function() {
+        player.baseSpeed = 5;
+        this.av = 0;
+        this.accretionDisk = [];
+        this.activated = false;
+        this.lastUsed = 0;
+        this.lastEnded = 0;
+    }
 }
 
 let allEnemies = [], allDangers = [];
