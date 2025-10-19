@@ -1,4 +1,4 @@
-console.log("accretionDisk4");
+console.log("accretionDisk5");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -178,7 +178,7 @@ let amplify = {
 
 let eventHorizon = {
   usable: true, activated: false,
-  av: 0, angle: 0, accretionDisk: [],
+  av: 0, accretionDisk: [],
   lastUsed: 0, lastEnded: 0,
 }
 
