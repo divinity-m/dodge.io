@@ -29,8 +29,7 @@ function recordKeyDown(event) {
     if ((event.code === "KeyQ" || event.code === "KeyJ") && gameState !== "endlessOver") {
         if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
             
-        else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
-            // activate the shockwave ability and set certain properties
+        if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             shockwave.activated = true;
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
@@ -40,6 +39,11 @@ function recordKeyDown(event) {
             shockwave.used = shockwave.active;
             if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; }
             else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
+        }
+
+        if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
+            eventHorizon.activated = true;
+            eventHorizon.lastUsed = Date.now();
         }
     } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
         if (player.dodger === "jötunn" && absoluteZero.usable) {
@@ -72,7 +76,7 @@ function recordRightClick(event) {
     if (gameState !== "endlessOver") {
         if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
         
-        else if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
+        if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             shockwave.activated = true;
             shockwave.facingAngle = player.facingAngle;
             shockwave.x = player.x;
@@ -82,6 +86,11 @@ function recordRightClick(event) {
             shockwave.used = shockwave.active;
             if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; }
             else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
+        }
+
+        if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
+            eventHorizon.activated = true;
+            eventHorizon.lastUsed = Date.now();
         }
     }
 }
@@ -205,7 +214,7 @@ function recordLeftClick() {
 
     // Hero Choice
     else if (innerGameState === "selectDodger") {
-        if (!dash.activated && (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo)) {
+        if (!player.invincible && (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo || mouseOver.quasar)) {
             if (mouseOver.evader) {
                 player.dodger = "evader";
                 player.color = "rgb(255, 255, 255)";
@@ -234,6 +243,12 @@ function recordLeftClick() {
                 player.dodger = "crescendo";
                 player.color = "rgb(0, 0, 0)";
                 player.subColor = "rgb(40, 40, 40)";
+            }
+            else if (mouseOver.quasar && highscore.euphoria === 100) {
+                player.dodger = "quasar";
+                player.color = "rgb(255, 165, 0)";
+                player.subColor = "rgb(230, 153, 11)";
+                amplify.reset();
             }
             mouseMovementOn = previousMM;
             // saves the players values to the local storage to keep track of the players dodger
@@ -600,10 +615,11 @@ function detectHover() {
 
     let dodgerSelection = gameState === "startScreen" && innerGameState === "selectDodger";
     mouseOver.evader = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
-    mouseOver.j_sab = dodgerSelection && mouseX > 425 && mouseX < 625 && mouseY > 150 && mouseY < 250;
-    mouseOver.jötunn = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
     mouseOver.jolt = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 25 && mouseY < 125;
-    mouseOver.crescendo = dodgerSelection && mouseX > 175 && mouseX < 375 && mouseY > 150 && mouseY < 250;
+    mouseOver.jötunn = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
+    mouseOver.crescendo = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 150 && mouseY < 250;
+    mouseOver.j_sab = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 150 && mouseY < 250;
+    mouseOver.quasar = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 150 && mouseY < 250;
 
     let difficultySelection = gameState === "startScreen" && innerGameState === "selectDifficulty";
     mouseOver.easy = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
@@ -1154,8 +1170,9 @@ function drawDodgerSelection() {
     const evader = { x: 50, y: 25, };
     const jolt = { x: 300, y: 25, };
     const jötunn = { x: 550, y: 25, };
-    const crescendo = { x: 175, y: 150, };
-    const j_sab = { x: 425, y: 150, };
+    const crescendo = { x: 50, y: 150, };
+    const j_sab = { x: 300, y: 150, };
+    const quasar = { x: 550, y: 150, };
 
     // Dodger Cards
     drawDodgerCard(mouseOver.evader, true, evader, "EVADER", "SKILL", "NONE", "rgb(230, 230, 230)", "rgb(220, 220, 220)", "white");
@@ -1163,6 +1180,7 @@ function drawDodgerSelection() {
     drawDodgerCard(mouseOver.jötunn, highscore.limbo === 100, jötunn, "JÖTUNN", "ABSOLUTE ZERO", "LIMBO 100%", "rgb(75, 180, 225)", "rgb(68, 168, 212)", "rgb(79, 203, 255)");
     drawDodgerCard(mouseOver.crescendo, highscore.hard >= 60, crescendo, "CRESCENDO", "AMPLIFY", "HARD 60S", "rgb(30, 30, 30)", "rgb(40, 40, 40)", "rgb(0, 0, 0)");
     drawDodgerCard(mouseOver.j_sab, highscore.andromeda === 100, j_sab, "J-SAB", "DASH", "ANDROMEDA 100%", "rgb(230, 0, 0)", "rgb(220, 0, 0)", "rgb(255, 0, 0)");
+    drawDodgerCard(mouseOver.quasar, highscore.euphoria === 100, quasar, "QUASAR", "EVENT HORIZON", "EUPHORIA 100%", "rgb(230, 153, 11)", "rgb(219, 144, 7)", "rgb(255, 165, 0)");
 
     // Ability Descriptions
     drawAbilityDesc(mouseOver.evader, true, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.9)", "rgba(200, 200, 200, 0.7)", "SKILL",
@@ -1192,7 +1210,13 @@ function drawDodgerSelection() {
                     "them, these dodgers instantaneously warp forward through the erased void, allowing",
                     "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
                     "Top Speed: 17.5 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
-                    "Dash Cooldown: 2s");
+                    "Cooldown: 2s");
+    drawAbilityDesc(mouseOver.quasar, highscore.euphoria === 100, "rgba(255, 165, 0, 0.7)", "rgba(230, 153, 11, 0.9)", "rgba(201, 135, 14, 0.9)", "EVENT HORIZON",
+                   "Quasars manifest the properties of black holes within their cores to replicate their",
+                   "indecipherable physics. Sorrounded by an accretion disk and lost within relatavistic,",
+                   "space-time they not only become impossible to touch, but their event horizon causes,",
+                   "their surroundings to accelerate indefinitely, while they lie stuck in time.",
+                   "Duration: 5s | Cooldown: 8s");
 }
 
 function drawGameOver() {
@@ -1453,7 +1477,7 @@ function drawText() { // draws the current time, highest time, and enemy count
     if (player.dodger === "evader") ctx.fillText(`Passive: Skill`, textX, 620);
 
     // Dash
-    else if (player.dodger === "j-sab") {
+    if (player.dodger === "j-sab") {
         // Dash CD
         let dashCDLeft = ((1100 - (now - dash.lastEnded)) / 1000).toFixed(2);
 
@@ -1467,7 +1491,7 @@ function drawText() { // draws the current time, highest time, and enemy count
     }
 
     // Absolute Zero
-    else if (player.dodger === "jötunn") {
+    if (player.dodger === "jötunn") {
         // Absolute Zero CD
         let absoluteZeroCDLeft = ((1000 - (now - absoluteZero.lastEnded)) / 1000).toFixed(3);
 
@@ -1481,21 +1505,37 @@ function drawText() { // draws the current time, highest time, and enemy count
     }
 
     // Shockwave
-    else if (player.dodger === "jolt") {
+    if (player.dodger === "jolt") {
         // Shockwave CD
         let shockwaveCDLeft = ((shockwave.cd - (now - shockwave.lastEnded)) / 1000).toFixed(2);
 
-        if (now - shockwave.lastEnded < shockwave.cd && !shockwave.activated) { // 5.5s or 8.5s
+        if (now - shockwave.lastEnded >= shockwave.cd) { // 5.5s or 8.5s
+            if (!shockwave.activated) shockwave.usable = true;
+            else shockwave.usable = false;
+            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
+        } else {
             shockwave.usable = false;
             ctx.fillText(`Active: ${shockwave.active} (${shockwaveCDLeft}s) | Swap (${controls[1]})`, textX, 620);
-        } else {
-            shockwave.usable = true;
-            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
         }
     }
 
     // Amplify
-    else if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify ${player.baseSpeed.toFixed(1)}`, textX, 620);
+    if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify ${player.baseSpeed.toFixed(1)}`, textX, 620);
+
+    // Event Horizon
+    if (player.dodger === "quasar") {
+        // Event Horizon CD
+        let eventHorizonCDLeft = ((8000 - (now - eventHorizon.lastEnded)) / 1000).toFixed(2);
+
+        if (now - eventHorizon.lastEnded >= 8000) {
+            if (!eventHorizon.activated) eventHorizon.usable = true;
+            else eventHorizon.usable = false;
+            ctx.fillText(`Active: Event Horizon ${controls[0]}`, textX, 620);
+        } else {
+            eventHorizon.usable = false;
+            ctx.fillText(`Active: Event Horizon ${eventHorizonCDLeft}s`, textX, 620);
+        }
+    }
 }
 
 function createEnemy() { // Creates an individual enemy with unique attributes
@@ -1867,6 +1907,22 @@ function abilities() { // player-specific abilities
                     amplify.accelRate = Date.now();
                 }
                 player.baseSpeed = amplify.baseSpeed + amplify.speed;
+        }
+    }
+    // Event Horizon makes the player invincible but speeds up nearby enemies
+    if (eventHorizon.activated) {
+        player.invincible = true;
+        player.color = "rgb(0, 0, 0)";
+        player.subColor = "rgb(255, 165, 0)";
+        ctx.fillStyle = "rgba(255, 165, 0, 0.75)";
+        drawCircle(player.x, player.y, 50, "fill");
+
+        if (now - eventHorizon.usable >= 5000) {
+            player.invincible = true;
+            player.color = "rgb(255, 165, 0)";
+            player.subColor = "rgb(230, 153, 11)";
+            eventHorizon.activated = false;
+            eventHorizon.lastEnded = Date.now();
         }
     }
 }
