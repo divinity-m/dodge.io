@@ -45,7 +45,6 @@ function recordKeyDown(event) {
             eventHorizon.activated = true;
             eventHorizon.lastUsed = Date.now();
             eventHorizon.av = 0;
-            eventHorizon.angle = 0;
             eventHorizon.accretionDisk = createAccretionDisk();
         }
     } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
@@ -95,7 +94,6 @@ function recordRightClick(event) {
             eventHorizon.activated = true;
             eventHorizon.lastUsed = Date.now();
             eventHorizon.av = 0;
-            eventHorizon.angle = 0;
             eventHorizon.accretionDisk = createAccretionDisk();
         }
     }
@@ -1929,8 +1927,8 @@ function abilities() { // player-specific abilities
         // Event Horizon Gradient
         const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 300);
         eventHorizonGrad.addColorStop(0, `rgba(255, 255, 255, ${eventHorizon.av})`);
-        eventHorizonGrad.addColorStop(0.25, `rgba(255, 165, 0, ${eventHorizon.av})`);
-        eventHorizonGrad.addColorStop(0.5, `rgba(255, 0, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.33, `rgba(255, 165, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.66, `rgba(255, 0, 0, ${eventHorizon.av})`);
         eventHorizonGrad.addColorStop(1, `rgba(200, 0, 0, ${eventHorizon.av})`);
 
         // Background Accretion Disk
@@ -1940,25 +1938,21 @@ function abilities() { // player-specific abilities
         drawCircle(player.x, player.y, 300, "stroke");
 
         // Accretion Disk Dust
-        ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
         eventHorizon.accretionDisk.forEach(dust => {
             ctx.save();
             ctx.translate(player.x, player.y);
-            ctx.rotate(eventHorizon.angle + dust.gravity);
-            ctx.fillStyle = `${dust.color}, ${eventHorizon.av}`
-            drawCircle(dust.x, dust.y, 2.5, "fill");
-            ctx.restore();
-                
+            
+            ctx.rotate(dust.gravity);
             dust.gravity += dust.baseGravity;
+            
+            ctx.fillStyle = `rgba(${dust.color}, ${eventHorizon.av})`;
+            drawCircle(dust.x, dust.y, 2.5, "fill");
+            
+            ctx.restore();
         })
-        
-        eventHorizon.angle += 0.005;
 
-        if (now - eventHorizon.lastUsed < 4000 && eventHorizon.av < 0.75) eventHorizon.av += 0.01;
-        else if (now - eventHorizon.lastUsed >= 4000 && eventHorizon.av > 0) eventHorizon.av -= 0.01;
-        // DELETE THIS LATER
-        if (eventHorizon.av === 0.75 && now-eventHorizon.lastUsed < 1500) console.log(now-eventHorizon.lastUsed);
-        // DELETE THIS LATER
+        if (now - eventHorizon.lastUsed < 1300 && eventHorizon.av < 0.75) eventHorizon.av += 0.01;
+        else if (now - eventHorizon.lastUsed >= 3700 && eventHorizon.av > 0) eventHorizon.av -= 0.01;
 
         // Reset and Deactivate Event Horizon
         if (now - eventHorizon.lastUsed >= 5000) {
@@ -1967,37 +1961,40 @@ function abilities() { // player-specific abilities
             player.subColor = "rgb(230, 153, 11)";
             eventHorizon.activated = false;
             eventHorizon.lastEnded = Date.now();
+            eventHorizon.accretionDisk = [];
         }
     }
 }
 function createAccretionDisk() {
     let accretionDisk = [];
     function createDust() {
-        let rand = Math.random * Math.PI; // random angle between 0 and 3.14
+        let max = 295, min = 25;
+        let randAngle = Math.random() * Math.PI*2; // random angle between 0 and 3.14*2
+        let randDist = Math.random() * max;
         let dust = {
-            x: 297.5 * Math.cos(rand),
-            y: 297.5 * Math.sin(rand),
+            x: randDist * Math.cos(randAngle),
+            y: randDist * Math.sin(randAngle),
         }
-        while (Math.hypot(dust.x, dust.y) < 17.5) {
-            rand = Math.random * Math.PI;
-            dust.x = 295 * Math.cos(rand);
-            dust.y = 295 * Math.sin(rand);
+        
+        while (Math.hypot(dust.x, dust.y) < min) {
+            randDist = Math.random * max;
+            dust.x = randDist * Math.cos(randAngle);
+            dust.y = randDist * Math.sin(randAngle);
         }
+        
         let dist = Math.hypot(dust.x, dust.y);
-        if (dist < 50) dust.color = '230, 230, 230'; // 0, 0.25, 0.5, 1
-        if (dist < 100) dust.color = `230, 153, 11`;
-        if (dist < 150) dust.color = '230, 0, 0';
+        if (dist < 75) dust.color = '230, 230, 230'; // 0, 0.33, 0.66, 1
+        else if (dist < 150) dust.color = '230, 153, 11';
+        else if (dist < 225) dust.color = '230, 0, 0';
         else dust.color = '180, 0, 0';
 
-        // between Math.hypot(20, 20) and Math.hypot(200, 200)
-        let max = Math.hypot(200, 200);
-        let min = Math.hypot(20, 20);
-        dust.gravity = ((Math.hypot(dust.x, dust.y) - min) / (max - min))/10;
+        // clamping between max and min to get its gravity
+        dust.gravity = (1 - ((Math.hypot(dust.x, dust.y) - min) / (max - min))) / 10;
         dust.baseGravity = dust.gravity;
         return dust;
     }
 
-    for (let i = 0; i < 250; i++) accretionDisk.push(createDust());
+    for (let i = 0; i < 300; i++) accretionDisk.push(createDust());
     return accretionDisk;
 }
            
