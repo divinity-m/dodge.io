@@ -753,16 +753,19 @@ function drawStartScreen() {
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.font = "bold 16px Verdana";
         ctx.textAlign = "left";
-        ctx.fillText("Inspired by                 and", 378, 25);
-            
-        if (mouseOver?.evades) ctx.fillStyle = "#8ad3ff";
-        else ctx.fillStyle = "#6bc6ff";
-        ctx.fillText("Evades.io", 485, 25);
-
-        if (mouseOver?.jsab) ctx.fillStyle = "#ff699f";
-        else ctx.fillStyle = "#ff2f7a";
-        ctx.textAlign = "right";
-        ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
+        if (isMobile()) ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", 378, 25);
+        else {
+            ctx.fillText("Inspired by                 and", 378, 25);
+                
+            if (mouseOver?.evades) ctx.fillStyle = "#8ad3ff";
+            else ctx.fillStyle = "#6bc6ff";
+            ctx.fillText("Evades.io", 485, 25);
+    
+            if (mouseOver?.jsab) ctx.fillStyle = "#ff699f";
+            else ctx.fillStyle = "#ff2f7a";
+            ctx.textAlign = "right";
+            ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
+        }
         
         // PLAY BUTTON //
         const playBtn = {
