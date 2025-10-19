@@ -221,30 +221,30 @@ function recordLeftClick() {
                 player.subColor = "rgb(230, 230, 230)";
                 amplify.reset();
             }
-            else if (mouseOver.j_sab && highscore.andromeda === 100) {
+            if (mouseOver.j_sab && highscore.andromeda === 100) {
                 player.dodger = "j-sab";
                 player.color = "rgb(255, 0, 0)";
                 player.subColor = "rgb(230, 0, 0)";
                 amplify.reset();
             }
-            else if (mouseOver.jötunn && highscore.limbo === 100) {
+            if (mouseOver.jötunn && highscore.limbo === 100) {
                 player.dodger = "jötunn";
                 player.color = "rgb(79, 203, 255)";
                 player.subColor = "rgb(70, 186, 235)";
                 amplify.reset();
             }
-            else if (mouseOver.jolt && highscore.medium >= 30) {
+            if (mouseOver.jolt && highscore.medium >= 30) {
                 player.dodger = "jolt";
                 player.color = "rgb(255, 255, 0)";
                 player.subColor = "rgb(230, 230, 0)";
                 amplify.reset();
             }
-            else if (mouseOver.crescendo && highscore.hard >= 60) {
+            if (mouseOver.crescendo && highscore.hard >= 60) {
                 player.dodger = "crescendo";
                 player.color = "rgb(0, 0, 0)";
                 player.subColor = "rgb(40, 40, 40)";
             }
-            else if (mouseOver.quasar && highscore.euphoria === 100) {
+            if (mouseOver.quasar && highscore.euphoria === 100) {
                 player.dodger = "quasar";
                 player.color = "rgb(255, 165, 0)";
                 player.subColor = "rgb(230, 153, 11)";
