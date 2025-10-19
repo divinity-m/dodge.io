@@ -1928,18 +1928,16 @@ function abilities() { // player-specific abilities
         if (player.baseSpeed < 5 && now - eventHorizon.lastUsed > 4000) player.baseSpeed += 0.05;
 
         // Event Horizon Gradient
-        const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 300);
+        const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 1010);
         eventHorizonGrad.addColorStop(0, `rgba(255, 255, 255, ${eventHorizon.av})`);
-        eventHorizonGrad.addColorStop(0.33, `rgba(255, 165, 0, ${eventHorizon.av})`);
-        eventHorizonGrad.addColorStop(0.66, `rgba(255, 0, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.25, `rgba(255, 165, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.5, `rgba(255, 0, 0, ${eventHorizon.av})`);
         eventHorizonGrad.addColorStop(1, `rgba(200, 0, 0, ${eventHorizon.av})`);
 
-        // Background Accretion Disk, Test the radius for 1586 and 1587
+        // Background Accretion Disk
         ctx.fillStyle = eventHorizonGrad;
-        drawCircle(player.x, player.y, 300, "fill");
+        drawCircle(player.x, player.y, 1010, "fill");
         ctx.strokeStyle = `rgba(165, 0, 0, ${eventHorizon.av})`;
-        ctx.lineWidth = 2;
-        drawCircle(player.x, player.y, 300, "stroke");
 
         // Accretion Disk Dust
         eventHorizon.accretionDisk.forEach(dust => {
@@ -1955,7 +1953,7 @@ function abilities() { // player-specific abilities
             ctx.restore();
         })
 
-        if (eventHorizon.av < 0.75 && now - eventHorizon.lastUsed < 1300) eventHorizon.av += 0.01;
+        if (eventHorizon.av < 0.65 && now - eventHorizon.lastUsed < 1300) eventHorizon.av += 0.01;
         else if (eventHorizon.av > 0 && now - eventHorizon.lastUsed > 3700) eventHorizon.av -= 0.01;
 
         // Speed up enemies
@@ -1985,7 +1983,7 @@ function abilities() { // player-specific abilities
 function createAccretionDisk() {
     let accretionDisk = [];
     function createDust() {
-        let max = 295, min = 25;
+        let max = 1005, min = 25; // radius of the accretion disk is 1010
         let randAngle = Math.random() * Math.PI*2; // random angle between 0 and 3.14*2
         let randDist = Math.random() * max;
         let dust = {
@@ -2000,9 +1998,9 @@ function createAccretionDisk() {
         }
         
         let dist = Math.hypot(dust.x, dust.y);
-        if (dist < 75) dust.color = '230, 230, 230'; // 0, 0.33, 0.66, 1
-        else if (dist < 150) dust.color = '230, 153, 11';
-        else if (dist < 225) dust.color = '230, 0, 0';
+        if (dist < max*0.166) dust.color = '230, 230, 230'; // 0, 0.25, 0.5, 1
+        else if (dist < max*0.322) dust.color = '201, 136, 14';
+        else if (dist < max*0.5) dust.color = '230, 0, 0';
         else dust.color = '180, 0, 0';
 
         // clamping between max and min to get its gravity
@@ -2011,7 +2009,7 @@ function createAccretionDisk() {
         return dust;
     }
 
-    for (let i = 0; i < 300; i++) accretionDisk.push(createDust());
+    for (let i = 0; i < 500; i++) accretionDisk.push(createDust());
     return accretionDisk;
 }
 
