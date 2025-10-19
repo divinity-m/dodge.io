@@ -1,4 +1,4 @@
-console.log("quasar no quasi");
+console.log("hover quasar");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -18,7 +18,7 @@ function isMobile() {
 
 function resize() {
     if (isMobile()) {
-        cnv.style.width = `${window.innerheight * (GAME_WIDTH/2340)}px`;
+        cnv.style.width = `400px`;
         // center the canvas on the screen for phones
         // cnv.style.position = "absolute";
         // cnv.style.left = `${(window.innerWidth - 400)/2}px`;
