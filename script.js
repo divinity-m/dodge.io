@@ -281,6 +281,9 @@ if (resetLocalData || !localData){
 // saves the game if the website is closed
 window.addEventListener('beforeunload', () => {
     if (gameState !== "loading") { // only save user data if they're not on the loading screen
+        // Dash and Blackhole causes bugs when the player leaves mid-usage
+        if (player.dodger === "j-sab") { player.color = "rgb(255, 0, 0)"; player.subColor = "rgb(230, 0, 0)"; }
+        if (player.dodger === "quaser") { player.color = "rgb(255, 165, 0)"; player.subColor = "rgb(230, 153, 11)"; }
         userData = { player: player, highscore: highscore, settings: settings, };
         localStorage.setItem('localUserData', JSON.stringify(userData));
     }
