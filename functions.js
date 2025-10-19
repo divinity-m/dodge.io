@@ -731,7 +731,7 @@ function drawStartScreen() {
         ctx.font = '30px Roboto';
         ctx.textAlign = 'left';
         ctx.strokeText("Vasto", 5, 30);
-        ctx.drawImage(document.getElementById("instalogo"), 85, 5, 30, 30);
+        // ctx.drawImage(document.getElementById("instalogo"), 85, 5, 30, 30);
 
         // CREDITS //
         ctx.fillStyle = "rgb(0, 0, 0)";
