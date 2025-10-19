@@ -37,7 +37,7 @@ function recordKeyDown(event) {
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
             shockwave.used = shockwave.active;
-            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; }
+            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
             else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
         }
 
@@ -84,7 +84,7 @@ function recordRightClick(event) {
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
             shockwave.used = shockwave.active;
-            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; }
+            if (shockwave.used === "Shockwave") { shockwave.cd = 8500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
             else if (shockwave.used === "Shockray") { shockwave.cd = 5500; shockwave.effect = 0.5; }
         }
 
@@ -619,7 +619,7 @@ function detectHover() {
     mouseOver.jötunn = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
     mouseOver.crescendo = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 150 && mouseY < 250;
     mouseOver.j_sab = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 150 && mouseY < 250;
-    mouseOver.quasar = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 150 && mouseY < 250;
+    mouseOver.quasar = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 150 && mouseY < 250;
 
     let difficultySelection = gameState === "startScreen" && innerGameState === "selectDifficulty";
     mouseOver.easy = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
@@ -1510,8 +1510,7 @@ function drawText() { // draws the current time, highest time, and enemy count
         let shockwaveCDLeft = ((shockwave.cd - (now - shockwave.lastEnded)) / 1000).toFixed(2);
 
         if (now - shockwave.lastEnded >= shockwave.cd) { // 5.5s or 8.5s
-            if (!shockwave.activated) shockwave.usable = true;
-            else shockwave.usable = false;
+            shockwave.usable = true;
             ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
         } else {
             shockwave.usable = false;
@@ -1528,8 +1527,7 @@ function drawText() { // draws the current time, highest time, and enemy count
         let eventHorizonCDLeft = ((8000 - (now - eventHorizon.lastEnded)) / 1000).toFixed(2);
 
         if (now - eventHorizon.lastEnded >= 8000) {
-            if (!eventHorizon.activated) eventHorizon.usable = true;
-            else eventHorizon.usable = false;
+            eventHorizon.usable = true;
             ctx.fillText(`Active: Event Horizon ${controls[0]}`, textX, 620);
         } else {
             eventHorizon.usable = false;
