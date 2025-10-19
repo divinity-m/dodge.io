@@ -761,7 +761,7 @@ function drawStartScreen() {
         ctx.textAlign = "left";
         if (isMobile()) {
             ctx.textAlign = "right";
-            ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", 378, 25);
+            ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", GAME_WIDTH-5, 25);
         }
         else {
             ctx.fillText("Inspired by                 and", 378, 25);
@@ -1921,28 +1921,32 @@ function abilities() { // player-specific abilities
     }
     // Event Horizon makes the player invincible but speeds up nearby enemies
     if (eventHorizon.activated) {
+        // Player Changes
         player.invincible = true;
         player.color = "rgb(0, 0, 0)";
         player.subColor = "rgb(255, 165, 0)";
-        
+
+        // Event Horizon Gradient
         const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 300);
         eventHorizonGrad.addColorStop(0, `rgba(255, 255, 255, ${eventHorizon.av})`);
         eventHorizonGrad.addColorStop(0.25, `rgba(255, 165, 0, ${eventHorizon.av})`);
         eventHorizonGrad.addColorStop(0.5, `rgba(255, 0, 0, ${eventHorizon.av})`);
         eventHorizonGrad.addColorStop(1, `rgba(200, 0, 0, ${eventHorizon.av})`);
-        
+
+        // Background Accretion Disk
         ctx.fillStyle = eventHorizonGrad;
         drawCircle(player.x, player.y, 300, "fill");
         ctx.strokeStyle = `rgba(165, 0, 0, ${eventHorizon.av})`
         drawCircle(player.x, player.y, 300, "stroke");
 
+        // Accretion Disk Dust
         ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
-        
         eventHorizon.accretionDisk.forEach(dust => {
             ctx.save();
             ctx.translate(player.x, player.y);
             ctx.rotate(eventHorizon.angle + dust.gravity);
-            drawCircle(dust.x, dust.y, 5, "fill");
+            ctx.fillStyle = `${dust.color}, ${eventHorizon.av}`
+            drawCircle(dust.x, dust.y, 2.5, "fill");
             ctx.restore();
                 
             dust.gravity += dust.baseGravity;
@@ -1952,7 +1956,11 @@ function abilities() { // player-specific abilities
 
         if (now - eventHorizon.lastUsed < 4000 && eventHorizon.av < 0.75) eventHorizon.av += 0.01;
         else if (now - eventHorizon.lastUsed >= 4000 && eventHorizon.av > 0) eventHorizon.av -= 0.01;
-        
+        // DELETE THIS LATER
+        if (eventHorizon.av === 0.75 && now-eventHorizon.lastUsed < 1500) console.log(now-eventHorizon.lastUsed);
+        // DELETE THIS LATER
+
+        // Reset and Deactivate Event Horizon
         if (now - eventHorizon.lastUsed >= 5000) {
             player.invincible = true;
             player.color = "rgb(255, 165, 0)";
@@ -1965,22 +1973,31 @@ function abilities() { // player-specific abilities
 function createAccretionDisk() {
     let accretionDisk = [];
     function createDust() {
+        let rand = Math.random * Math.PI; // random angle between 0 and 3.14
         let dust = {
-            x: Math.random() * 290 - 145, // between 295 and -295
-            y: Math.random() * 290 - 145,
+            x: 297.5 * Math.cos(rand),
+            y: 297.5 * Math.sin(rand),
         }
-        while (dust.x < 20 && dust.x > -20) dust.x = Math.random() * 290 - 145;
-        while (dust.y < 20 && dust.y > -20) dust.y = Math.random() * 290 - 145;
+        while (Math.hypot(dust.x, dust.y) < 17.5) {
+            rand = Math.random * Math.PI;
+            dust.x = 295 * Math.cos(rand);
+            dust.y = 295 * Math.sin(rand);
+        }
+        let dist = Math.hypot(dust.x, dust.y);
+        if (dist < 50) dust.color = '230, 230, 230'; // 0, 0.25, 0.5, 1
+        if (dist < 100) dust.color = `230, 153, 11`;
+        if (dist < 150) dust.color = '230, 0, 0';
+        else dust.color = '180, 0, 0';
 
-        // between Math.hypot(20, 20) and Math.hypot(145, 145)
-        let max = Math.hypot(145, 145);
+        // between Math.hypot(20, 20) and Math.hypot(200, 200)
+        let max = Math.hypot(200, 200);
         let min = Math.hypot(20, 20);
         dust.gravity = ((Math.hypot(dust.x, dust.y) - min) / (max - min))/10;
         dust.baseGravity = dust.gravity;
         return dust;
     }
 
-    for (let i = 0; i < 100; i++) accretionDisk.push(createDust());
+    for (let i = 0; i < 250; i++) accretionDisk.push(createDust());
     return accretionDisk;
 }
            
