@@ -1,4 +1,4 @@
-console.log("accretionDisk3");
+console.log("accretionDisk4");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
