@@ -757,7 +757,10 @@ function drawStartScreen() {
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.font = "bold 16px Verdana";
         ctx.textAlign = "left";
-        if (isMobile()) ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", 378, 25);
+        if (isMobile()) {
+            ctx.textAlign = "right";
+            ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", 378, 25);
+        }
         else {
             ctx.fillText("Inspired by                 and", 378, 25);
                 
