@@ -1,4 +1,4 @@
-console.log("accretionDisk5");
+console.log("accretionDisk effect on enemies");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
