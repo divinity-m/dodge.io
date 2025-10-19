@@ -25,7 +25,7 @@ function resize() {
         // cnv.style.top = `${(window.innerHeight - 325)/2}px`;
     } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
-window.addEventListener('resize', resize);
+window.addEventListener("resize", resize);
 screen?.orientation.addEventListener("change", resize);
 resize();
 
