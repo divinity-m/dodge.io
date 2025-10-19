@@ -1929,15 +1929,19 @@ function abilities() { // player-specific abilities
         drawCircle(player.x, player.y, 300, "fill");
 
         ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
-        ctx.save();
-        ctx.translate(player.x, player.y);
-        eventHorizon.accretionDisk.forEach(dust => {
-            ctx.rotate(dust.gravity/10);
-            drawCircle(dust.x, dust.y, 5, "fill");
-        })
-        ctx.restore();
         eventHorizon.av += 0.01;
-        eventHorizon.av = Math.min(eventHorizon.av, 0.75)
+        eventHorizon.av = Math.min(eventHorizon.av, 0.75);
+        
+        eventHorizon.accretionDisk.forEach(dust => {
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(eventHorizon.angle + dust.gravity);
+            drawCircle(dust.x, dust.y, 5, "fill");
+            ctx.restore();
+                
+            dust.gravity += dust.baseGravity;
+        })
+        
         eventHorizon.angle += 0.01;
         
         if (now - eventHorizon.lastUsed >= 5000) {
@@ -1953,14 +1957,17 @@ function createAccretionDisk() {
     let accretionDisk = [];
     function createDust() {
         let dust = {
-            x: Math.random() * 590 - 295, // between 295 and -295
-            y: Math.random() * 590 - 295,
+            x: Math.random() * 290 - 145, // between 295 and -295
+            y: Math.random() * 290 - 145,
         }
-        while (dust.x < 20 && dust.x > -20) dust.x = Math.random() * 590 - 295;
-        while (dust.y < 20 && dust.y > -20) dust.y = Math.random() * 590 - 295;
+        while (dust.x < 20 && dust.x > -20) dust.x = Math.random() * 290 - 145;
+        while (dust.y < 20 && dust.y > -20) dust.y = Math.random() * 290 - 145;
 
-        // between 28.284271247461902 and 417.1930009000630
-        dust.gravity = (Math.hypot(dust.x, dust.y) - 28.284) / (417.193 - 28.284);
+        // between Math.hypot(20, 20) and Math.hypot(145, 145)
+        let max = Math.hypot(145, 145);
+        let min = Math.hypot(20, 20);
+        dust.gravity = ((Math.hypot(dust.x, dust.y) - min) / (max - min))/10;
+        dust.baseGravity = dust.gravity;
         return dust;
     }
 
