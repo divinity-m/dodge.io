@@ -1,4 +1,4 @@
-console.log("leave-mid-use");
+console.log("leave-mid-use 2");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -259,6 +259,8 @@ if (localData) {
                               aZ_Range: s.aZ_Range, aZ_Av: s.aZ_Av, customCursor: s.customCursor, cursorTrail: s.cursorTrail}};
         // updates the current data to the locally saved data
         player = userData.player;
+        if (player.dodger === "j-sab") { player.color = "rgb(255, 0, 0)"; player.subColor = "rgb(230, 0, 0)"; }
+        if (player.dodger === "quaser") { player.color = "rgb(255, 165, 0)"; player.subColor = "rgb(230, 153, 11)"; }
         highscore = userData.highscore;
         settings = userData.settings;
         musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
@@ -282,8 +284,6 @@ if (resetLocalData || !localData){
 window.addEventListener('beforeunload', () => {
     if (gameState !== "loading") { // only save user data if they're not on the loading screen
         // Dash and Blackhole causes bugs when the player leaves mid-usage
-        if (player.dodger === "j-sab") { player.color = "rgb(255, 0, 0)"; player.subColor = "rgb(230, 0, 0)"; }
-        if (player.dodger === "quaser") { player.color = "rgb(255, 165, 0)"; player.subColor = "rgb(230, 153, 11)"; }
         userData = { player: player, highscore: highscore, settings: settings, };
         localStorage.setItem('localUserData', JSON.stringify(userData));
     }
