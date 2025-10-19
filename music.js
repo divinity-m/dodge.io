@@ -123,7 +123,7 @@ function createBeam(variant="none") {
         variant: Math.random(),
         x: Math.random() * GAME_WIDTH, y: Math.random() * GAME_HEIGHT,
         w: (Math.random() * 20) + 80, h: (Math.random() * 20) + 50,
-        spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
+        spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2, baseDespawnRate: 2,
         colorValue: 185,
         get color() {
             return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
@@ -152,7 +152,7 @@ function createCircle(variant="none") {
         type: "circle",
         variant: Math.random(),
         x: Math.random() * GAME_WIDTH, y: Math.random() * GAME_HEIGHT, r: (Math.random() * 40) + 80,
-        spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2,
+        spawnRate: 0.25, baseSpawnRate: 0.25, despawnRate: 2, baseDespawnRate: 2,
         colorValue: 185,
         get color() {
             return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
@@ -184,7 +184,7 @@ function createSpike() {
         x: 0, y: 0, r: 20,
         rotate: 0, 
         baseSpeed: 2.5 + 2 * (music.var.currentTime/music.var.duration),
-        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
+        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2, baseDespawnRate: 2,
         colorValue: 185,
         get color() {
             return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
@@ -223,7 +223,7 @@ function createText() {
         variant: "none",
         x: 0, y: 0,
         text: "placeholder", textAlign: "left", font: "50px Verdana",
-        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2,
+        spawnRate: 0.5, baseSpawnRate: 0.5, despawnRate: 2, baseDespawnRate: 2,
         colorValue: 185,
         get color() {
             return `rgba(${this.colorValue}, ${this.colorValue}, ${this.colorValue}, 0.95)`;
@@ -596,18 +596,17 @@ function musicCollisions() {
             }
             if (player.dodger === "quasar" && eventHorizon.activated) {
                 let relativity = 1 + distance/300;
-                let max = danger.baseSpawnRate * relativity;
+                function eventHorizonEffect(danger, rate, baseRate) {
+                    let max = danger[baseRate] * relativity;
 
-                if (danger.spawnRate < max && now - eventHorizon.lastUsed < 1000) danger.spawnRate += max/100;
-                if (danger.spawnRate > danger.baseSpawnRate && now - eventHorizon.lastUsed > 4000) danger.spawnRate -= max/100;
-                if (danger.spawnRate < danger.baseSpawnRate - max/100 && now - eventHorizon.lastUsed > 4000) danger.spawnRate = danger.baseSpawnRate;
-
-                if (danger.type === "spike") {
-                    max = danger.baseSpeed * relativity;
-                    if (danger.speed < max && now - eventHorizon.lastUsed < 1000) danger.speed += max/100;
-                    if (danger.speed > danger.baseSpeed && now - eventHorizon.lastUsed > 4000) danger.speed -= max/100;
-                    if (danger.speed < danger.baseSpeed - max/100 && now - eventHorizon.lastUsed > 4000) danger.speed = danger.baseSpeed;
+                    if (danger[rate] < max && now - eventHorizon.lastUsed < 1000) danger[rate] += max/100;
+                    if (danger[rate] > danger[baseRate] && now - eventHorizon.lastUsed > 4000) danger[rate] -= max/100;
+                    if (danger[rate] < danger[baseRate] - max/100 && now - eventHorizon.lastUsed > 4000) danger[rate] = danger[baseRate];
                 }
+                
+                eventHorizonEffect(danger, "spawnRate", "baseSpawnRate");
+                eventHorizonEffect(danger, "despawnRate", "baseDespawnRate");
+                if (danger.type === "spike") eventHorizonEffect(danger, "speed", "baseSpeed");
             }
         }
 
