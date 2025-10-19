@@ -599,9 +599,9 @@ function musicCollisions() {
                 function eventHorizonEffect(danger, rate, baseRate) {
                     let max = danger[baseRate] * relativity;
 
-                    if (danger[rate] < max && now - eventHorizon.lastUsed < 1000) danger[rate] += max/100;
-                    if (danger[rate] > danger[baseRate] && now - eventHorizon.lastUsed > 4000) danger[rate] -= max/100;
-                    if (danger[rate] < danger[baseRate] - max/100 && now - eventHorizon.lastUsed > 4000) danger[rate] = danger[baseRate];
+                    if (danger[rate] < max && now - eventHorizon.lastUsed < 4200) danger[rate] += max/50;
+                    if (danger[rate] > danger[baseRate] && now - eventHorizon.lastUsed > 4200) danger[rate] -= max/50;
+                    if (danger[rate] < danger[baseRate] - max/50 && now - eventHorizon.lastUsed > 4200) danger[rate] = danger[baseRate];
                 }
                 
                 eventHorizonEffect(danger, "spawnRate", "baseSpawnRate");
