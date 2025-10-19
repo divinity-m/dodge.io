@@ -44,6 +44,8 @@ function recordKeyDown(event) {
         if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
             eventHorizon.activated = true;
             eventHorizon.lastUsed = Date.now();
+            eventHorizon.av = 0;
+            eventHorizon.angle = 0;
         }
     } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
         if (player.dodger === "jötunn" && absoluteZero.usable) {
@@ -91,6 +93,8 @@ function recordRightClick(event) {
         if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
             eventHorizon.activated = true;
             eventHorizon.lastUsed = Date.now();
+            eventHorizon.av = 0;
+            eventHorizon.angle = 0;
         }
     }
 }
@@ -1531,10 +1535,10 @@ function drawText() { // draws the current time, highest time, and enemy count
 
         if (now - eventHorizon.lastEnded >= 8000) {
             eventHorizon.usable = true;
-            ctx.fillText(`Active: Event Horizon ${controls[0]}`, textX, 620);
+            ctx.fillText(`Active: Event Horizon (${controls[0]})`, textX, 620);
         } else {
             eventHorizon.usable = false;
-            ctx.fillText(`Active: Event Horizon ${eventHorizonCDLeft}s`, textX, 620);
+            ctx.fillText(`Active: Event Horizon (${eventHorizonCDLeft}s)`, textX, 620);
         }
     }
 }
@@ -1915,10 +1919,19 @@ function abilities() { // player-specific abilities
         player.invincible = true;
         player.color = "rgb(0, 0, 0)";
         player.subColor = "rgb(255, 165, 0)";
-        ctx.fillStyle = "rgba(255, 165, 0, 0.75)";
-        drawCircle(player.x, player.y, 50, "fill");
-
-        if (now - eventHorizon.usable >= 5000) {
+        
+        ctx.fillStyle = `rgba(255, 165, 0, ${av})`;
+        drawCircle(player.x, player.y, 300, "fill");
+        
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        ctx.rotate(eventHorizon.angle);
+        drawCircle(10, 10, 20, "fill");
+        ctx.restore();
+        eventHorizon.av += 0.05;
+        eventHorizon.angle += 0.1;
+        
+        if (now - eventHorizon.lastUsed >= 5000) {
             player.invincible = true;
             player.color = "rgb(255, 165, 0)";
             player.subColor = "rgb(230, 153, 11)";
