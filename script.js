@@ -18,7 +18,7 @@ function isMobile() {
 
 function resize() {
     if (isMobile()) {
-        cnv.style.width = `400px`;
+        cnv.style.width = `350px`;
         // center the canvas on the screen for phones
         // cnv.style.position = "absolute";
         // cnv.style.left = `${(window.innerWidth - 400)/2}px`;
