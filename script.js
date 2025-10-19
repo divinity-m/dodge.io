@@ -1,4 +1,4 @@
-console.log("event horizon 2.0 or sum shi");
+console.log("finishing touches");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
