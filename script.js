@@ -1,4 +1,4 @@
-console.log("event horizon base code done");
+console.log("event horizon 2.0 or sum shi");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -177,6 +177,8 @@ let eventHorizon = {
     lastUsed: 0, lastEnded: 0,
     reset: function() {
         player.baseSpeed = 5;
+        player.color = "rgb(255, 165, 0)";
+        player.subColor = "rgb(230, 153, 11)";
         this.av = 0;
         this.accretionDisk = [];
         this.activated = false;
@@ -389,9 +391,9 @@ function draw() {
     else if (gameState === "endlessMode") {
         loopAudio();
         drawText();
+        drawEnemies();
         abilities();
         drawPlayer();
-        drawEnemies();
         
         keyboardControls();
         mouseMovement();
@@ -403,9 +405,9 @@ function draw() {
     else if (gameState === "endlessOver") {
         drawText();
         drawGameOver();
+        drawEnemies();
         abilities();
         drawPlayer();
-        drawEnemies();
     }
     else if (gameState === "musicMode") {
         drawEndLevel();
