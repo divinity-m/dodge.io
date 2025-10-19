@@ -17,13 +17,8 @@ function isMobile() {
 }
 
 function resize() {
-    if (isMobile()) {
-        cnv.style.width = `350px`;
-        // center the canvas on the screen for phones
-        // cnv.style.position = "absolute";
-        // cnv.style.left = `${(window.innerWidth - 400)/2}px`;
-        // cnv.style.top = `${(window.innerHeight - 325)/2}px`;
-    } else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
+    if (isMobile()) cnv.style.width = `350px`;
+    else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
 }
 window.addEventListener("resize", resize);
 screen?.orientation.addEventListener("change", resize);
