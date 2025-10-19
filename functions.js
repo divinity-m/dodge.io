@@ -1763,6 +1763,7 @@ function restartEndless() { // Resets certain variables once the play button is 
     dash.lastEnded = 0;
     shockwave.reset();
     amplify.reset();
+    eventHorizon.reset();
     
     innerGameState = "inEndless";
     gameState = "endlessMode"
@@ -1963,10 +1964,10 @@ function abilities() { // player-specific abilities
             let relativity = 1 + dist/300;
             let max = enemy.baseSpeed * relativity;
 
-            if (enemy.speed < enemy.baseSpeed * max && now - eventHorizon.lastUsed < 1000) enemy.speed += max/100;
-            if (enemy.speed > enemy.baseSpeed && now - eventHorizonlastUsed > 4000) enemy.speed -= max/100;
+            if (enemy.speed < max && now - eventHorizon.lastUsed < 1000) enemy.speed += max/100;
+            if (enemy.speed > enemy.baseSpeed && now - eventHorizon.lastUsed > 4000) enemy.speed -= max/100;
 
-            if (enemy.speed < enemy.baseSpeed - max/100 && now - eventHorizonlastUsed > 4000) enemy.speed = enemy.baseSpeed;
+            if (enemy.speed < enemy.baseSpeed - max/100 && now - eventHorizon.lastUsed > 4000) enemy.speed = enemy.baseSpeed;
         })
 
         // Reset and Deactivate Event Horizon
