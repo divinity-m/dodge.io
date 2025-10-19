@@ -1920,7 +1920,7 @@ function abilities() { // player-specific abilities
         player.color = "rgb(0, 0, 0)";
         player.subColor = "rgb(255, 165, 0)";
         
-        ctx.fillStyle = `rgba(255, 165, 0, ${av})`;
+        ctx.fillStyle = `rgba(255, 165, 0, ${eventHorizon.av})`;
         drawCircle(player.x, player.y, 300, "fill");
         
         ctx.save();
