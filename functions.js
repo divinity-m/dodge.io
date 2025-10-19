@@ -1931,7 +1931,7 @@ function abilities() { // player-specific abilities
         ctx.fillStyle = `rgba(230, 153, 11, ${eventHorizon.av})`;
         ctx.save();
         ctx.translate(player.x, player.y);
-        eventHorizion.accretionDisk.forEach(dust => {
+        eventHorizon.accretionDisk.forEach(dust => {
             ctx.rotate(dust.gravity/10);
             drawCircle(dust.x, dust.y, 5, "fill");
         })
