@@ -599,7 +599,11 @@ function musicCollisions() {
                 function eventHorizonEffect(danger, rate, baseRate) {
                     let max = danger[baseRate] * relativity;
 
+                    // To max
                     if (danger[rate] < max && now - eventHorizon.lastUsed < 4200) danger[rate] += max/50;
+                    if (danger[rate] > max && now - eventHorizon.lastUsed < 4200) danger[rate] -= max/50;
+                    
+                    // To base rate
                     if (danger[rate] > danger[baseRate] && now - eventHorizon.lastUsed > 4200) danger[rate] -= max/50;
                     if (danger[rate] < danger[baseRate] - max/50 && now - eventHorizon.lastUsed > 4200) danger[rate] = danger[baseRate];
                 }
