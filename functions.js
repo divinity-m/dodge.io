@@ -1012,9 +1012,10 @@ function drawDifficultySelection() {
         if (description[1]) ctx.fillText(description[1], x+10, y + 80);
 
         if (!unlocked) {
-            if (difficultyName === "HARD") ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-            else if (difficultyName === "ANDROMEDA") ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
-            else ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+            if (difficultyName === "HARD") ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            else if (difficultyName === "LIMBO") ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            else if (difficultyName === "ANDROMEDA") ctx.fillStyle = "rgba(0, 0, 0, 0.92)";
+            else ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
             ctx.fillRect(x, y, 200, 100);
 
             ctx.lineWidth = 1.25;
@@ -1111,6 +1112,10 @@ function drawDodgerSelection() {
         // Rectangle
         decideFillStyle(mouseOver, colors[0], colors[1]);
         ctx.fillRect(dodger.x, dodger.y, 200, 100);
+        
+        ctx.strokeStyle = colors[2];
+        ctx.lineWidth = 2;
+        ctx.strokeRect(dodger.x, dodger.y, 200, 100);
 
         // Circle
         ctx.fillStyle = colors[2];
@@ -1125,8 +1130,8 @@ function drawDodgerSelection() {
 
         // Locked
         if (!unlocked) {
-            if (dodgerName !== "CRESCENDO") ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-            else ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            if (dodgerName === "CRESCENDO") ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            else ctx.fillStyle = "rgba(0, 0, 0, 0.9)";
             ctx.fillRect(dodger.x, dodger.y, 200, 100);
             
             ctx.lineWidth = 1.25;
@@ -1159,8 +1164,8 @@ function drawDodgerSelection() {
             for (let i = 0; i < description.length; i++) ctx.fillText(description[i], 70, 335 + i*25);
 
             if (!unlocked) {
-                if (abilityName !== "AMPLIFY") ctx.fillStyle = "rgba(0, 0, 0, 0.825)";
-                else ctx.fillStyle = "rgba(0, 0, 0, 0.525)";
+                if (abilityName === "AMPLIFY") ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+                else ctx.fillStyle = "rgba(0, 0, 0, 0.925)";
                 ctx.fillRect(50, 275, 700, 175);
                 
                 ctx.lineWidth = 2;
