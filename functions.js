@@ -1968,9 +1968,12 @@ function abilities() { // player-specific abilities
             let relativity = 1 + dist/300;
             let max = enemy.baseSpeed * relativity;
 
+            // To max
             if (enemy.speed < max && now - eventHorizon.lastUsed < 4200) enemy.speed += max/50;
+            if (enemy.speed > max && now - eventHorizon.lastUsed < 4200) enemy.speed -= max/50;
+            
+            // To base speed
             if (enemy.speed > enemy.baseSpeed && now - eventHorizon.lastUsed > 4200) enemy.speed -= max/50;
-
             if (enemy.speed < enemy.baseSpeed - max/50 && now - eventHorizon.lastUsed > 4200) enemy.speed = enemy.baseSpeed;
         })
 
