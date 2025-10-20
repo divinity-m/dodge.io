@@ -80,7 +80,6 @@ function drawEndLevel() {
             ctx.fillText(`Exiting In`, 250, GAME_HEIGHT/2 - 25);
             ctx.fillText(`${Math.ceil(3 - (now-startTime)/1000)}`, 250, GAME_HEIGHT/2 + 25);
             if (now - startTime >= 3000) {
-                resetBgVars();
                 dash.lastEnded = 0;
                 shockwave.reset();
                 amplify.reset();
@@ -92,6 +91,7 @@ function drawEndLevel() {
                 music.promise = music.var.play();
                 gameState = "startScreen";
                 innerGameState = "mainMenu";
+                resetBgVars();
             }
         }
         else {
