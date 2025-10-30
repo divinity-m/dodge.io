@@ -5,9 +5,9 @@ const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
 // Game Units
-let gameState = "loading", innerGameState = "loading", previousGameState = "loading";
-cnv.width = 800, cnv.height = 650;
-let GAME_WIDTH = 800, GAME_HEIGHT = 650;
+let [gameState, innerGameState, previousGameState] = ["loading", "loading", "loading"];
+[cnv.width, cnv.height] = [800, 650];
+let [GAME_WIDTH, GAME_HEIGHT] = [800, 650];
 
 // Screen Orientations
 function isMobile() {
@@ -24,22 +24,16 @@ window.addEventListener("resize", resize);
 screen?.orientation.addEventListener("change", resize);
 resize();
 
+// Keyboard and Mouse Variables
+let [lastPressing, keyboardMovementOn, mouseMovementOn, previousMM] = ["mouse", false, false, false];
+let [wPressed, aPressed, sPressed, dPressed, shiftPressed] = [false, false, false, false, 1];
+let [mouseDown, allClicks] = [false, []];
+
 // Keyboard Events
-let lastPressing = "mouse";
-let keyboardMovementOn = false;
-let wPressed = false;
-let aPressed = false;
-let sPressed = false;
-let dPressed = false;
-let shiftPressed = 1;
 document.addEventListener("keydown", recordKeyDown);
 document.addEventListener("keyup", recordKeyUp);
 
 // Mouse Events
-let mouseDown = false;
-let allClicks = [];
-let mouseMovementOn = false;
-let previousMM = false;
 document.addEventListener("mousedown", () => { if (!isMobile()) mouseDown = true; });
 document.addEventListener("mouseup", () => { if (!isMobile()) mouseDown = false; });
 document.addEventListener("click", () => {
@@ -71,12 +65,8 @@ let mouseOver = {
     enemyOutBtn: false, disableMMBtn: false, musicSlider: false, sfxSlider: false,
     aZ_RangeBtn: false, aZ_AvSlider: false, customCursorBtn: false, cursorTrailSlider: false,
 };
-
 let mouseX, mouseY, cursorX, cursorY;
-let track = false;
-let allCursors = [];
-let lastCursorTrail = 0;
-let trailDensity = 0;
+let [track, allCursors, lastCursorTrail, trailDensity] = [false, [], 0, 0];
 
 function updateCursor(eventObject) {
     // update cursor
@@ -130,6 +120,8 @@ let player = {
     facingAngle: 0, invincible: false,
 };
 
+let [allEnemies, allDangers] = [[], []];
+
 let settings = {
     enemyOutlines: true, disableMM: false,
     musicSliderX: 640, sfxSliderX: 627,
@@ -155,19 +147,14 @@ let shockwave = {
     radius: 25, path: new Path2D(),
     lastEnded: 0, cd: 7000, effect: 0.75,
     reset: function () {
-        this.lastEnded = 0;
-        this.activated = false;
-        this.radius = 25;
-    }
+        [this.lastEnded, this.activated, this.radius] = [0, false, 25];
+    },
 };
 
 let amplify = {
     baseSpeed: 5, speed: 0, accel: 0, limit: 10.5, accelRate: Date.now(),
     reset: function () {
-        player.baseSpeed = 5;
-        this.speed = 0;
-        this.accel = 0;
-        this.accelRate = Date.now();
+        [player.baseSpeed, this.speed, this.accel, this.accelRate] = [5, 0, 0, Date.now()];
     },
 };
 
@@ -177,36 +164,26 @@ let eventHorizon = {
     lastUsed: 0, lastEnded: 0,
     reset: function() {
         player.baseSpeed = 5;
-        player.color = "rgb(255, 165, 0)";
-        player.subColor = "rgb(230, 153, 11)";
-        this.av = 0;
-        this.accretionDisk = [];
-        this.activated = false;
-        this.lastUsed = 0;
-        this.lastEnded = 0;
+        if (player.dodger === "quasar") [player.color, player.subColor] = ["rgb(255, 165, 0)", "rgb(230, 153, 11)"];
+        [this.av, this.accretionDisk, this.activated, this.lastUsed, this.lastEnded] = [0, [], false, 0, 0];
     }
 }
 
-let allEnemies = [], allDangers = [];
-
 // Time, Highscore, and Difficulty
-let now = Date.now();
-let clickEventSave = 0;
-
-let loadingGame = Date.now(), loadingTextChange = Date.now();
+let [now, loadingGame, loadingTextChange, startTime, lastSpawn] = [Date.now(), Date.now(), Date.now(), Date.now(), Date.now()];
+let enemySpawnPeriod = 3000;
+let currentTime = ((now-startTime) / 1000).toFixed(2);
+let timeLeft;
 let LI = 0; // loading index
 let endLoading = false;
-
-let startTime = Date.now(), currentTime = ((now-startTime) / 1000).toFixed(2), timeLeft;
-
-let enemySpawnPeriod = 3000, lastSpawn = Date.now();
+let clickEventSave = 0; // prevents spam saving when clicking something that saves the game as a side-effect
 
 let highscoreColor = "rgb(87, 87, 87)";
 let highscore = { easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0, };
 let difficulty = { level: "easy", color: "rgb(0, 225, 255)", };
 
 // Music
-let musicVolume = 0, sfxVolume = 0;
+let [musicVolume, sfxVolume] = [0, 0];
 
 let alarm9 = document.getElementById("alarm9");
 let music = {
