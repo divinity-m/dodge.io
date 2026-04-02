@@ -199,7 +199,7 @@ let sharpPop = document.getElementById("sharp-pop");
 
 // User Data
 let lastSave = 0; // tracks how often data is saved (during gameplay)
-const localData = localStorage.getItem('localUserData'); // load savedData (if it exists)
+const localData = localStorage.getItem('localDodgeData'); // load savedData (if it exists)
 let userData;
 let resetLocalData = false;
 
@@ -209,7 +209,7 @@ if (localData) {
         userData = JSON.parse(localData);       
     } catch (exception) {
         console.warn('Local user data was invalid, resetting.', exception);
-        localStorage.removeItem('localUserData');
+        localStorage.removeItem('localDodgeData');
         resetLocalData = true;
     }
 
@@ -260,7 +260,7 @@ if (resetLocalData || !localData){
     userData = { player: player, highscore: highscore, settings: settings, };
     
     // saves the new user data to local storage
-    localStorage.setItem('localUserData', JSON.stringify(userData));
+    localStorage.setItem('localDodgeData', JSON.stringify(userData));
 }
 
 // saves the game if the website is closed
@@ -268,7 +268,7 @@ window.addEventListener('beforeunload', () => {
     if (gameState !== "loading") { // only save user data if they're not on the loading screen
         // Dash and Blackhole causes bugs when the player leaves mid-usage
         userData = { player: player, highscore: highscore, settings: settings, };
-        localStorage.setItem('localUserData', JSON.stringify(userData));
+        localStorage.setItem('localDodgeData', JSON.stringify(userData));
     }
 })
 
