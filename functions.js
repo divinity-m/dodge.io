@@ -166,7 +166,7 @@ function recordLeftClick() {
         if (innerGameState === "settings") {
             userData.settings = settings;
             if (now - clickEventSave > 500) {
-                localStorage.setItem('localUserData', JSON.stringify(userData));
+                localStorage.setItem('localDodgeData', JSON.stringify(userData));
                 clickEventSave = Date.now();
             }
             innerGameState = previousGameState;
@@ -208,7 +208,7 @@ function recordLeftClick() {
                 userData.settings = settings;
 
                 if (now - clickEventSave > 500) {
-                    localStorage.setItem('localUserData', JSON.stringify(userData));
+                    localStorage.setItem('localDodgeData', JSON.stringify(userData));
                     clickEventSave = Date.now();
                 }
     
@@ -259,7 +259,7 @@ function recordLeftClick() {
             // saves the players values to the local storage to keep track of the players dodger
             userData.player = player;
             if (now - clickEventSave > 500) {
-                localStorage.setItem('localUserData', JSON.stringify(userData));
+                localStorage.setItem('localDodgeData', JSON.stringify(userData));
                 clickEventSave = Date.now();
             }
         }
@@ -1432,7 +1432,7 @@ function drawText() { // draws the current time, highest time, and enemy count
         // Saves data every 1.5 seconds incase the user disconnects/crashes
         userData.highscore = highscore;
         if (now - lastSave > 1500) {
-            localStorage.setItem('localUserData', JSON.stringify(userData));
+            localStorage.setItem('localDodgeData', JSON.stringify(userData));
             lastSave = Date.now();
         }
     }
@@ -1785,7 +1785,7 @@ function collisions() { // Keeps track of when the player touches any enemy in t
                 gameState = "endlessOver";
                 // Saves data once the user dies
                 userData.highscore = highscore;
-                localStorage.setItem('localUserData', JSON.stringify(userData));
+                localStorage.setItem('localDodgeData', JSON.stringify(userData));
             }
         }
         if (gameState === "endlessOver") underAura = 0;
