@@ -24,6 +24,13 @@ window.addEventListener("resize", resize);
 screen?.orientation.addEventListener("change", resize);
 resize();
 
+// window.addEventListener("touchstart", () => {
+//     if (isMobile() && !document.fullscreenElement) {
+//         // full screen stuff
+//         document.documentElement.requestFullscreen();
+//     }
+// })
+
 // Keyboard and Mouse Variables
 let [lastPressing, keyboardMovementOn, mouseMovementOn, previousMM] = ["mouse", false, false, false];
 let [wPressed, aPressed, sPressed, dPressed, shiftPressed] = [false, false, false, false, 1];
@@ -51,8 +58,13 @@ document.addEventListener("auxclick", (event) => {
 });
 
 // Touchscreen Events
-document.addEventListener("touchend", () => { if (isMobile()) mouseDown = false; });
-document.addEventListener("touchcancel", () => { if (isMobile()) mouseDown = false; });
+document.addEventListener("touchend", () => {
+    recordLeftClick();
+    mouseDown = false;
+});
+document.addEventListener("touchcancel", () => {
+    mouseDown = false;
+});
 
 // Input Tracking
 let mouseOver = {
@@ -81,6 +93,7 @@ function updateCursor(eventObject) {
     mouseX = (cursorX - rect.left) * scaleX;
     mouseY = (cursorY - rect.top) * scaleY;
 }
+
 function addCursorTrail() {
     if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
         // Trail Density
@@ -95,20 +108,23 @@ function addCursorTrail() {
         }
     }
 }
+
 // cursor update event listeners
 document.addEventListener('mousemove', (event) => {
     updateCursor(event);
     addCursorTrail();
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
+
 document.addEventListener("touchmove", (event) => {
-    updateCursor(event.touches[0]);
     mouseDown = true;
+    updateCursor(event.touches[0]);
     addCursorTrail();
 });
 document.addEventListener("touchstart", (event) => {
+    mouseDown = true;
     updateCursor(event.touches[0]);
-    if (isMobile()) {recordLeftClick(); allClicks.push(createClick("left")); }
+    allClicks.push(createClick("left"));
     if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
 });
 
