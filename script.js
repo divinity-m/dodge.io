@@ -1,4 +1,4 @@
-console.log("finishing touches");
+console.log("fixed broken mobile clicking");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
