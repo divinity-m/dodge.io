@@ -1,4 +1,4 @@
-console.log("fixed broken mobile clicking");
+console.log("mobile update");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
