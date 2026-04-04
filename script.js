@@ -4,10 +4,12 @@ console.log("mobile update");
 const cnv = document.getElementById("game");
 const ctx = cnv.getContext('2d');
 
+
 // Game Units
 let [gameState, innerGameState, previousGameState] = ["loading", "loading", "loading"];
 [cnv.width, cnv.height] = [800, 650];
 let [GAME_WIDTH, GAME_HEIGHT] = [800, 650];
+
 
 // Screen Orientations
 function isMobile() {
@@ -31,16 +33,17 @@ resize();
 //     }
 // })
 
-// Keyboard and Mouse Variables
-let [lastPressing, keyboardMovementOn, mouseMovementOn, previousMM] = ["mouse", false, false, false];
+
+// Keyboard and Mouse Variables & Events 
+let [lastPressing, keyboardMovementOn, mouseMovementOn] = ["mouse", false, false];
 let [wPressed, aPressed, sPressed, dPressed, shiftPressed] = [false, false, false, false, 1];
 let [mouseDown, allClicks] = [false, []];
 
-// Keyboard Events
+/* Keyboard Events */
 document.addEventListener("keydown", recordKeyDown);
 document.addEventListener("keyup", recordKeyUp);
 
-// Mouse Events
+/* Mouse Events */
 document.addEventListener("mousedown", () => { if (!isMobile()) mouseDown = true; });
 document.addEventListener("mouseup", () => { if (!isMobile()) mouseDown = false; });
 document.addEventListener("click", () => {
@@ -48,23 +51,28 @@ document.addEventListener("click", () => {
 });
 document.addEventListener("contextmenu", (event) => {
     event.preventDefault();
-    if (!isMobile()) { recordRightClick(event); allClicks.push(createClick("right")); }
+    if (!isMobile()) { recordRightClick(); allClicks.push(createClick("right")); }
 });
 document.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
         event.preventDefault();
-        if (!isMobile()) {  recordMiddleClick(event); allClicks.push(createClick("middle")); }
+        if (!isMobile()) {  recordMiddleClick(); allClicks.push(createClick("middle")); }
     }
 });
 
-// Touchscreen Events
+/* Touchscreen Events */
 document.addEventListener("touchend", () => {
-    recordLeftClick();
+    const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
+    if (!mouseInAbilityBtn) {
+        recordLeftClick();
+    }
+    allClicks.push(createClick("left"));
     mouseDown = false;
 });
 document.addEventListener("touchcancel", () => {
     mouseDown = false;
 });
+
 
 // Input Tracking
 let mouseOver = {
@@ -109,13 +117,14 @@ function addCursorTrail() {
     }
 }
 
-// cursor update event listeners
+/* cursor update event listeners */
 document.addEventListener('mousemove', (event) => {
-    updateCursor(event);
-    addCursorTrail();
-    if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
+    if (!isMobile()) {
+        updateCursor(event);
+        addCursorTrail();
+        if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
+    }
 });
-
 document.addEventListener("touchmove", (event) => {
     mouseDown = true;
     updateCursor(event.touches[0]);
@@ -123,10 +132,13 @@ document.addEventListener("touchmove", (event) => {
 });
 document.addEventListener("touchstart", (event) => {
     mouseDown = true;
-    updateCursor(event.touches[0]);
-    allClicks.push(createClick("left"));
-    if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
+
+    const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
+    if (!mouseInAbilityBtn) {
+        updateCursor(event.touches[0]);
+    }
 });
+
 
 // Player & Enemies
 let player = {
@@ -145,6 +157,7 @@ let settings = {
     customCursor: true, cursorTrail: 715,
 };
 
+/* Abilities */
 let dash = {
     usable: true, activated: false,
     deccelerating: false, accel: 1,
@@ -184,6 +197,63 @@ let eventHorizon = {
         [this.av, this.accretionDisk, this.activated, this.lastUsed, this.lastEnded] = [0, [], false, 0, 0];
     }
 }
+
+const abilityOneBtn = document.getElementById("ability-one");
+const abilityTwoBtn = document.getElementById("ability-two");
+
+const upEvents = ["touchend", "click"];
+upEvents.forEach((upEvent) => {
+    abilityOneBtn.addEventListener(upEvent, recordRightClick);
+    abilityTwoBtn.addEventListener(upEvent, recordMiddleClick);
+})
+
+/* Ability Button hover and click effects */
+window.addEventListener("load", () => {
+    [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
+        if (abilityBtn) {
+            const moveEvents = ["touchmove", "mousemove"];
+            moveEvents.forEach((moveEvent) => {
+                document.addEventListener(moveEvent, (e) => {
+                    if (abilityBtn.contains(e.target)) {
+                        abilityBtn.style.opacity = 0.7;
+                        
+                        if (mouseDown) {
+                            abilityBtn.style.backgroundColor = player.subColor;
+                            abilityBtn.style.borderColor = player.color;
+                            abilityBtn.style.color = player.color;
+                        }
+                    }
+                    else {
+                        abilityBtn.style.opacity = 1;
+                        
+                        abilityBtn.style.backgroundColor = player.color;
+                        abilityBtn.style.borderColor = player.subColor;
+                        abilityBtn.style.color = player.subColor;
+                    }
+                });
+            })
+            
+            const downEvents = ["touchstart", "mousedown"];
+            downEvents.forEach((downEvent) => {
+                abilityBtn.addEventListener(downEvent, () => {
+                    abilityBtn.style.backgroundColor = player.subColor;
+                    abilityBtn.style.borderColor = player.color;
+                    abilityBtn.style.color = player.color;
+                });
+            })
+            
+            upEvents.forEach((upEvent) => {
+                abilityBtn.addEventListener(upEvent, () => {
+                    abilityBtn.style.backgroundColor = player.color;
+                    abilityBtn.style.borderColor = player.subColor;
+                    abilityBtn.style.color = player.subColor;
+                });
+            })
+        }
+    })
+});
+
+
 
 // Time, Highscore, and Difficulty
 let [now, loadingGame, loadingTextChange, startTime, lastSpawn] = [Date.now(), Date.now(), Date.now(), Date.now(), Date.now()];
@@ -261,6 +331,13 @@ if (localData) {
         if (player.dodger === "j-sab") { player.color = "rgb(255, 0, 0)"; player.subColor = "rgb(230, 0, 0)"; }
         if (player.dodger === "quasar") { player.color = "rgb(255, 165, 0)"; player.subColor = "rgb(230, 153, 11)"; }
         highscore = userData.highscore;
+
+        [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
+            abilityBtn.style.backgroundColor = player.color;
+            abilityBtn.style.borderColor = player.subColor;
+            abilityBtn.style.color = player.subColor;
+        })
+        
         settings = userData.settings;
         musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
         sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
@@ -476,18 +553,18 @@ function draw() {
         overlayEl.style.height = `${window.innerWidth * (12/1397)}px`;
         overlayEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
         
-        // Handles hoverings
+        // Handles hovers
         let hovering = false;
         
         // covers hovering over canvas buttons
         Object.keys(mouseOver).forEach(hover => {
-          if (mouseOver[hover]) hovering = true;
+            if (mouseOver[hover]) hovering = true;
         })
         
-        // covers hovering over hyperlinks
+        // handles hovering over hyperlinks
         let hyperlinks = document.getElementsByTagName('a');
         for (let i = 0; i < hyperlinks.length; i++) {
-          if (hyperlinks[i].matches(":hover")) hovering = true;
+            if (hyperlinks[i].matches(":hover")) hovering = true;
         }
         
         // hovering inverts cursor colors
