@@ -9,6 +9,12 @@ function loadingScreen(validInput) {
     }
 }
 
+function maxOut() {
+    for (let level in highscore) {
+        highscore[level] = 100;
+    }
+}
+
 // KEYBAORD AND MOUSE EVENTS (player inputs)
 function recordKeyDown(event) {
     // stops the page from scrolling when arrow keys are pressed
@@ -32,10 +38,12 @@ function recordKeyDown(event) {
         if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
             shockwave.activated = true;
             shockwave.facingAngle = player.facingAngle;
+            
             shockwave.x = player.x;
             shockwave.y = player.y;
             shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
             shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
+            
             shockwave.used = shockwave.active;
             if (shockwave.used === "Shockwave") { shockwave.cd = 7500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
             else if (shockwave.used === "Shockray") { shockwave.cd = 4500; shockwave.effect = 0.5; }
@@ -70,7 +78,7 @@ function recordKeyUp(event) {
     if (!wPressed && !aPressed && !sPressed && !dPressed) keyboardMovementOn = false;
 }
 
-function recordRightClick(event) {
+function recordRightClick() {
     lastPressing = "mouse";
     if (loadingScreen(true)) return;
     
@@ -99,7 +107,7 @@ function recordRightClick(event) {
     }
 }
 
-function recordMiddleClick(event) {
+function recordMiddleClick() {
     lastPressing = "mouse";
     if (loadingScreen(true)) return;
     
@@ -118,30 +126,56 @@ function recordMiddleClick(event) {
 
 function recordLeftClick() {
     lastPressing = "mouse";
-    if (loadingScreen(true)) return;
-    previousMM = false;
+
+    const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
+    
+    if (loadingScreen(true) || mouseInAbilityBtn) return;
+    
+    let previousMM = false;
     
     // Mouse Movement
-    if (mouseMovementOn && !settings.disableMM) {
-        mouseMovementOn = false;
-        previousMM = true;
-    } else if (!mouseMovementOn && !settings.disableMM) {
-        mouseMovementOn = true;
-        previousMM = false;
+    if (!isMobile()) {
+        if (mouseMovementOn && !settings.disableMM) {
+            mouseMovementOn = false;
+            previousMM = true;
+        } else if (!mouseMovementOn && !settings.disableMM) {
+            mouseMovementOn = true;
+            previousMM = false;
+        }
+    }
+    // mobile MM stays on for normal screen taps
+    else {
+        if (!settings.disableMM) mouseMovementOn = true;
+        else mouseMovementOn = false;
+
+        previousMM = mouseMovementOn;
     }
     
     // Start screen buttons
     if (innerGameState === "mainMenu" && (mouseOver.play || mouseOver.selector)) {
         if (mouseOver.play) innerGameState = "selectDifficulty";
         else if (mouseOver.selector) innerGameState = "selectDodger";
+        
         resetBgVars();
+        mouseMovementOn = previousMM;
+    }
+
+    // Links
+    else if ((mouseOver.evades || mouseOver.jsab) && !isMobile()) {
+        const evadesAnchor = document.getElementById("evades-link");
+        const jsabAnchor = document.getElementById("jsab-link");
+        
+        if (mouseOver.evades) evadesAnchor.click();
+        if (mouseOver.jsab) jsabAnchor.click();
+        
         mouseMovementOn = previousMM;
     }
     
     // Gear button
-    else if (gameState === "startScreen" && innerGameState != "settings" && mouseOver.settings) {
+    else if (innerGameState !== "settings" && mouseOver.settings) {
         previousGameState = innerGameState;
         innerGameState = "settings";
+        
         resetBgVars();
         mouseMovementOn = previousMM;
     }
@@ -255,13 +289,21 @@ function recordLeftClick() {
                 player.subColor = "rgb(230, 153, 11)";
                 amplify.reset();
             }
-            mouseMovementOn = previousMM;
+
+            [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
+                abilityBtn.style.backgroundColor = player.color;
+                abilityBtn.style.borderColor = player.subColor;
+                abilityBtn.style.color = player.subColor;
+            })
+
             // saves the players values to the local storage to keep track of the players dodger
             userData.player = player;
             if (now - clickEventSave > 500) {
                 localStorage.setItem('localDodgeData', JSON.stringify(userData));
                 clickEventSave = Date.now();
             }
+            
+            mouseMovementOn = previousMM;
         }
     }
         
@@ -279,9 +321,11 @@ function recordLeftClick() {
             if (mouseOver?.[level]) mouseMovementOn = previousMM;
             if (mouseOver?.[level] && !locked) {
                 pauseAudio(music.promise, music.var);
+                
                 if (mouseOver?.easy) difficulty = {level: "easy", color: "rgb(0, 225, 255)"};
                 if (mouseOver?.medium) difficulty = {level: "medium", color: "rgb(255, 255, 0)"};
                 if (mouseOver?.hard) difficulty = {level: "hard", color: "rgb(0, 0, 0)"};
+                
                 music = {var: interstellar, name: "interstellar", artist: "pandora., chillwithme, & cødy",
                          color: "rgb(105, 105, 105)", subColor: "rgb(115, 115, 115)",};
                 restartEndless();
@@ -291,323 +335,17 @@ function recordLeftClick() {
             if (mouseOver?.[level]) mouseMovementOn = previousMM;
             if (mouseOver?.[level] && !locked) {
                 pauseAudio(music.promise, music.var);
-                if (mouseOver?.limbo) {
-                    music = {var: alarm9, name: "Alarm 9", artist: "Blue Cxve",
-                             color: "rgb(100, 0, 100)", subColor: "rgb(128, 0, 128)", textColor: "rgb(163, 0, 163)",
-                             timestamps: [[0.079], [2.79], [3.13], [3.49], [3.81], [4.17], [5.58], [6.28],
-                                          [6.99], [7.7], [8.4], [9.1], [9.8], [10.5], [11.9], [12.6]],};
-                    music.timestamps.forEach(ts => ts[1] = "beam");
-                    for (let loopNum = 1; loopNum < 11; loopNum++) { // loop amount: 11, wavelength: 11.5
-                        loopedPoints = music.timestamps.slice(1, 16).map(x => [x[0] + 11.5*loopNum, x[1]]);
-                        music.timestamps = music.timestamps.concat(loopedPoints);
-                    }
-                    music.timestamps.forEach(ts => { ts[0] -= 0.025; }); // delay slightly for better visual to audio sync
-                }
-                if (mouseOver?.andromeda) {
-                    function solo8Beam(time) {
-                        return [ // 8-beam - [0.225, 0.24, 0.23, 0.236, 0.217, 0.258, 0.228]
-                        [time, "horizontal"], [time+0.225, "horizontal"], [time+0.456, "vertical"], [time+0.695, "vertical"],
-                        [time+0.931, "horizontal"], [time+1.148, "horizontal"], [time+1.406, "vertical"], [time+1.634, "vertical"],
-                        ]
-                    }
-                    function doubleTriple(time, ending="none", addon="none") {
-                        // DT to TD [0.475] // TD to DT [0.493] // DT to 8B [0.49] // 8B to DT [0.222]
-                        // double-triple - [0.48, 0.465, 0.189, 0.256]
-                        // triple doubled - [0.189, 0.256, 0.508, 0.202, 0.226]
-                        
-                        let DT = [
-                            // double-triple
-                        [time, "horizontal"], [time+0.48, "horizontal"], [time+0.945, "vertical"], [time+1.134, "vertical"], [time+1.390, "vertical"],
-                            
-                            // triple doubled
-                        [time+1.865, "horizontal"], [time+2.054, "horizontal"], [time+2.310, "horizontal"],
-                        [time+2.818, "vertical"], [time+3.020, "vertical"], [time+3.246, "vertical"],
-                            
-                            // silent double-triple
-                        /*[time+3.739, "vertical"],*/ [time+4.219, "horizontal"], [time+4.684, "vertical"], [time+4.873, "horizontal"], [time+5.129, "vertical"],
-                        ];
-                        // 8-beam
-                        if (ending === "8-beam" || ending === "8-beam-cutout") DT.push([time+5.619, "horizontal"], [time+5.844, "horizontal"], [time+6.084, "vertical"], [time+6.314, "vertical"]);
-                        if (ending === "8-beam") DT.push([time+6.550, "horizontal"], [time+6.767, "horizontal"], [time+7.025, "vertical"], [time+7.253, "vertical"]);
-                        // quintuple
-                        if (ending === "quintuple") DT.push([time+5.608, "ring"], [time+6.078, "ring"], [time+6.545, "ring"], [time+7.015, "ring"], [time+7.248, "ring"]);
-                        // addon
-                        if (addon === "bombs") DT.push([time, "bomb"], [time+0.945, "bomb"], [time+1.865, "bomb"], [time+2.818, "bomb"], [time+3.739, "bomb"], [time+4.684, "bomb"]);
-                        if (addon === "bombs" && ending === "8-beam") DT.push([time+5.619, "bomb"], [time+6.550, "bomb"])
-                        return DT;
-                    }
-                    function drumBuildUp(time) {
-                        DBU = [// 15-beat (16th cuts out) // 0.242 horiz, 0.356 vert
-                        [time, "bomb"], [time+0.479, "bomb"], [time+0.912, "bomb"], [time+1.411, "bomb"], [time+1.885, "bomb"], 
-                        [time+2.356, "bomb"], [time+2.819, "bomb"], [time+3.296, "bomb"], [time+3.761, "bomb"], [time+4.236, "bomb"], 
-                        [time+4.695, "bomb"], [time+5.165, "bomb"], [time+5.638, "bomb"], [time+6.106, "bomb"], [time+6.575, "bomb"], 
-                            
-                            // 16-beat, drum tempo increased // avg 0.235
-                        [time+7.509, "bomb"], [time+7.744, "bomb"], [time+7.979, "bomb"], [time+8.214, "bomb"],
-                        [time+8.449, "bomb"], [time+8.684, "bomb"], [time+8.919, "bomb"], [time+9.153, "bomb"],
-                        [time+9.386, "bomb"], [time+9.619, "bomb"], [time+9.857, "bomb"], [time+10.088, "bomb"],
-                        [time+10.317, "bomb"], [time+10.556, "bomb"], [time+10.798, "bomb"], [time+11.019, "bomb"],
-                            
-                            // accelerando // 0.225, 0.24, 0.23, 0.236, 0.217, 0.258, 0.228
-                        [time+11.265, "bomb"], [time+11.500, "bomb"], [time+11.732, "bomb"], [time+11.952, "bomb"],
-                        [time+12.195, "bomb"], [time+12.425, "bomb"], [time+12.738, "bomb"], [time+12.671, "bomb"],
-
-                            // quintuple ring // 0.47, 0.467, 0.47, 0.233
-                        [time+13.140, "ring"], [time+13.610, "ring"], [time+14.077, "ring"], [time+14.547, "ring"], [time+14.780, "ring"],
-                        ];
-                            // in-betweens
-                        for (let i = 0; i < DBU.length; i+=3) {
-                            if (i < 15) DBU.push([DBU[i][0]+0.242, "horizontal"], [DBU[i][0]+0.356, "vertical"]);
-                            else if (i < 39) DBU.push([DBU[i][0], "horizontal"], [DBU[i][0], "vertical"]);
-                        }
-                        return DBU;
-                    }
-                    function ending(time) {
-                        let finale =  [ // 6-beat
-                        [time, "ring"], [time+0.459, "ring"], [time+0.942, "ring"],
-                        [time+1.405, "ring"], [time+1.879, "ring"], [time+2.329, "ring"],
-                        [time, "horizontal"], [time+0.459, "horizontal"], [time+0.942, "horizontal"],
-                        [time+1.405, "horizontal"], [time+1.879, "horizontal"], [time+2.329, "horizontal"],
-                            
-                        [time+2.827, "bomb"],
-
-                            // 4-beam
-                        [time+2.827, "vertical"], [time+3.061, "horizontal"], [time+3.269, "vertical"], [time+3.495, "horizontal"],
-                        [time+2.827, "bomb"], [time+3.061, "bomb"], [time+3.269, "bomb"], [time+3.495, "bomb"],
-
-                            // 6-beat
-                        [time+3.755, "ring"], [time+4.214, "ring"], [time+4.691, "ring"],
-                        [time+5.140, "ring"], [time+5.631, "ring"],  [time+6.094, "ring"],
-                        [time+3.755, "vertical"], [time+4.214, "vertical"], [time+4.691, "vertical"],
-                        [time+5.140, "vertical"], [time+5.631, "vertical"], [time+6.094, "vertical"],
-
-                            // 5-beam
-                        [time+6.279, "vertical"], [time+6.578, "horizontal"], [time+6.796, "vertical"], [time+7.101, "horizontal"], [time+7.276, "vertical"],
-                        [time+6.279, "bomb"], [time+6.578, "bomb"], [time+6.796, "bomb"], [time+7.101, "bomb"], [time+7.276, "bomb"],
-
-                            // drum build up
-                        [time+7.509, "bomb"], [time+7.946, "bomb"], [time+8.429, "bomb"], [time+8.903, "bomb"],
-                        [time+9.377, "bomb"], [time+9.827, "bomb"], [time+10.312, "bomb"], [time+10.748, "bomb"],
-                        [time+11.267, "bomb"], [time+11.724, "bomb"], [time+12.188, "bomb"], [time+12.626, "bomb"],
-                        [time+13.127, "bomb"], [time+13.579, "bomb"], [time+14.074, "bomb"], 
-
-                            // final echo
-                        [time+14.538, "ring"],
-                        ]
-                            // layers
-                        for (let i = 43; i < 58; i++) { finale.push([finale[i][0], "vertical"], [finale[i][0], "horizontal"]); }
-                        return finale;
-                    }
-                    music = {var: astralProjection, name: "Astral Projection", artist: "Hallmore",
-                             color: "rgb(220, 220, 220)", subColor: "rgb(240, 240, 240)", textColor: "rgb(0, 0, 0)",
-                             timestamps: [],
-                            };
-                    // structure
-                    music.timestamps = music.timestamps.concat(solo8Beam(0.075));
-                    music.timestamps = music.timestamps.concat(doubleTriple(1.931, "8-beam"), doubleTriple(9.433, "8-beam"));
-                    music.timestamps = music.timestamps.concat(doubleTriple(16.931, "8-beam"), doubleTriple(24.435, "8-beam-cutout"));
-                    music.timestamps = music.timestamps.concat(drumBuildUp(31.925));
-                    music.timestamps = music.timestamps.concat(doubleTriple(46.959, "8-beam", "bombs"), doubleTriple(54.459, "quintuple", "bombs"));
-                    music.timestamps = music.timestamps.concat(doubleTriple(61.935, "8-beam", "bombs"), doubleTriple(69.393, "none", "bombs"));
-                    music.timestamps = music.timestamps.concat([[76.461, "ring"]]);
-                    // 8 consecutive solo 8-beams
-                    for (let i = 0; i < 8; i++) { music.timestamps = music.timestamps.concat(solo8Beam(84.430+(1.882*i))); }
-                    music.timestamps = music.timestamps.concat(doubleTriple(99.437, "8-beam"), doubleTriple(106.925, "8-beam-cutout"));
-                    music.timestamps = music.timestamps.concat(drumBuildUp(114.417));
-                    music.timestamps = music.timestamps.concat(doubleTriple(129.431, "8-beam", "bombs"), doubleTriple(136.390, "quintuple", "bombs"));
-                    music.timestamps = music.timestamps.concat(doubleTriple(144.438, "8-beam", "bombs"), doubleTriple(151.909, "8-beam", "bombs"));
-                    music.timestamps = music.timestamps.concat(ending(159.426));
-                    music.timestamps.forEach(ts => { ts[0] -= 0.025; });
-                }
-                if (mouseOver?.euphoria) {
-                    const xMid = GAME_WIDTH/2;
-                    const yMid = GAME_HEIGHT/2;
-                    function lessThan(time = 33.590) {
-                        return [[time, "horizontal", {size: 150, coords: ["player"]}], [time+0.388, "vertical", {size: 150, coords: ["player"]}], [time+0.902, "horizontal", {size: 150, coords: ["player"]}],
-                                  // 2.095, 2.47
-                                  [time+2.00, "bomb", {size: 150}], [time+2.375, "bomb", {size: 180}],
-                                  // 3.06, 3.538
-                                  [time+1.900, "spike", {size: 22.5, location: "tl", spawnRate: 0.6}], [time+2.275, "spike", {size: 22.5, location: "tr", spawnRate: 0.6}]];
-                    }
-                    function heyAh_heyHi(time = 66.920) {
-                        return [[time, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+0.18, "vertical", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}],
-                                [time+1.083, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}], [time+1.606, "horizontal", {coords: ["player"], spawnRate: 0.5, despawnRate: 3}]];
-                    }
-                    function bg16Beat(time = 91.834, difficulty = "easy") {
-                        let bg = [[time, "spike"], [time+0.547, "spike"], [time+1.091, "spike"], [time+1.586, "spike"],
-                                [time+2.133, "horizontal"], [time+2.637, "horizontal"], [time+3.178, "horizontal"],
-                                [time+3.694, "bomb"], [time+3.942, "bomb"],
-                                [time+4.222, "spike"], [time+4.74, "spike"], [time+5.265, "spike"], [time+5.775, "spike"],
-                                [time+6.307, "horizontal", {despawnRate: 3}], [time+6.826, "horizontal", {despawnRate: 3}], [time+7.336, "horizontal", {despawnRate: 3}]];
-                        if (difficulty !== "easy") {
-                            bg.push([time+1.036, "ring"], [time+3.096, "ring"], [time+5.175, "ring"], [time+7.246, "ring"]);
-                            if (difficulty === "hard") { for (let i = 0; i < 16; i+=2) bg.push([bg[i][0]+0.231, "vertical"]); }
-                            bg.push([time, "bomb", {size: 150, despawnRate: 3}], [time+2.07, "bomb", {size: 150, despawnRate: 3}],
-                                    [time+4.167, "bomb", {size: 150, despawnRate: 3}], [time+6.253, "bomb", {size: 150, despawnRate: 3}]);
-                        }
-                        return bg;
-                    }
-                    function deepSynth(time = 150.313, extras = "none") {
-                        dS = [[time, "vertical", {size: xMid, coords: [xMid/2, 0], spawnRate: 0.3, despawnRate: 3}],
-                              [time+1.029, "horizontal", {size: yMid, coords: [0, yMid/2], spawnRate: 0.3, despawnRate: 3}],
-                              [time+2.359, "bomb", {spawnRate: 0.7, despawnRate: 4}], [time+3.118, "bomb", {spawnRate: 0.7, despawnRate: 4}]];
-                        let duration = 3.995 - 3.137;
-                        if (extras === "leftSpikeWall" || extras === "rightSpikeWall") {
-                            let interval = (duration / 14);
-                            let margin = (GAME_HEIGHT-(30*14)) / 15; // 650 = (r*2 * 14) + 15n
-                            let xValue;
-                            if (extras === "leftSpikeWall") xValue = 10 * 1.501;
-                            else if (extras === "rightSpikeWall") xValue = GAME_WIDTH - 10 * 1.501;
-                            for (let i = 0; i < 14; i++) {
-                                dS.push([time+3.137 + (interval*i), "spike", {size: 10, speed: 5, coords: [xValue, margin*(i+1) + 30*i + 15], spawnRate: 0.5}]);
-                            }
-                        } else if (extras === "encirclingSpikes") {
-                            let interval = (duration / 8);
-                            let intIndex = 0;
-                            ["bl", "lm", "tl", "tm", "tr", "rm", "br", "bm"].forEach(spawn => {
-                                dS.push([time+3.137 + (interval*intIndex), "spike", {size: 25, speed: 3.5, location: spawn, spawnRate: 0.5}]);
-                                intIndex++;
-                            })
-                        }
-                        return dS;
-                    }
-                    music = {var: divine, name: "Divine", artist: "SOTAREKO",
-                             color: "rgb(223, 255, 156)", subColor: "rgb(224, 255, 232)", textColor: "rgb(255, 165, 252)",
-                             timestamps: [
-                                 [16.730, "vertical", {size: 80, coords: [140, 0]}], [17.268, "vertical", {size: 80, coords: [360, 0]}], [17.835, "vertical", {size: 80, coords: [580, 0]}],
-                                 [18.400, "horizontal", {size: 80, coords: [0, 490/3]}], [18.900, "horizontal", {size: 80, coords: [0, 2*490/3 + 80]}],
-                                 [19.400, "vertical", {size: 200, coords: [50, 0]}], [19.670, "vertical", {size: 200, coords: [300, 0]}], [19.950, "vertical", {size: 200, coords: [550, 0]}],
-                                 [20.430, "horizontal", {size: 200, coords: [0, 250/3]}], [20.800, "horizontal", {size: 200, coords: [0, 2*250/3 + 200]}],
-                                 [23.550, "vertical", {size: 100, coords: [0, 0]}], [23.800, "horizontal", {size: 100, coords: [0, 0]}],
-                                 [24.075, "vertical", {size: 100, coords: [700, 0]}], [24.592, "horizontal", {size: 100, coords: [0, 550]}],
-                                 [25.100, "vertical", {size: 100, coords: [100, 0]}], [25.688, "horizontal", {size: 100, coords: [0, 100]}],
-                                 [26.175, "vertical", {size: 100, coords: [600, 0]}], [26.700, "horizontal", {size: 100, coords: [0, 450]}],
-                                 [27.220, "bomb", {size: 300, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 2.5}],
-                                 [29.246, "ring", {size: 400, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 2.2}], // shrink
-                                 [30.050, "ring", {size: 200, coords: [xMid, yMid], spawnRate: 0.4, despawnRate: 2.5}],
-                                 [30.800, "ring", {size: 75, coords: [xMid, yMid], spawnRate: 0.5, despawnRate: 3}],
-                                 [32.093, "bomb", {size: 100, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}], // growth
-                                 [32.630, "bomb", {size: 250, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
-                                 [32.930, "bomb", {size: 350, coords: [xMid, yMid], spawnRate: 0.3, despawnRate: 3}],
-                                 [32.631, "spike", {size: 20, speed: 3.5, location: "tl", spawnRate: 0.8, despawnRate: 3}],
-                                 [32.632, "spike", {size: 20, speed: 3.5, location: "tr", spawnRate: 0.5, despawnRate: 3}],
-                                 [32.931, "spike", {size: 20, speed: 3.5, location: "br", spawnRate: 0.4, despawnRate: 3}],
-                                 [73.081, "vertical", {size: GAME_WIDTH/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}], // 4 walls
-                                 [73.610, "vertical", {size: GAME_WIDTH/2, coords: [xMid, 0], spawnRate: 1, despawnRate: 5}],
-                                 [74.125, "horizontal", {size: GAME_HEIGHT/2, coords: [0, yMid], spawnRate: 1, despawnRate: 5}],
-                                 [74.646, "horizontal", {size: GAME_HEIGHT/2, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
-                                 [85.341, "vertical", {size: 200, coords: ["player"]}], [87.219, "vertical", {size: 200, coords: ["player"]}],
-                                 [87.400, "horizontal", {size: 200, coords: ["player"]}], [89.331, "horizontal", {size: 200, coords: ["player"]}],
-                                 [140.914, "bomb", {size: 500, coords: [GAME_WIDTH, GAME_HEIGHT], spawnRate: 1, despawnRate: 5}], // 2 corner semi circles
-                                 [141.458, "bomb", {size: 500, coords: [0, 0], spawnRate: 1, despawnRate: 5}],
-                                 [141.957, "spike", {size: 50, location: "bl", spawnRate: 0.3, despawnRate: 3}], // spike triangle
-                                 [142.482, "spike", {size: 50, location: "tm", spawnRate: 0.3, despawnRate: 3}],
-                                 [142.986, "spike", {size: 50, location: "br", spawnRate: 0.3, despawnRate: 3}],
-                                 [192.047, "text", {text: "Thank", coords: [265, 100], despawnRate: 0.2}], // thanks
-                                 [193.098, "text", {text: "You", coords: [440, 100], despawnRate: 0.3}],
-                                 [194.134, "text", {text: "For", coords: [260, 175], despawnRate: 0.2}],
-                                 [195.186, "text", {text: "Playing", coords: [360, 175], despawnRate: 0.3}],
-                                 [196.226, "text", {text: "This", coords: [285, 100], despawnRate: 0.2}],
-                                 [197.391, "text", {text: "Was", coords: [400, 100], despawnRate: 0.3}],
-                                 [198.577, "text", {text: "Dodge", coords: [280, 175], despawnRate: 0}],
-                                 [199.300, "text", {text: ".io", coords: [443, 175], despawnRate: 0}],
-                             ],
-                            };
-                    music.timestamps = music.timestamps.concat(lessThan(33.590));
-                    music.timestamps = music.timestamps.concat(lessThan(37.760));
-                    music.timestamps = music.timestamps.concat(lessThan(41.930));
-                    music.timestamps = music.timestamps.concat(lessThan(46.123));
-                    let spb = 60/115; // bpm = 115
-                    let startBeat = 50.102;
-                    let beats = 29; // beam sync to increase difficulty
-                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) music.timestamps.push([i, "beam", {despawnRate: 3}]);
-                    music.timestamps = music.timestamps.concat(lessThan(50.814));
-                    music.timestamps = music.timestamps.concat(lessThan(54.460));
-                    music.timestamps = music.timestamps.concat(lessThan(58.620));
-                    // music.timestamps = music.timestamps.concat(lessThan(62.810)); excluded
-                    // ring spam
-                    startBeat = 66.797;
-                    beats = 12;
-                    music.timestamps.push([64.749, "ring", {size: 450, invincible: true, coords: [xMid, yMid], spawnRate: 0.325}]);
-                    for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) music.timestamps.push([i-0.2, "ring", {size: 450, invincible: true, coords: [xMid, yMid], spawnRate: 1}]);
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(66.920));
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(69.020));
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(71.120));
-                    // 73.081-74.646 4 half-walls
-                    // 4 corner circles
-                    startBeat = 75.250;
-                    beats = 16;
-                    let corner = 1;
-                    let coords = {1:[0, 0], 2:[GAME_WIDTH, 0], 3:[GAME_WIDTH, GAME_HEIGHT], 4:[0, GAME_HEIGHT]};
-                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
-                        music.timestamps.push([i-0.2, "bomb", {size: 300, coords: coords[corner], spawnRate: 1}]);
-                        corner++;
-                        if (corner > 4) corner = 1;
-                    }
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(75.250));
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(77.350));
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(79.434));
-                    music.timestamps = music.timestamps.concat(heyAh_heyHi(81.521));
-                    music.timestamps = music.timestamps.concat(bg16Beat(91.834));
-                    music.timestamps = music.timestamps.concat(bg16Beat(100.233, "medium"));
-                    music.timestamps = music.timestamps.concat(bg16Beat(108.580, "hard"));
-                    music.timestamps = music.timestamps.concat(bg16Beat(116.926, "medium"));
-                    music.timestamps = music.timestamps.concat(lessThan(117.032));
-                    music.timestamps = music.timestamps.concat(lessThan(121.180));
-                    music.timestamps = music.timestamps.concat(lessThan(125.376));
-                    // music.timestamps = music.timestamps.concat(bg16Beat(125.276, "medium")); excluded
-                    // music.timestamps = music.timestamps.concat(lessThan(129.568)); excluded
-                    // music.timestamps = music.timestamps.concat(lessThan(133.700)); excluded
-                    // 4 Walls spam
-                    startBeat = 133.619;
-                    beats = 15;
-                    let side = 1;
-                    coords = {1:[0, 0, "vertical", xMid], 2:[0, 0, "horizontal", yMid],
-                              3:[xMid, 0, "vertical", xMid], 4:[0, yMid, "horizontal", yMid]};
-                    music.timestamps.push([131.571, "vertical", {size: GAME_WIDTH/2, coords: [0, 0], spawnRate: 0.325, despawnRate: 5,}]);
-                    for (let i = startBeat; i < startBeat-0.01 + spb*(beats-1); i+=spb) {
-                        side++;
-                        if (side > 4) side = 1;
-                        music.timestamps.push([i-0.2, coords[side][2], {size: coords[side][3], coords: coords[side], spawnRate: 1, despawnRate: 5,}]);
-                    }
-                    // 140.914-141.458 2 corner circles
-                    music.timestamps = music.timestamps.concat(lessThan(142.062));
-                    // music.timestamps = music.timestamps.concat(lessThan(146.222)); excluded
-                    // Bomb Encircling
-                    startBeat = 146.135;
-                    beats = 3;
-                    let w = 300;
-                    for (let i = startBeat; i < startBeat-0.01 + spb*beats; i+=spb) {
-                        music.timestamps.push([i, "bomb", {size: w, coords: [0, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        music.timestamps.push([i, "bomb", {size: w, coords: [GAME_WIDTH, 0], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        music.timestamps.push([i, "bomb", {size: w, coords: [GAME_WIDTH, GAME_HEIGHT], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        music.timestamps.push([i, "bomb", {size: w, coords: [0, GAME_HEIGHT], spawnRate: 0.3, despawnRate: 0.7,}]);
-                        w += 80;
-                    }
-                    music.timestamps = music.timestamps.concat(deepSynth(150.313));
-                    music.timestamps = music.timestamps.concat(deepSynth(154.472, "leftSpikeWall"));
-                    music.timestamps = music.timestamps.concat(deepSynth(158.662));
-                    music.timestamps = music.timestamps.concat(deepSynth(162.985, "rightSpikeWall"));
-                    music.timestamps = music.timestamps.concat(deepSynth(167.002));
-                    music.timestamps = music.timestamps.concat(deepSynth(171.190, "encirclingSpikes"));
-                    music.timestamps = music.timestamps.concat(deepSynth(175.353));
-                    music.timestamps = music.timestamps.concat(deepSynth(179.531));
-                    music.timestamps = music.timestamps.concat(deepSynth(183.669));
-                    music.timestamps = music.timestamps.concat(deepSynth(187.874));
-                    // music.timestamps = music.timestamps.concat(deepSynth(192.047)); excluded
-                    // music.timestamps = music.timestamps.concat(deepSynth(196.226)); excluded
-                    music.timestamps.forEach(ts => { ts[0] -= 0.025; });
-                    for (let i = 1; i < 16; i++) music.timestamps.unshift([i, "ring", {size: 40+(i-1)*25, invincible: true, coords: [xMid, yMid]}]);
-                }
+                
+                if (mouseOver?.limbo) createLimbo();
+                if (mouseOver?.andromeda) createAndromeda();
+                if (mouseOver?.euphoria) createEuphoria();
+                
                 music.timestamps.sort((a, b) => a[0] - b[0]);
                 music.backUpTS = [...music.timestamps];
                 restartMusicMode();
             }
         })
     }
-
-    // Mobile MM stays on
-    if (isMobile()) mouseMovementOn = true;
 }
 
 function detectHover() {
@@ -618,7 +356,7 @@ function detectHover() {
     mouseOver.evades = gameState === "startScreen" && innerGameState === "mainMenu" && mouseX > 485 && mouseX < 570 && mouseY > 11 && mouseY < 28;
     mouseOver.jsab = gameState === "startScreen" && innerGameState === "mainMenu" && mouseX > 612 && mouseX < 795 && mouseY > 11 && mouseY < 28;
 
-    let dodgerSelection = gameState === "startScreen" && innerGameState === "selectDodger";
+    const dodgerSelection = gameState === "startScreen" && innerGameState === "selectDodger";
     mouseOver.evader = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
     mouseOver.jolt = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 25 && mouseY < 125;
     mouseOver.jötunn = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
@@ -626,7 +364,7 @@ function detectHover() {
     mouseOver.j_sab = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 150 && mouseY < 250;
     mouseOver.quasar = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 150 && mouseY < 250;
 
-    let difficultySelection = gameState === "startScreen" && innerGameState === "selectDifficulty";
+    const difficultySelection = gameState === "startScreen" && innerGameState === "selectDifficulty";
     mouseOver.easy = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
     mouseOver.medium = difficultySelection && mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
     mouseOver.hard = difficultySelection && mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
@@ -634,7 +372,7 @@ function detectHover() {
     mouseOver.andromeda = difficultySelection && mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
     mouseOver.euphoria = difficultySelection && mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
 
-    let settingsMenu = gameState === "startScreen" && innerGameState === "settings";
+    const settingsMenu = gameState === "startScreen" && innerGameState === "settings";
     mouseOver.enemyOutBtn = settingsMenu && mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
     mouseOver.disableMMBtn = settingsMenu && mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
     mouseOver.musicSlider = settingsMenu && mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
@@ -1635,8 +1373,10 @@ function spawnEnemyPeriodically() {
 
 // PLAYER AND ENEMY MOVEMENT
 function keyboardControls() {
+    const playerExists = player?.x !== undefined && player?.y !== undefined;
+    
     // Moves the player with the keyboard
-    if (keyboardMovementOn && player?.x !== undefined && player?.y !== undefined) {
+    if (keyboardMovementOn && playerExists) {
         lastPressing = "kb";
 
         let dxKB = 0;
@@ -1667,8 +1407,10 @@ function keyboardControls() {
 }
 
 function mouseMovement() {
+    const playerExists = player?.x !== undefined && player?.y !== undefined;
+    
     // Moves the player towards the cursor
-    if (mouseMovementOn && !keyboardMovementOn && player?.x !== undefined && player?.y !== undefined) {
+    if (mouseMovementOn && !keyboardMovementOn && playerExists) {
         lastPressing = "mouse";
         
         const dxMouse = mouseX - player.x;
@@ -1854,12 +1596,12 @@ function abilities() { // player-specific abilities
         else if (shockwave.used === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
         ctx.fill(shockwave.path);
 
-        // checks for collisions
+        // check for collisions
         allEnemies.forEach(enemy => { 
             enemy.collisionPoints.forEach(point => {
                 if (ctx.isPointInPath(shockwave.path, point[0], point[1])
                     && (enemy.vulnerable === shockwave.used || enemy.vulnerable === "None")) {
-                    enemy.reset = Date.now(); // starts the time which an enemy got hit
+                    enemy.reset = Date.now(); // starts the time for which an enemy got hit
                     enemy.vulnerable = shockwave.used;
                 }
             })
@@ -1870,7 +1612,10 @@ function abilities() { // player-specific abilities
         // pauses beam if the player dies
         if (gameState !== "endlessOver") {
             shockwave.radius *= 1.022;
-            if (shockwave.used === "Shockray") { shockwave.x += shockwave.movex; shockwave.y += shockwave.movey; }
+            if (shockwave.used === "Shockray") {
+                shockwave.x += shockwave.movex;
+                shockwave.y += shockwave.movey;
+            }
         }
         
         // once the radius is big enough, end the entire ability
