@@ -7,10 +7,13 @@
         <title>Dodge.io</title>
         <link rel="icon" type="image/x-icon" href="DodgeImages/dodgeIcon.png" />
 
-        <!-- JAVASCRIPT -->
-        <script defer src="functions.js"></script>
-        <script defer src="music.js"></script>
-        <script defer src="script.js"></script>
+        <!-- Outfit Font-Family Link -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+            rel="stylesheet"
+        />
 
         <!-- CSS -->
         <style>
@@ -22,10 +25,11 @@
                 overscroll-behavior: none; /* prevent edge bounce */
             }
             body {
+                position: relative;
                 display: flex;
                 justify-content: center; /* Center horizontally */
                 align-items: center; /* Center vertically */
-                background-color: rgb(255, 255, 255);
+                background-color: rgb(250, 250, 250);
             }
             #game {
                 width: 100%;
@@ -56,6 +60,40 @@
                 left: -20px;
                 border-radius: 100%;
             }
+            .ability-div {
+                width: 5rem;
+                height: 5rem;
+                
+                position: absolute;
+                top: 50%;
+                
+                background-color: rgb(255, 255, 255);
+                border: rgb(230, 230, 230) 5px solid;
+                border-radius: 15%;
+                
+                color: rgb(230, 230, 230);
+                font-size: 1.1rem;
+                font-family: "Outfit";
+                font-weight: bold;
+                text-align: center;
+                white-space: nowrap;
+                user-select: none;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            #ability-one {
+                left: 10%;
+                transform: translate(-50%, -50%);
+            }
+            #ability-two {
+                right: 10%;
+                transform: translate(50%, -50%);
+            }
+            a {
+                display: none;
+            }
         </style>
     </head>
     <body id="bodyEl">        
@@ -74,11 +112,30 @@
             <audio id="sharp-pop" src="Audio/sharp-pop.mp3" preload="metadata"></audio>
         </div>
 
+        <!-- Links -->
+        <a id="evades-link" href="https://evades.io/" target="_blank" rel="noopener noreferrer"></a>
+        <a id="jsab-link" href="https://www.justshapesandbeats.com/" target="_blank" rel="noopener noreferrer"></a>
+
         <!-- Canvas -->
         <canvas id="game"></canvas>
+
+        <!-- Abilities -->
+        <div id="ability-one" class="ability-div">
+            <p>Ability 1</p>
+        </div>
+        <div id="ability-two" class="ability-div">
+            <p>Ability 2</p>
+        </div>
+
+        <!-- Cursor -->
         <div id="cursor-trail"></div>
         <div id="cursor"></div>
         <div id="cursor-overlay"></div>
         <div id="cursor-clicks"></div>
+
+        <!-- JAVASCRIPT -->
+        <script defer src="functions.js"></script>
+        <script defer src="music.js"></script>
+        <script defer src="script.js"></script>
     </body>
 </html>
