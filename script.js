@@ -1,4 +1,4 @@
-console.log("fixed ability btn bugs");
+console.log("fixed ability btn color bugs");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
