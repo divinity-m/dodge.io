@@ -1,4 +1,4 @@
-console.log("full screen, resize");
+console.log("fixed some of the broken buttons on mobile");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
@@ -27,7 +27,7 @@ screen?.orientation.addEventListener("change", resize);
 resize();
 
 /* Full Screen Stuff */
-window.addEventListener("touchstart", () => {
+document.addEventListener("touchstart", () => {
     if (isMobile() && !document.fullscreenElement) {
         document.documentElement.requestFullscreen();
         resize();
@@ -66,8 +66,8 @@ document.addEventListener("touchend", () => {
     const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
     if (!mouseInAbilityBtn) {
         recordLeftClick();
+        allClicks.push(createClick("left"));
     }
-    allClicks.push(createClick("left"));
     mouseDown = false;
 });
 document.addEventListener("touchcancel", () => {
@@ -202,22 +202,27 @@ let eventHorizon = {
 const abilityOneBtn = document.getElementById("ability-one");
 const abilityTwoBtn = document.getElementById("ability-two");
 
-const upEvents = ["touchend", "click"];
-upEvents.forEach((upEvent) => {
-    abilityOneBtn.addEventListener(upEvent, recordRightClick);
-    abilityTwoBtn.addEventListener(upEvent, recordMiddleClick);
-})
+abilityOneBtn.addEventListener("click", () => {
+    recordRightClick();
+    allClicks.push(createClick("right"));
+    colorAbilityButtons(abilityOneBtn);
+});
+                                   
+abilityTwoBtn.addEventListener("click", () => {
+    recordMiddleClick();
+    allClicks.push(createClick("middle"));
+    colorAbilityButtons(abilityTwoBtn);
+});
 
 /* Ability Button hover and click effects */
 window.addEventListener("load", () => {
     [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
         if (abilityBtn) {
-            const moveEvents = ["touchmove", "mousemove"];
-            moveEvents.forEach((moveEvent) => {
-                document.addEventListener(moveEvent, (e) => {
+            if (!isMobile()) {
+                document.addEventListener("mousemove", (e) => {
                     if (abilityBtn.contains(e.target)) {
                         abilityBtn.style.opacity = 0.7;
-                        
+                            
                         if (mouseDown) {
                             abilityBtn.style.backgroundColor = player.subColor;
                             abilityBtn.style.borderColor = player.color;
@@ -226,30 +231,39 @@ window.addEventListener("load", () => {
                     }
                     else {
                         abilityBtn.style.opacity = 1;
-                        
-                        abilityBtn.style.backgroundColor = player.color;
-                        abilityBtn.style.borderColor = player.subColor;
-                        abilityBtn.style.color = player.subColor;
+                        colorAbilityButtons(abilityBtn);
                     }
                 });
-            })
-            
-            const downEvents = ["touchstart", "mousedown"];
-            downEvents.forEach((downEvent) => {
-                abilityBtn.addEventListener(downEvent, () => {
-                    abilityBtn.style.backgroundColor = player.subColor;
-                    abilityBtn.style.borderColor = player.color;
-                    abilityBtn.style.color = player.color;
+                document.addEventListener("mousedown", (e) => {
+                    if (abilityBtn.contains(e.target)) {
+                        abilityBtn.style.backgroundColor = player.subColor;
+                        abilityBtn.style.borderColor = player.color;
+                        abilityBtn.style.color = player.color;
+                    }
                 });
-            })
-            
-            upEvents.forEach((upEvent) => {
-                abilityBtn.addEventListener(upEvent, () => {
-                    abilityBtn.style.backgroundColor = player.color;
-                    abilityBtn.style.borderColor = player.subColor;
-                    abilityBtn.style.color = player.subColor;
+            }
+            else {
+                document.addEventListener("touchmove", (e) => {
+                    const touch = e.changedTouches[0];
+                    const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
+                    
+                    if (abilityBtn.contains(elementUnderFinger) || elementUnderFinger.id === abilityBtn.id) {
+                        abilityBtn.style.backgroundColor = player.subColor;
+                        abilityBtn.style.borderColor = player.color;
+                        abilityBtn.style.color = player.color;
+                    }
+                    else {
+                        colorAbilityButtons(abilityBtn);
+                    }
                 });
-            })
+                document.addEventListener("touchstart", (e) => {
+                    if (abilityBtn.contains(e.target)) {
+                        abilityBtn.style.backgroundColor = player.subColor;
+                        abilityBtn.style.borderColor = player.color;
+                        abilityBtn.style.color = player.color;
+                    }
+                });
+            }
         }
     })
 });
@@ -333,11 +347,7 @@ if (localData) {
         if (player.dodger === "quasar") { player.color = "rgb(255, 165, 0)"; player.subColor = "rgb(230, 153, 11)"; }
         highscore = userData.highscore;
 
-        [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
-            abilityBtn.style.backgroundColor = player.color;
-            abilityBtn.style.borderColor = player.subColor;
-            abilityBtn.style.color = player.subColor;
-        })
+        [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => colorAbilityButtons(abilityBtn));
         
         settings = userData.settings;
         musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
