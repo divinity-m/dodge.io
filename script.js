@@ -1,4 +1,4 @@
-console.log("fixed some of the broken buttons on mobile");
+console.log("fixed ability btn bugs");
 
 // DODGE.IO - SCRIPT.JS
 const cnv = document.getElementById("game");
