@@ -1545,22 +1545,37 @@ function collisions() { // Keeps track of when the player touches any enemy in t
 function abilities() { // player-specific abilities
     // Dash gives the player a powerful but short-lived burst of speed
     if (dash.activated) {
+        // changes the players colors
         player.color = "rgb(255, 100, 100)";
         player.subColor = "rgb(230, 100, 100)";
+
+        // changes the ability buttons colors
+        const abilityOneBtnColorsUnchanged = abilityOneBtn.style.backgroundColor === "rgb(255, 0, 0)";
+        const abilityTwoBtnColorsUnchanged = abilityTwoBtn.style.backgroundColor === "rgb(255, 0, 0)";
+        if (abilityOneBtnColorsUnchanged) colorAbilityButtons(abilityOneBtn);
+        if (abilityTwoBtnColorsUnchanged) colorAbilityButtons(abilityTwoBtn);
+
+        // speeds up the player
         player.speed += dash.accel;
         if (player.speed > 17.5) {
             dash.deccelerating = true;
             dash.accel *= -1;
             player.speed += dash.accel;
         }
+
+        // resets the player after the ability is finished
         if (player.speed <= player.baseSpeed && dash.deccelerating) {
             player.speed = player.baseSpeed;
             player.color = "rgb(255, 0, 0)";
             player.subColor = "rgb(230, 0, 0)";
+            
             dash.activated = false;
             dash.deccelerating = false;
             dash.accel *= -1;
             dash.lastEnded = Date.now();
+
+            colorAbilityButtons(abilityOneBtn);
+            colorAbilityButtons(abilityTwoBtn);
         }
     }
     // Absolute Zero's effect changes enemy speed based on distance
@@ -1676,11 +1691,17 @@ function abilities() { // player-specific abilities
     }
     // Event Horizon makes the player invincible but speeds up nearby enemies
     if (eventHorizon.activated) {
-        // Player Changes
+        // Player Alterations
         player.color = "rgb(0, 0, 0)";
         player.subColor = "rgb(255, 165, 0)";
         if (player.baseSpeed > 1 && now - eventHorizon.lastUsed < 1000) player.baseSpeed -= 0.05;
         if (player.baseSpeed < 5 && now - eventHorizon.lastUsed > 4000) player.baseSpeed += 0.05;
+
+        // Ability Button Color Alterations
+        const abilityOneBtnColorsUnchanged = abilityOneBtn.style.borderColor === "rgb(230, 153, 11)";
+        const abilityTwoBtnColorsUnchanged = abilityTwoBtn.style.borderColor === "rgb(230, 153, 11)";
+        if (abilityOneBtnColorsUnchanged) colorAbilityButtons(abilityOneBtn);
+        if (abilityTwoBtnColorsUnchanged) colorAbilityButtons(abilityTwoBtn);
 
         // Event Horizon Gradient
         const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 1010);
@@ -1731,9 +1752,13 @@ function abilities() { // player-specific abilities
             player.baseSpeed = 5;
             player.color = "rgb(255, 165, 0)";
             player.subColor = "rgb(230, 153, 11)";
+            
             eventHorizon.activated = false;
             eventHorizon.lastEnded = Date.now();
             eventHorizon.accretionDisk = [];
+
+            colorAbilityButtons(abilityOneBtn);
+            colorAbilityButtons(abilityTwoBtn);
         }
     }
 }
