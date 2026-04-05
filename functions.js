@@ -63,8 +63,11 @@ function recordKeyDown(event) {
             else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
             else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
         }
-        if (player.dodger === "jolt" && shockwave.active === "Shockwave") shockwave.active = "Shockray";
-        else if (player.dodger === "jolt" && shockwave.active === "Shockray") shockwave.active = "Shockwave";
+        
+        if (player.dodger === "jolt") {
+            if (shockwave.active === "Shockwave") shockwave.active = "Shockray";
+            else shockwave.active = "Shockwave";
+        }
     }
 }
 
@@ -119,8 +122,11 @@ function recordMiddleClick() {
             else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
             else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
         }
-        if (player.dodger === "jolt" && shockwave.active === "Shockwave") shockwave.active = "Shockray";
-        else if (player.dodger === "jolt" && shockwave.active === "Shockray") shockwave.active = "Shockwave";
+
+        if (player.dodger === "jolt") {
+            if (shockwave.active === "Shockwave") shockwave.active = "Shockray";
+            else shockwave.active = "Shockwave";
+        }
     }
 }
 
@@ -291,9 +297,7 @@ function recordLeftClick() {
             }
 
             [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
-                abilityBtn.style.backgroundColor = player.color;
-                abilityBtn.style.borderColor = player.subColor;
-                abilityBtn.style.color = player.subColor;
+                colorAbilityButtons(abilityBtn);
             })
 
             // saves the players values to the local storage to keep track of the players dodger
@@ -1802,4 +1806,10 @@ function enemyAbilitiesAndStats(enemy) {
         enemy.detectionRadius = 200;
     }
     enemy.color = enemy.baseColor;
+}
+
+function colorAbilityButtons(abilityBtn) {
+    abilityBtn.style.backgroundColor = player.color;
+    abilityBtn.style.borderColor = player.subColor;
+    abilityBtn.style.color = player.subColor;
 }
