@@ -1,656 +1,602 @@
-console.log("fixed ability btn color bugs");
+/// SCRIPT.JS ANTI GRAVITY ///
 
-// DODGE.IO - SCRIPT.JS
-const cnv = document.getElementById("game");
-const ctx = cnv.getContext('2d');
+// Canvas Setup //
+const cnv = document.getElementById("game-canvas");
+const ctx = cnv.getContext("2d");
+let gameState = "titleScreen";
+let interaction = false;
 
+// Global Variables //
+let now = Date.now();
 
-// Game Units
-let [gameState, innerGameState, previousGameState] = ["loading", "loading", "loading"];
-[cnv.width, cnv.height] = [800, 650];
-let [GAME_WIDTH, GAME_HEIGHT] = [800, 650];
+const borderHeight = cnv.height/5;
 
+let [mouseX, mouseY] = [-10, -10];
+let wPressed, aPressed, sPressed, dPressed;
+let buttons = [];
 
-// Screen Orientations
-function isMobile() {
-  const uaCheck = /Mobi|Android/i.test(navigator.userAgent);
-  const sizeCheck = window.matchMedia("(max-width: 768px)").matches;
-  return uaCheck || sizeCheck;
-}
+let [gravity, dGravity] = [0, 0.75];
+let [fallingDirection, isMidAir, onObstacle] = ["down", false, false];
 
-function resize() {
-    if (isMobile()) cnv.style.width = `350px`;
-    else cnv.style.width = `${window.innerWidth * (GAME_WIDTH/1397)}px`;
-}
-window.addEventListener("resize", resize);
-screen?.orientation.addEventListener("change", resize);
-resize();
+let [allLevels, currentLvlNum] = [[], 0];
 
-/* Full Screen Stuff */
-document.addEventListener("touchstart", () => {
-    if (isMobile() && !document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-        resize();
-    }
-})
+let keys = [];
 
+const dirtColor = "rgb(143, 89, 43)";
+const grassColor = "rgb(42, 191, 42)";
+const lightGrassColor = "rgb(82, 213, 82)";
+const cloudColor = "rgba(237, 253, 255, 0.8)";
+const cloudColor2 = "rgba(218, 251, 255, 0.8)";
+const rockColor = "rgb(81, 79, 77)";
+const phaseColor = "rgba(81, 79, 77, 0.7)";
 
-// Keyboard and Mouse Variables & Events 
-let [lastPressing, keyboardMovementOn, mouseMovementOn] = ["mouse", false, false];
-let [wPressed, aPressed, sPressed, dPressed, shiftPressed] = [false, false, false, false, 1];
-let [mouseDown, allClicks] = [false, []];
+let lastPlayingAudioEl = "none";
 
-/* Keyboard Events */
-document.addEventListener("keydown", recordKeyDown);
-document.addEventListener("keyup", recordKeyUp);
+// objects
+const player = {
+    x: cnv.width/5, y: cnv.height - cnv.height/3,
 
-/* Mouse Events */
-document.addEventListener("mousedown", () => { if (!isMobile()) mouseDown = true; });
-document.addEventListener("mouseup", () => { if (!isMobile()) mouseDown = false; });
-document.addEventListener("click", () => {
-    if (!isMobile()) { recordLeftClick(); allClicks.push(createClick("left")); }
-});
-document.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-    if (!isMobile()) { recordRightClick(); allClicks.push(createClick("right")); }
-});
-document.addEventListener("auxclick", (event) => {
-    if (event.button === 1) {
-        event.preventDefault();
-        if (!isMobile()) {  recordMiddleClick(); allClicks.push(createClick("middle")); }
-    }
-});
-
-/* Touchscreen Events */
-document.addEventListener("touchend", () => {
-    const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
-    if (!mouseInAbilityBtn) {
-        recordLeftClick();
-        allClicks.push(createClick("left"));
-    }
-    mouseDown = false;
-});
-document.addEventListener("touchcancel", () => {
-    mouseDown = false;
-});
-
-
-// Input Tracking
-let mouseOver = {
-    play: false, settings: false, selector: false, restart: false, evades: false, jsab: false,
+    r: 17.5, rotation: 0, spinSpeed: Math.PI/16,
     
-    evader: false, j_sab: false, jötunn: false, jolt: false, crescendo: false, quasar: false,
+    speed: 5, facingAngle: 0,
+
+    img: document.getElementById("grey-ball"), keys: [],
     
-    easy: false, medium: false, hard: false, limbo: false, andromeda: false, euphoria: false,
-    
-    enemyOutBtn: false, disableMMBtn: false, musicSlider: false, sfxSlider: false,
-    aZ_RangeBtn: false, aZ_AvSlider: false, customCursorBtn: false, cursorTrailSlider: false,
-};
-let mouseX, mouseY, cursorX, cursorY;
-let [track, allCursors, lastCursorTrail, trailDensity] = [false, [], 0, 0];
+    enteringPortal: false,
 
-function updateCursor(eventObject) {
-    // update cursor
-    [cursorX, cursorY] = [eventObject.clientX, eventObject.clientY];
+    phasing: false,
 
-    // update mouse
-    const rect = cnv.getBoundingClientRect();
-  
-    const scaleX = cnv.width / rect.width;
-    const scaleY = cnv.height / rect.height;
-  
-    mouseX = (cursorX - rect.left) * scaleX;
-    mouseY = (cursorY - rect.top) * scaleY;
-}
-
-function addCursorTrail() {
-    if (cursorX !== undefined && cursorY !== undefined && settings.customCursor && trailDensity > 0) {
-        // Trail Density
-        const pNow = performance.now();
-        if (pNow - lastCursorTrail > 16) { // ~60fps cap
-            allCursors.push(createCursor());
-            if (allCursors.length > 100) { // drop oldest
-                allCursors[0].div.remove();
-                allCursors.shift();
-            }
-            lastCursorTrail = pNow;
+    phase() {
+        if (!this.phasing && isMidAir && !onObstacle) {
+            this.phasing = true;
+            resetGravity();
         }
-    }
-}
-
-/* cursor update event listeners */
-document.addEventListener('mousemove', (event) => {
-    if (!isMobile()) {
-        updateCursor(event);
-        addCursorTrail();
-        if (track) console.log(`x: ${mouseX.toFixed()} || y: ${mouseY.toFixed()}`);
-    }
-});
-document.addEventListener("touchmove", (event) => {
-    mouseDown = true;
-    updateCursor(event.touches[0]);
-    addCursorTrail();
-});
-document.addEventListener("touchstart", (event) => {
-    mouseDown = true;
-
-    const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
-    if (!mouseInAbilityBtn) {
-        updateCursor(event.touches[0]);
-    }
-});
-
-
-// Player & Enemies
-let player = {
-    x: GAME_WIDTH/2, y: GAME_HEIGHT/2, r: 15,
-    speed: 5, baseSpeed: 5, slowed: 1,
-    dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)",
-    facingAngle: 0, invincible: false,
-};
-
-let [allEnemies, allDangers] = [[], []];
-
-let settings = {
-    enemyOutlines: true, disableMM: false,
-    musicSliderX: 640, sfxSliderX: 627,
-    aZ_Range: true, aZ_Av: 650,
-    customCursor: true, cursorTrail: 715,
-};
-
-/* Abilities */
-let dash = {
-    usable: true, activated: false,
-    deccelerating: false, accel: 1,
-    lastEnded: 0,
-};
-
-let absoluteZero = {
-    usable: true, av: 0.5,
-    passive: "Absolute Zero",
-    slowStart: 273.15, slowEnd: 75,
-    lastEnded: 0,
-};
-
-let shockwave = {
-    usable: true, active: "Shockwave", used: "Shockwave", activated: false,
-    radius: 25, path: new Path2D(),
-    lastEnded: 0, cd: 7000, effect: 0.75,
-    reset: function () {
-        [this.lastEnded, this.activated, this.radius] = [0, false, 25];
     },
-};
-
-let amplify = {
-    baseSpeed: 5, speed: 0, accel: 0, limit: 10.5, accelRate: Date.now(),
-    reset: function () {
-        [player.baseSpeed, this.speed, this.accel, this.accelRate] = [5, 0, 0, Date.now()];
+    checkPhase() {
+        if (!isMidAir || onObstacle) {
+            this.phasing = false;
+            resetGravity();
+        }
+        if (this.enteringPortal) {
+            this.phasing = true;
+        }
     },
-};
+}
 
-let eventHorizon = {
-    usable: true, activated: false,
-    av: 0, accretionDisk: [],
-    lastUsed: 0, lastEnded: 0,
-    reset: function() {
-        player.baseSpeed = 5;
-        if (player.dodger === "quasar") [player.color, player.subColor] = ["rgb(255, 165, 0)", "rgb(230, 153, 11)"];
-        [this.av, this.accretionDisk, this.activated, this.lastUsed, this.lastEnded] = [0, [], false, 0, 0];
+const portal = {
+    x: cnv.width - cnv.width/5, y: cnv.height/2,
+
+    r: 40, rotation: 0, spinSpeed: Math.PI/128,
+
+    timeSinceEntered: Date.now(),
+}
+
+const songText = {
+    active: false,
+
+    x: -100, y: cnv.height - 20,
+
+    alpha: 0, fadeIn: true,
+
+    content: "A New Start - Thygan Buch",
+
+    reset() {
+        this.active = false;
+        this.x = -100;
+        this.y = cnv.height - 20;
+        this.alpha = 0;
+        this.fadeIn = true;
     }
 }
 
-const abilityOneBtn = document.getElementById("ability-one");
-const abilityTwoBtn = document.getElementById("ability-two");
-
-abilityOneBtn.addEventListener("click", () => {
-    recordRightClick();
-    allClicks.push(createClick("right"));
-    colorAbilityButtons(abilityOneBtn);
-});
-                                   
-abilityTwoBtn.addEventListener("click", () => {
-    recordMiddleClick();
-    allClicks.push(createClick("middle"));
-    colorAbilityButtons(abilityTwoBtn);
-});
-
-/* Ability Button hover and click effects */
-window.addEventListener("load", () => {
-    [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
-        if (abilityBtn) {
-            if (!isMobile()) {
-                document.addEventListener("mousemove", (e) => {
-                    if (abilityBtn.contains(e.target)) {
-                        abilityBtn.style.opacity = 0.7;
-                            
-                        if (mouseDown) {
-                            abilityBtn.style.backgroundColor = player.subColor;
-                            abilityBtn.style.borderColor = player.color;
-                            abilityBtn.style.color = player.color;
-                        }
-                    }
-                    else {
-                        abilityBtn.style.opacity = 1;
-                        colorAbilityButtons(abilityBtn);
-                    }
-                });
-                document.addEventListener("mousedown", (e) => {
-                    if (abilityBtn.contains(e.target)) {
-                        abilityBtn.style.backgroundColor = player.subColor;
-                        abilityBtn.style.borderColor = player.color;
-                        abilityBtn.style.color = player.color;
-                    }
-                });
-            }
-            else {
-                document.addEventListener("touchmove", (e) => {
-                    const touch = e.changedTouches[0];
-                    const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
-                    
-                    if (abilityBtn.contains(elementUnderFinger) || elementUnderFinger.id === abilityBtn.id) {
-                        abilityBtn.style.backgroundColor = player.subColor;
-                        abilityBtn.style.borderColor = player.color;
-                        abilityBtn.style.color = player.color;
-                    }
-                    else {
-                        colorAbilityButtons(abilityBtn);
-                    }
-                });
-                document.addEventListener("touchstart", (e) => {
-                    if (abilityBtn.contains(e.target)) {
-                        abilityBtn.style.backgroundColor = player.subColor;
-                        abilityBtn.style.borderColor = player.color;
-                        abilityBtn.style.color = player.color;
-                    }
-                });
-            }
-        }
-    })
-});
-
-
-
-// Time, Highscore, and Difficulty
-let [now, loadingGame, loadingTextChange, startTime, lastSpawn] = [Date.now(), Date.now(), Date.now(), Date.now(), Date.now()];
-let enemySpawnPeriod = 3000;
-let currentTime = ((now-startTime) / 1000).toFixed(2);
-let timeLeft;
-let LI = 0; // loading index
-let endLoading = false;
-let clickEventSave = 0; // prevents spam saving when clicking something that saves the game as a side-effect
-
-let highscoreColor = "rgb(87, 87, 87)";
-let highscore = { easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0, };
-let difficulty = { level: "easy", color: "rgb(0, 225, 255)", };
-
-// Music
-let [musicVolume, sfxVolume] = [0, 0];
-
-let alarm9 = document.getElementById("alarm9");
-let music = {
-    var: alarm9, name: "Alarm 9", artist: "Blue Cxve",
-    color: "rgb(163, 0, 163)", subColor: "rgb(173, 0, 173)",
-    timestamps: [], promise: "alarm9.play()",
-}
-let aNewStart = document.getElementById("a-new-start");
-let interstellar = document.getElementById("interstellar");
-let astralProjection = document.getElementById("astral-projection");
-let divine = document.getElementById("divine");
-let sharpPop = document.getElementById("sharp-pop");
-
-// User Data
-let lastSave = 0; // tracks how often data is saved (during gameplay)
-const localData = localStorage.getItem('localDodgeData'); // load savedData (if it exists)
-let userData;
-let resetLocalData = false;
-
-if (localData) {
-    // retrieves the users local data and watches for corrupted data
-    try {
-        userData = JSON.parse(localData);       
-    } catch (exception) {
-        console.warn('Local user data was invalid, resetting.', exception);
-        localStorage.removeItem('localDodgeData');
-        resetLocalData = true;
-    }
-
-    if (!resetLocalData) {
-        // checks to see if the userData is missing any elements and replaces it with default data
-        ["player", "highscore", "settings"].forEach(data => {
-            if (!(data in userData)) userData[data] = eval(data);
-        });
-        
-        let p = {dodger: "evader", color: "rgb(255, 255, 255)", subColor: "rgb(230, 230, 230)", invincible: false};
-        ["dodger", "color", "subColor", "invincible"].forEach(attribute => {
-            if (userData?.player?.[attribute] !== undefined) p[attribute] = userData.player[attribute];
-        })
-        
-        let hs = {easy: 0, medium: 0, hard: 0, limbo: 0, andromeda: 0, euphoria: 0};
-        ["easy", "medium", "hard", "limbo", "andromeda", "euphoria"].forEach(score => {
-            if (userData?.highscore?.[score] !== undefined) hs[score] = userData.highscore[score];
-        })
-        
-        let s = {enemyOutlines: true, disableMM: false, musicSliderX: 640, sfxSliderX: 627, aZ_Range: true, aZ_Av: 650, customCursor: true, cursorTrail: 715};
-        ["enemyOutlines", "disableMM", "musicSliderX", "sfxSliderX", "aZ_Range", "aZ_Av", "customCursor", "cursorTrail"].forEach(setting => {
-            if (userData?.settings?.[setting] !== undefined) s[setting] = userData.settings[setting];
-        })
-                
-        userData = {player: {x: GAME_WIDTH/2, y: GAME_HEIGHT/2, r: 15, speed: 5, baseSpeed: 5, slowed: 1, dodger: p.dodger,
-                                color: p.color, subColor: p.subColor, facingAngle: 0, invincible: p.invincible},
-                    highscore: {easy: hs.easy, medium: hs.medium, hard: hs.hard,
-                                limbo: hs.limbo, andromeda: hs.andromeda, euphoria: hs.euphoria},
-                    settings: {enemyOutlines: s.enemyOutlines, disableMM: s.disableMM, musicSliderX: s.musicSliderX, sfxSliderX: s.sfxSliderX,
-                              aZ_Range: s.aZ_Range, aZ_Av: s.aZ_Av, customCursor: s.customCursor, cursorTrail: s.cursorTrail}};
-        // updates the current data to the locally saved data
-        player = userData.player;
-        if (player.dodger === "j-sab") { player.color = "rgb(255, 0, 0)"; player.subColor = "rgb(230, 0, 0)"; }
-        if (player.dodger === "quasar") { player.color = "rgb(255, 165, 0)"; player.subColor = "rgb(230, 153, 11)"; }
-        highscore = userData.highscore;
-
-        [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => colorAbilityButtons(abilityBtn));
-        
-        settings = userData.settings;
-        musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
-        sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
-        absoluteZero.av = Math.max(Math.min((settings.aZ_Av - 555) / (705 - 555), 1), 0)
-        trailDensity = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0);
-        music.var.volume = musicVolume;
-        sharpPop.volume = sfxVolume;
-    }
-}
-
-if (resetLocalData || !localData){
-    // creates a new userData for new users
-    userData = { player: player, highscore: highscore, settings: settings, };
+// classes
+/*
+data types to remember for @param
+{string}
+{number}
+{boolean}
+{null}
+{undefined}
+{symbol}
+{Object}
+{Array}
+{function}
+*/
+class Button {
+    // Button: A class that makes it easier to create canvas-drawn buttons
     
-    // saves the new user data to local storage
-    localStorage.setItem('localDodgeData', JSON.stringify(userData));
-}
-
-// saves the game if the website is closed
-window.addEventListener('beforeunload', () => {
-    if (gameState !== "loading") { // only save user data if they're not on the loading screen
-        // Dash and Blackhole causes bugs when the player leaves mid-usage
-        userData = { player: player, highscore: highscore, settings: settings, };
-        localStorage.setItem('localDodgeData', JSON.stringify(userData));
-    }
-})
-
-// cool background stuff
-let bgTopText, bgBottomText, bgTopX, bgBottomX, bgTopMax, bgBottomMax;
-function resetBgVars() {
-    const hyp = Math.hypot(GAME_WIDTH, GAME_HEIGHT);
-    if (innerGameState === "mainMenu") {
-        [bgTopText, bgBottomText] = ["DODGE.IO", "HIT PLAY"];
-        [bgTopX, bgBottomX] = [-1000, GAME_WIDTH+1000];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
-    }
-    if (innerGameState === "selectDifficulty") {
-        [bgTopText, bgBottomText] = ["LEVEL", "SELECTION"];
-        [bgTopX, bgBottomX] = [-625, GAME_WIDTH+1125];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
-    }
-    if (innerGameState === "selectDodger") {
-        [bgTopText, bgBottomText] = ["DODGER", "SELECTION"];
-        [bgTopX, bgBottomX] = [-750, GAME_WIDTH+1125];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*4.75/10];
-    }
-    if (innerGameState === "settings") {
-        [bgTopText, bgBottomText] = ["GAME", "SETTINGS"];
-        [bgTopX, bgBottomX] = [-500, GAME_WIDTH+1000];
-        [bgTopMax, bgBottomMax] = [hyp*5/10, hyp*5/10];
-    }
-}
-
-// Drawing the game
-function draw() {
-    now = Date.now();
-    detectHover();
-  
-    ctx.fillStyle = "rgb(185, 185, 185)";
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-    // Loading Screen
-    if (now - loadingGame <= 5000 && !endLoading) { // Takes 5 seconds to load the game safely
-        options = ["Loading.", "Loading..", "Loading..."];
-        if (now - loadingTextChange >= 1000) { // change the text every second
-            loadingTextChange = Date.now();
-            LI++;
-            if (LI > 2) LI = 0;
-        }
-        
-        ctx.fillStyle = "rgb(87, 87, 87)";
-        ctx.font = "40px 'Verdana'";
-        ctx.textAlign = "center";
-        ctx.fillText(options[LI], GAME_WIDTH/2, GAME_HEIGHT/2);
-
-        ctx.font = "30px 'Verdana'";
-        ctx.fillText(`${now - loadingGame}/5000`, GAME_WIDTH/2, GAME_HEIGHT/2 + 50);
-
-        if (now - loadingGame >= 1000) {
-            ctx.font = "20px 'Verdana'";
-            ctx.textAlign = "left";
-            ctx.fillText("click anywhere to skip", 20, GAME_HEIGHT - 20);
-        }
-        
-        music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
-        music.var.currentTime = 0;
-    }
-    else if (now - loadingGame > 5000 && !endLoading) {
-        ctx.fillStyle = "rgb(87, 87, 87)";
-        ctx.font = "40px Verdana";
-        ctx.textAlign = "center";
-        ctx.fillText("Dodge.io", GAME_WIDTH/2, GAME_HEIGHT/2);
-
-        ctx.font = "20px Verdana";
-        ctx.textAlign = "left";
-        ctx.fillText("click anywhere to start", 20, GAME_HEIGHT - 20);
-    }
-    else if (endLoading && gameState === "loading") {
-        music.promise = music.var.play();
-        gameState = "startScreen";
-        innerGameState = "mainMenu";
-        resetBgVars();
+    /**
+    * @param {number} x - The buttons's x coordinate
+    * @param {number} y - The buttons's y coordinate
+    * @param {number} w - The button's width
+    * @param {number} h - The button's height
+    * @param {string} name - The buttons id
+    * @param {string} content - The stuff inside the button (text or image)
+    * @param {string} location - Which gamestate the button is visible in
+    * @param {function} event - What the button does
+    */
+    
+    constructor(x, y, w, h, name, content, location, event) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.name = name;
+        this.content = content;
+        this.location = location;
+        this.event = event;
+        this.mouseOver = false; // A boolean which checks various conditions to determine if the mouse is hovering over the button
     }
 
-    // Actual Game
-    if (gameState === "startScreen") {
-        loopAudio();
-        drawText();
-      
-        drawStartScreen();
-        if (innerGameState === "selectDifficulty") drawDifficultySelection();
-        if (innerGameState === "selectDodger") drawDodgerSelection();
-      
-        abilities();
-        drawPlayer();
-        drawSettings();
-        
-        keyboardControls();
-        mouseMovement();
-    }
-    else if (gameState === "endlessMode") {
-        loopAudio();
-        drawText();
-        drawEnemies();
-        abilities();
-        drawPlayer();
-        
-        keyboardControls();
-        mouseMovement();
+    draw() {
+        // Button.draw(): Establishes the buttons `mouseOver` property and draws the buttons using its x, y, w, and h properties
+        this.mouseOver = gameState === this.location &&
+            (mouseX > this.x && mouseX < this.x + this.w &&
+             mouseY > this.y && mouseY < this.y + this.h);
+
+        if (gameState === this.location) {
+            // button background
+            const cyanGradient = ctx.createLinearGradient(this.x, this.y, this.x+this.w, this.y+this.h);
+            cyanGradient.addColorStop(0, "rgb(122, 255, 255)");
+            cyanGradient.addColorStop(1, "rgb(255, 255, 255)");
+
+            const greyGradient = ctx.createLinearGradient(this.x, this.y, this.x+this.w, this.y+this.h);
+            greyGradient.addColorStop(0, "rgb(60, 61, 64)");
+            greyGradient.addColorStop(1, "rgb(167, 167, 167)");
+
+            const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
+
+
+            if (currentLevel.terrain === "grassy") {
+                ctx.fillStyle = cyanGradient;
+            }
+            else if (currentLevel.terrain === "rocky") {
+                ctx.fillStyle = greyGradient;
+            }
+
+            ctx.fillRect(this.x, this.y, this.w, this.h);
             
-        spawnEnemyPeriodically();
-        moveEnemies();
-        collisions();
-    }
-    else if (gameState === "endlessOver") {
-        drawText();
-        drawGameOver();
-        drawEnemies();
-        abilities();
-        drawPlayer();
-    }
-    else if (gameState === "musicMode") {
-        drawEndLevel();
-        spawnAndDrawDanger();
-        drawText();
-
-        abilities();
-        drawPlayer();
-        
-        keyboardControls();
-        mouseMovement();
-
-        musicCollisions();
-    }
-
-    // CURSOR STUFF
-    let cursorEl = document.getElementById("cursor");
-    let overlayEl = document.getElementById("cursor-overlay");
-  
-    let playerColor = player.color.slice(4, player.color.length-1);
-    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
-
-    // filters trails and clicks divs
-    allCursors.forEach(trail => { if (trail.av <= 0 || trailDensity <= 0) trail.div.remove(); })
-    allClicks.forEach(click => {
-        if (click.av <= 0) {
-            click.div.remove();
-            if (click?.divMid) click?.divMid.remove(); // need to acocunt for middle click
-        }
-    })
-
-    // filters trails and clicks from array
-    allCursors = allCursors.filter(c => c.av > 0 && trailDensity > 0); // removes trails with low av's
-    allClicks = allClicks.filter(c => c.av > 0); // removes clicks with low av's
-  
-    // Makes default cursor invisible
-    if (settings.customCursor && !isMobile()) {
-        document.documentElement.classList.add("no-cursor");
-        cursorEl.style.display = "block";
-        overlayEl.style.display = "block";
-    } else {
-        document.documentElement.classList.remove("no-cursor");
-        cursorEl.style.display = "none";
-        overlayEl.style.display = "none";
-    }
-    
-  
-    // Cursor & Cursor Trail
-    if (cursorX !== undefined && cursorY !== undefined) {
-        // Draws Trail
-        allCursors.forEach(trail => {
-            // draws trails dimensions and color
-            trail.div.style.width = `${trail.r*2}px`;
-            trail.div.style.height = `${trail.r*2}px`;
-            trail.div.style.backgroundColor = trail.color;
-
-            // places trail
-            trail.div.style.transform = "translate(-50%, -50%)";
-            trail.div.style.top = `${trail.y}px`;
-            trail.div.style.left = `${trail.x}px`;
-
-            // changes trails radius and alpha value to animate it
-            trail.r -= trail.subR;
-            trail.av -= trail.subAv;
-        })
-    
-        // Draws Cursor
-        cursorEl.style.width = `${window.innerWidth * (12/1397)}px`;
-        cursorEl.style.height = `${window.innerWidth * (12/1397)}px`;
-        cursorEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
-        
-        overlayEl.style.width = `${window.innerWidth * (12/1397)}px`;
-        overlayEl.style.height = `${window.innerWidth * (12/1397)}px`;
-        overlayEl.style.borderWidth = `${window.innerWidth * (3/1397)}px`;
-        
-        // Handles hovers
-        let hovering = false;
-        
-        // covers hovering over canvas buttons
-        Object.keys(mouseOver).forEach(hover => {
-            if (mouseOver[hover]) hovering = true;
-        })
-        
-        // handles hovering over hyperlinks
-        let hyperlinks = document.getElementsByTagName('a');
-        for (let i = 0; i < hyperlinks.length; i++) {
-            if (hyperlinks[i].matches(":hover")) hovering = true;
-        }
-        
-        // hovering inverts cursor colors
-        if (hovering) {
-            cursorEl.style.backgroundColor = player.subColor;
-            cursorEl.style.borderColor = player.color;
-        } else {
-            cursorEl.style.backgroundColor = player.color;
-            cursorEl.style.borderColor = player.subColor;
-        }
-
-        // clicking brightens the cursor with an overlay
-        if (mouseDown) {
-            let av = 0.25; // alpha value
-            if (player.dodger === "jötunn") av = 0.05;
-            if (player.dodger === "crescendo") av = 0.1;
-            if (player.dodger === "j-sab") av = 0.1;
-
-            if (hovering) av *= 1.2;
-            overlayEl.style.backgroundColor = `rgba(255, 255, 255, ${av})`;
-            overlayEl.style.borderColor = `rgba(255, 255, 255, ${av})`;
-        }
-        else {
-            overlayEl.style.backgroundColor = "rgba(255, 255, 255, 0)";
-            overlayEl.style.borderColor = "rgba(255, 255, 255, 0)";
-        }
-        
-        // update cursor position
-        cursorEl.style.transform = "translate(-50%, -50%)";
-        cursorEl.style.top = `${cursorY}px`;
-        cursorEl.style.left = `${cursorX}px`;
-
-        // update overlay position
-        overlayEl.style.transform = "translate(-50%, -50%)";
-        overlayEl.style.top = cursorEl.style.top;
-        overlayEl.style.left = cursorEl.style.left;
-    }
-      
-    // Click Animation
-    allClicks.forEach(click => {
-        // draws clicks dimensions and color
-        click.div.style.width = `${click.r*2}px`;
-        click.div.style.height = `${click.r*2}px`;
-        click.div.style.border = "2px solid";
-        
-        click.div.style.backgroundColor = "rgba(0, 0, 0, 0)";
-        if (click.button === "left" || click.button === "middle") click.div.style.borderColor = click.colorLeft;
-        if (click.button === "right") click.div.style.borderColor = click.colorRight;
-
-        // places click
-        click.div.style.transform = "translate(-50%, -50%)";
-        click.div.style.top = `${click.y}px`;
-        click.div.style.left = `${click.x}px`;
-        
-        // determines middle clicks dimensions, color, and placement
-        if (click.button === "middle") {
-            click.divMid.style.backgroundColor = "rgba(0, 0, 0, 0)";
-            let newR = click.r-3;
-            if (newR > 0) {
-                click.divMid.style.width = `${newR*2}px`;
-                click.divMid.style.height = `${newR*2}px`;
-                click.divMid.style.border = `2px solid ${click.colorRight}`;
-
-                click.divMid.style.transform = "translate(-50%, -50%)";
-                click.divMid.style.top = `${click.y}px`;
-                click.divMid.style.left = `${click.x}px`;
+            // button content
+            const splitInfo = this.content.split(" ");
+            
+            if (this.content.includes("img")) {
+                ctx.drawImage(document.getElementById(splitInfo[0]), this.x+2, this.y+2, this.w-4, this.h-4);
             }
+            else if (this.content.includes("px")) {
+                ctx.fillStyle = "white";
+                ctx.font = `${splitInfo[1]} Outfit`;
+                ctx.textAlign = "center";
+
+                ctx.strokeStyle = currentLevel.terrain === "grassy" ? "rgb(0, 255, 255)" : "black";
+                ctx.lineWidth = 2;
+                ctx.strokeText(splitInfo[0], this.x + this.w*0.5, this.y + this.h*0.75);
+
+                ctx.fillText(splitInfo[0], this.x + this.w*0.5, this.y + this.h*0.75);         
+            }
+
+            // overlay for mouse hovers
+            ctx.fillStyle = this.mouseOver ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0)";
+            ctx.strokeStyle = this.mouseOver ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0)";
+            ctx.lineWidth = 4;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.strokeRect(this.x, this.y, this.w, this.h);
         }
-
-        // changes clicks radius and alpha value to animate it
-        click.r += click.addR;
-        click.av -= click.subAv;
-    })
-
-    requestAnimationFrame(draw);
+    }
 }
 
-draw();
+class Key {
+    // Key: A collectible item used to unlock player skins
+
+    /**
+    * @param {number} x - The key's x coordinate
+    * @param {number} y - The key's y coordinate
+    * @param {number} w - The key's width
+    * @param {number} h - The key's height
+    * @param {string} img - The key's image src
+    * @param {number} level - The level number in which the key is located
+    * @param {string} unlock - What the key gives the player 
+    */
+    constructor(x, y, w, h, img, level, unlock) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.img = img;
+        this.level = level;
+        this.unlock = unlock;
+        this.obtained = false;
+    }
+
+    obtain() {
+        // Key.obtain(): creates the collisions for the key and gives the player the key if they fulfill those collisions
+        
+        const obtainKey = (
+            player.x > this.x && player.x < this.x + this.w &&
+            player.y > this.y && player.y < this.y + this.h
+        )
+        
+        if (obtainKey && !this.obtained) {
+            this.obtained = true;
+            player.keys.push(this);
+        }
+    }
+
+    draw() {
+        // Key.draw(): uses the keys `img` and `level` properties to draw it 
+
+        if (currentLvlNum === this.level) {
+            ctx.drawImage(document.getElementById(this.img), this.x, this.y, this.w, this.h);
+        }
+    }
+}
+
+class Obstacle {
+    // Block: A template class for classes involved in level creation
+
+    /**
+    * @param {number} x - The obstacles's x coordinate
+    * @param {number} y - The obstacles's y coordinate
+    * @param {string} variant - The specific design/type of the obstacle
+    * @param {integer} rotation - How much the obstacle is rotated in radians
+    * @param {string} color - The obstacles's fillStyle/strokeStyle
+    */
+    
+    constructor(x, y, variant, rotation, color) {
+        this.x = x;
+        this.y = y;
+        this.variant = variant;
+        this.rotation = rotation;
+        this.color = color;
+    }
+
+    draw() {
+        // Obstacle.draw(): A template method for inheritance, classes which inherit it would use JS canvas to draw their design
+    }
+
+    checkCollisions() {
+        // Obstacle.checkCollisions(): A template method for inheritance, classes which inherit it would run multiple checks to detect player collisions
+    }
+}
+
+class Block extends Obstacle {
+    // Block: A harmless rectangle that has its own collision properties
+
+    /**
+    * @param {number} w - The block's width
+    * @param {number} h - The block's height
+    * @param {boolean} collisions - Determines if the block has collision properties
+    */
+    constructor(x, y, w, h, variant, rotation = 0, collisions = true, color = "gray") {
+        super(x, y, variant, rotation, color);
+        this.w = w;
+        this.h = h;
+        this.collisions = collisions;
+        this.type = "block";
+        this.playerGrounded = false;
+    }
+
+    draw() {
+        // Block.draw(): draws the block
+        ctx.fillStyle = this.color;
+
+        ctx.save();
+        ctx.translate(this.x+this.w/2, this.y+this.h/2);
+        ctx.rotate(this.rotation);
+        
+        if (this.variant === "normal" || this.variant === "phase") ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+
+        if (this.variant === "tallGrass") ctx.drawImage(document.getElementById("tall-grass-platform"), -this.w/2, -this.h/2, this.w, this.h);
+
+        if (this.variant === "shortGrass") ctx.drawImage(document.getElementById("short-grass-platform"), -this.w/2, -this.h/2, this.w, this.h);
+
+        if (this.variant === "cloud") {
+            ctx.drawImage(document.getElementById("cloud-platform"), -this.w/2-this.w*0.1, -this.h/2-this.h*0.1, this.w*1.2, this.h*1.2);
+            ctx.drawImage(document.getElementById("cloud-platform-fluff"), -this.w/2-this.w*0.075, -this.h/2-this.h*0.075, this.w*1.15, this.h*1.15);
+        }
+
+        if (this.variant === "horiz-rock") {
+            ctx.drawImage(document.getElementById("horiz-rock-platform"), -this.w/2, -this.h/2, this.w, this.h);
+        }
+        if (this.variant === "vert-rock") {
+            ctx.drawImage(document.getElementById("vert-rock-platform"), -this.w/2, -this.h/2, this.w, this.h);
+        }
+
+        ctx.restore();
+    }
+
+    checkCollisions() {
+        // Block.checkCollisions(): checks if the player is colliding with the block by comparing coordinates
+        const fallingUpIntoBlock = (
+            player.y - player.r > this.y + this.h + gravity && player.y - player.r + gravity*0.4 < this.y + this.h &&
+            player.x + player.r > this.x + player.speed && player.x - player.r < this.x + this.w - player.speed
+        );
+
+        const fallingDownIntoBlock = (
+            player.y + player.r + gravity*0.4 > this.y && player.y + player.r < this.y + gravity &&
+            player.x + player.r > this.x + player.speed && player.x - player.r < this.x + this.w - player.speed
+        );
+
+        const movingRightIntoBlock = (
+            player.x + player.r > this.x - player.speed*0.3 && player.x + player.r < this.x + player.speed &&
+            player.y + player.r > this.y && player.y - player.r < this.y + this.h
+        );
+
+        const movingLeftIntoBlock = (
+            player.x - player.r > this.x + this.w - player.speed && player.x - player.r < this.x + this.w + player.speed*0.3 &&
+            player.y + player.r > this.y && player.y - player.r < this.y + this.h
+        );
+
+        // checks if the conditions are right to allow the player to phase through the block
+        const notPhasing = this.variant === "phase" && !player.phasing;
+
+        if ((this.variant !== "phase" || notPhasing) && this.collisions) {
+            this.playerGrounded = fallingUpIntoBlock || fallingDownIntoBlock;
+    
+            if (fallingUpIntoBlock) player.y = this.y + this.h + player.r - gravity*0.2;
+            if (fallingDownIntoBlock) player.y = this.y - player.r - gravity*0.2;
+    
+            if (movingRightIntoBlock) player.x = this.x - player.r - player.speed*0.31;
+            if (movingLeftIntoBlock) player.x = this.x + this.w + player.r + player.speed*0.31;
+        }
+    }
+}
+
+class Spike extends Obstacle {
+    // Block: A harmless rectangle that has its own collision properties
+
+    /**
+    * @param {string} size - The spikes overall height and width
+    */
+    constructor(x, y, size, variant, rotation = 0, color = "gray") {
+        super(x, y, variant, rotation, color);
+        this.size = size;
+        this.type = "spike";
+    }
+
+    draw() {
+        // Spike.draw(): draws the spike
+        ctx.fillStyle = this.color;
+
+        ctx.save();
+        ctx.translate(this.x+this.size/2, this.y+this.size/2);
+        ctx.rotate(this.rotation);
+        
+        ctx.beginPath();
+        
+        if (this.variant.toLowerCase().includes("normal")) {
+            ctx.moveTo(0, -this.size/2);
+            ctx.lineTo(this.size/2, this.size/2);
+            ctx.lineTo(-this.size/2, this.size/2);
+        }
+        if (this.variant.toLowerCase().includes("wide")) {
+            ctx.moveTo(0, -this.size/4);
+            ctx.lineTo(this.size/2, this.size/4);
+            ctx.lineTo(-this.size/2, this.size/4);
+        }
+
+        ctx.fill();
+
+        // spike hitbox visualization
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 0.5;
+        if (this.variant.toLowerCase().includes("normal")) {
+            // ctx.strokeRect(-this.size/2 + this.size*0.325, -this.size/2, this.size*0.35, this.size);
+        }
+        if (this.variant.toLowerCase().includes("wide")) {
+            // ctx.strokeRect(-this.size/2 + this.size*0.325, -this.size/4, this.size*0.35, this.size/2);
+        }
+        
+        ctx.restore();
+    }
+
+    checkCollisions() {
+        // Spike.checkCollisions(): checks if the player is colliding with the spike, spikes have a rectangular hitbox
+        let playerHitSpike;
+        if (this.variant === "normal" || this.variant === "phaseNormal")  {
+            playerHitSpike = (
+                player.x+player.r > this.x+this.size*0.325 && player.x - player.r < this.x+this.size*0.325+this.size*0.35 &&
+                player.y+player.r > this.y && player.y-player.r < this.y+this.size
+            );
+        }
+        if (this.variant === "wide" || this.variant === "phaseWide")  {
+            playerHitSpike = (
+                player.x+player.r > this.x+this.size*0.325 && player.x - player.r < this.x+this.size*0.325+this.size*0.35 &&
+                player.y+player.r > this.y+this.size/4 && player.y-player.r < this.y+this.size*0.75
+            );
+        }
+        
+        const notPhasing = this.variant.includes("phase") && !player.phasing;
+
+        if (!this.variant.includes("phase") || notPhasing) {
+            if (playerHitSpike) respawnPlayer();
+        }
+    }
+}
+
+class Text extends Obstacle {
+    // Text: A string of text to display information
+
+    /**
+    * @param {string} content - The words in the text
+    * @param {number} size - The text's size (in px)
+    * @param {string} align - Where to align the text (left, centre, or right)
+    */
+    constructor(x, y, size, content, align, variant = "fill", rotation = 0, color = "gray") {
+        super(x, y, variant, rotation, color);
+        this.size = size;
+        this.content = content;
+        this.align = align;
+        this.type = "text";
+    }
+
+    draw() {
+        // Text.draw(): draws the text using the object's parameters
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = this.color;
+        ctx.font = `${this.size}px Outfit`;
+        ctx.textAlign = this.align;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        
+        if (this.variant === "fill") ctx.fillText(this.content, 0, 0);
+        else {
+            ctx.lineWidth = this.variant;
+            ctx.strokeText(this.content, 0, 0);
+        }
+        
+        ctx.restore();
+    }
+}
+
+class Level {
+    // Level: A singular stage with its own unique obstacles
+
+    /**
+    * @param {number} number - The level's id
+    * @param {string} terrain - The level's overall design
+    * @param {Array} obstacles - An array of all of the obstacles in the level
+    * @param {Array} portalCoord - The portal's coordinates
+    * @param {Array} playerSpawn - The player's spawnpoint
+    */
+    constructor(number, terrain, obstacles, portalCoord, playerSpawn = []) {
+        this.number = number;
+        this.terrain = terrain;
+        this.obstacles = obstacles;
+        this.portalCoord = portalCoord;
+        this.playerSpawn = playerSpawn;
+    }
+
+    addBlock(x, y, w, h, variant = "normal", rotation = 0, collisions = true, color = "gray") {
+        // Level.addBlock(): pushes a block object into the level's obstacles array
+        this.obstacles.push(new Block(x, y, w, h, variant, rotation, collisions, color));
+    }
+    
+    addSpike(x, y, size, variant = "normal", rotation = 0, color = "gray") {
+        // Level.addSpike(): pushes a spike object into the level's obstacles array
+        this.obstacles.push(new Spike(x, y, size, variant, rotation, color));
+    }
+
+    addText(x, y, size, content, align, variant = "fill", rotation = 0, color = "gray") {
+        // Level.addText(): pushes a text object into the level's obstacles array
+        this.obstacles.push(new Text(x, y, size, content, align, variant, rotation, color));
+    }
+}
+
+// define every level, button, and key manually
+setUpLevels();
+setUpButtons();
+setUpKeys();
+
+
+// Inputs //
+document.addEventListener("keydown", keydownHandler);
+document.addEventListener("keyup", keyupHandler);
+
+document.addEventListener("mousemove", mouseMoveHandler);
+document.addEventListener("click", clickHandler);
+
+// Draw Function //
+function draw() {
+    // draw(): the main function which is repeated to call other process and draw functions
+    
+    now = Date.now();
+    
+    // canvas reset
+    ctx.clearRect(0, 0, cnv.width, cnv.height);
+    
+
+    // backdrop
+    const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
+
+    if (currentLevel.terrain === "grassy") {
+        ctx.drawImage(document.getElementById("sky-backdrop"), 0, 0, cnv.width, cnv.height);
+    }
+    else if (currentLevel.terrain === "rocky") {
+        ctx.drawImage(document.getElementById("cave-backdrop"), 0, 0, cnv.width, cnv.height);
+    }
+    
+    
+    playerMovement(); // used for rotating the titlescreen ball and drawing the player in the levels
+    
+    if (gameState !== "levels") drawTitleScreen();
+    else if (gameState === "levels") {
+        // gravity
+        imposeNaturalGravity(borderHeight);
+
+        
+        // map restrictions
+        if (player.x - player.r < -70) player.x = cnv.width + 70 - player.r;
+        if (player.x + player.r > cnv.width + 70) player.x = -70 + player.r;
+
+        
+        // portal mechanics, levels, and obstacles
+        imposePortalGravity();
+        
+        if (player.enteringPortal && now - portal.timeSinceEntered > 2500) proceedToNextLevel(); // waits for 2.5s before moving on
+
+        checkObstacleCollisions();
+        
+        
+        // content visuals
+        drawPortal();
+        drawPlayer();
+        drawObstacles();
+    }
+    
+    // bottom bar
+    if (currentLevel.terrain === "grassy") {
+        ctx.drawImage(document.getElementById("grass-bar"), 0, cnv.height - borderHeight, cnv.width, borderHeight);
+        ctx.drawImage(document.getElementById("grass-blades"), 0, cnv.height - borderHeight - 9, cnv.width, 20);
+    }
+    else if (currentLevel.terrain === "rocky") {
+        ctx.fillStyle = "rgb(60, 61, 64)";
+        ctx.fillRect(0, cnv.height-borderHeight, cnv.width, borderHeight);
+        // ctx.drawImage(document.getElementById("cave-bar"), 0, cnv.height - borderHeight, cnv.width, borderHeight);
+    }
+    
+    // top bar
+    if (currentLevel.terrain === "grassy") {
+        ctx.drawImage(document.getElementById("cloud-fluff"), 0, borderHeight-0.5, cnv.width, 10);
+        ctx.drawImage(document.getElementById("cloud-bar"), 0, 0, cnv.width, borderHeight);
+    }
+    else if (currentLevel.terrain === "rocky") {
+        ctx.fillStyle = "rgb(60, 61, 64)";
+        ctx.fillRect(0, 0, cnv.width, borderHeight);
+        // ctx.drawImage(document.getElementById("cave-bar"), 0, 0, cnv.width, borderHeight);
+    }
+    
+    drawButtons();
+    drawKeys();
+    
+    playMusic();
+    animateArtistPopUp();
+    
+    drawCursor();
+}
+
+
+// Framerate related variables
+let lastTime = window.performance.now();
+const fps = 80;
+const msPerFrame = 1000 / fps;
+
+function update() {
+    // update(): Caps fps so the game speed doesn't increase with higher performance devices
+    
+    // calculate delta time
+    const currentTime = window.performance.now();
+    const timePassed = currentTime - lastTime;
+    
+    // only draw after enough time has passed since the last frame
+    if (timePassed > msPerFrame) {
+        draw();
+        lastTime = currentTime;
+    }
+
+    // repeat the function
+    requestAnimationFrame(update);
+}
+
+requestAnimationFrame(update);
