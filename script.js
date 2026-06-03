@@ -1,7 +1,7 @@
 /// SCRIPT.JS ANTI GRAVITY ///
 
 // Canvas Setup //
-const cnv = document.getElementById("game-canvas");
+const cnv = document.getElementById("game");
 const ctx = cnv.getContext("2d");
 let gameState = "titleScreen";
 let interaction = false;
