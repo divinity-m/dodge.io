@@ -1,1051 +1,1840 @@
-/// FUNCTIONS.JS ANTI GRAVITY ///
-
-//* Handlers *//
-
-function keydownHandler(e) {
-    // keydownHandler(): handles the keyboard inputs for the "keydown" event listener
-
-    const key = e.code;
-
-    if (key === "KeyW" || key === "ArrowUp") {
-        wPressed = true;
-        if (gameState !== "titleScreen") swapGravity();
-    }
-    if (key === "KeyS" || key === "ArrowDown") {
-        sPressed = true;
-        if (gameState !== "titleScreen") player.phase();
-    }
-    if (key === "KeyA" || key === "ArrowLeft") aPressed = true;
-    if (key === "KeyD" || key === "ArrowRight") dPressed = true;
-}
-
-function keyupHandler(e) {
-    // keyupHandler(): handles the keyboard inputs for the "keyup" event listener
-    
-    const key = e.code;
-    
-    if (key === "KeyW" || key === "ArrowUp") wPressed = false;
-    if (key === "KeyS" || key === "ArrowDown") sPressed = false;
-    if (key === "KeyA" || key === "ArrowLeft") aPressed = false;
-    if (key === "KeyD" || key === "ArrowRight") dPressed = false;
-}
-
-function mouseMoveHandler(e) {
-    // mouseMoveHandler(): checks where the cursor is hovering over and updates mouseX & mouseY
-
-    const rect = cnv.getBoundingClientRect();
-
-    // scales the cursor coordinates to the canvas dimensions
-    const scaleX = cnv.width / rect.width;
-    const scaleY = cnv.height / rect.height;
-
-    // rect.left and rect.top are both 0, so subtracting them is kinda redundant, but there may be edge cases that I might miss if I remove them from this equation
-    mouseX = (e.clientX - rect.left) * scaleX;
-    mouseY = (e.clientY - rect.top) * scaleY;
-}
-
-function clickHandler(e) {
-    // clickHandler(): checks if the user clicks any buttons
-    
-    if (interaction === false) {
-        // `interaction === false` is not redundant. interaction specifically needs to be `false`... i think
-        
-        interaction = true;
-        songText.reset();
-        songText.active = true;
-    }
-
-    for (let i in buttons) {
-        let btn = buttons[i];
-        if (btn.mouseOver) btn.event();
+// DODGE.IO - FUNCTIONS.JS
+function loadingScreen(validInput) {
+    if (validInput || endLoading) {
+        if (now - loadingGame >= 1000 && gameState == "loading") {
+            endLoading = true;
+            return true;
+        }
+        else if (now - loadingGame <= 5000 && gameState == "loading") return true;
     }
 }
 
-
-//* Processes (Continuous) *//
-
-function playerMovement() {
-    // playerMovement(): checks if certain buttons are pressed to move the player
-    
-    const canMove = gameState === "levels" && !player.enteringPortal;
-    player.spinSpeed = gameState === "levels" ? Math.PI/16 : Math.PI/128;
-    
-    if (aPressed) {
-        if (canMove) player.x -= player.speed;
-
-        player.rotation -= player.spinSpeed;
-    }
-    if (dPressed) {
-        if (canMove) player.x += player.speed;
-        
-        player.rotation += player.spinSpeed;
-    }
-    
-    
-    // update the player's angle when the player is moving
-    let [dx, dy] = [0, 0];
-    const isFalling = isMidAir && !player.enteringPortal && !onObstacle;
-
-    if (aPressed) dx -= player.speed;
-    if (dPressed) dx += player.speed;
-    if (isFalling) dy += gravity;
-    
-    if (!player.enteringPortal) {
-        player.facingAngle = Math.atan2(dy, dx);
+function maxOut() {
+    for (let level in highscore) {
+        highscore[level] = 100;
     }
 }
 
-function resetGravity() {
-    // resetGravity(): returns gravity and dGravity to it's base values
-    
-    if (!player.phasing) {
-        gravity = fallingDirection === "down" ? 3 : -3;
-        dGravity = fallingDirection === "down" ? 0.25 : -0.25;
-    } else {
-        gravity = fallingDirection === "down" ? 9 : -9;
-        dGravity = fallingDirection === "down" ? 0.75 : -0.75;
+// KEYBAORD AND MOUSE EVENTS (player inputs)
+function recordKeyDown(event) {
+    // stops the page from scrolling when arrow keys are pressed
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(event.code) > -1) {
+        event.preventDefault();
     }
-}
-
-function swapGravity() {
-    // swapGravity(): determines the falling direciton and changes the values of gravity and dGravity acoordingly
+    if (loadingScreen(false)) return;
     
-    if (!isMidAir || onObstacle) {
-        fallingDirection = (fallingDirection === "down") ? "up" : "down";
-        resetGravity();
-    }
-}
+    // Keyboard Inputs (WASD & Shift)
+    if (event.code === "KeyW" || event.code === "ArrowUp") wPressed = true;
+    if (event.code === "KeyA" || event.code === "ArrowLeft") aPressed = true;
+    if (event.code === "KeyS" || event.code === "ArrowDown") sPressed = true;
+    if (event.code === "KeyD" || event.code === "ArrowRight") dPressed = true;
+    if (event.code === "ShiftLeft" || event.code === "ShiftRight") shiftPressed = 0.7;
+    if (wPressed || aPressed || sPressed || dPressed) keyboardMovementOn = true;
 
-function imposeNaturalGravity(borderHeight) {
-    // imposeNaturalGravity(): checks if the player is falling to apply the gravity mechanic
-
-    // checks if the player is not mounted on the bottom or top bar
-    const midAirDown = player.y + player.r + gravity < cnv.height-borderHeight;
-    const midAirUp = player.y - player.r + gravity > borderHeight;
-
-    isMidAir = fallingDirection === "down" ? midAirDown : midAirUp;
-
-    
-    // checks if the player is mounted on a block by checking if any existing obstacle has a true `playerGrounded` property
-    const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
-    
-    onObstacle = currentLevel.obstacles.find((block) => block.playerGrounded);
-    if (onObstacle) resetGravity();
-    player.checkPhase();
-
-    
-    // imposes gravity based on the direction the player is falling (if the player isn't influenced by something else)
-    if (isMidAir && !player.enteringPortal && !onObstacle) {
-        if (fallingDirection === "down") gravity = Math.min(gravity + dGravity, 10);
-        else gravity = Math.max(gravity + dGravity, -10);
-
-        player.y += gravity;
-    }
-
-    
-    // prevents the player from falling through the top and bottom bars 
-    const notInfluenced = !isMidAir && !player.enteringPortal && !onObstacle;
-
-    if (fallingDirection === "down" && notInfluenced) player.y = cnv.height-borderHeight - player.r;
-    if (fallingDirection === "up" && notInfluenced) player.y = borderHeight + player.r;
-}
-
-function imposePortalGravity() {
-    // imposePortalGravity(): imposes the portals 'pull' effect on the player when they get close enough
-
-    // calculate the distance of the player from the portal
-    const portalDx = portal.x - player.x;
-    const portalDy = portal.y - player.y;
-    const portalDist = Math.hypot(portalDx, portalDy);
-    
-    const portalRange = portal.r + 45;
-
-    // a visual of the portals range for testing
-    // ctx.strokeStyle = "blue"
-    // drawCircle(portal.x, portal.y, portalRange, 2);
-    
-    if (portalDist < portalRange) {
-        player.enteringPortal = true;
-        player.spinSpeed = Math.PI/32;
-
-        // prevent accelertion due to gravity and activate the players phase state
-        resetGravity(); 
-        player.checkPhase();
-
-        // the angle from the player to the portal
-        const angleToPortal = Math.atan2(portalDy, portalDx);
-
-        // gets the angular difference then normalizes it
-        let dAngle = angleToPortal - player.facingAngle;
-        dAngle = Math.atan2(Math.sin(dAngle), Math.cos(dAngle));
-
-        // get a turn speed proportional to the distance from the player to the portal
-        const turnSpeed = 0.085;
-
-        // add either the dAngle or the turnSpeed to the players angle
-        player.facingAngle += Math.sign(dAngle) * Math.min(Math.abs(dAngle), turnSpeed);
-        
-        const clampSpeed = Math.max(portalDist / portalRange, 0.1);
-
-        // move the player in the direciton of the angle
-        player.x += Math.cos(player.facingAngle) * player.speed * clampSpeed;
-        player.y += Math.sin(player.facingAngle) * player.speed * clampSpeed;
-    }
-    else {
-        player.enteringPortal = false;
-        player.spinSpeed = Math.PI/16;
-
-        // constantly reset so the script can track when the player enters the portal
-        portal.timeSinceEntered = now;
-    }
-}
-
-function proceedToNextLevel() {
-    // proceedToNextLevel(): finds the next level based off `currentLvlNum` then adjusts the player's & the portal's coordinates...
-    // ...based off the levels properties
-    
-    portal.timeSinceEntered = now;
-    
-    // increment the currentLvlNum
-    currentLvlNum++;
-    const nextLevel = allLevels.find((level) => level.number === currentLvlNum);
-
-    // set the portal coordinates
-    portal.x = nextLevel.portalCoord[0];
-    portal.y = nextLevel.portalCoord[1];
-
-    // only set the player coordinates if they exist, otherwise, make the spawn point where the player started the level
-    if (nextLevel.playerSpawn.length > 0) {
-        player.x = nextLevel.playerSpawn[0];
-        player.y = nextLevel.playerSpawn[1];
-    }
-    else {
-        nextLevel.playerSpawn = [player.x, player.y];
-    }
-
-    // force the player to fall back down
-    fallingDirection = "down";
-    resetGravity();
-    player.phasing = false;
-}
-
-function warpToLevel(levelNum, spawn) {
-    // warpToLevel(): sets the spawn of a level, then relocates to that level
-    // used primarily for testing
-    
-    gameState = "levels";
-
-    // adjust the level's spawn
-    const level = allLevels.find((level) => level.number === levelNum);
-    level.playerSpawn = spawn;
-
-    // Relocate to the next level by adjusting `currentLvlNum` then incrementing it with proceedToNextLevel()
-    currentLvlNum = levelNum-1;
-    proceedToNextLevel();
-}
-
-function checkObstacleCollisions() {
-    // drawObstacles(): loops through the current level's obstacles to check their collisions
-    
-    const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
-    
-    for (let i in currentLevel.obstacles) {
-        currentLevel.obstacles[i].checkCollisions();
-    }
-}
-
-function respawnPlayer() {
-    // respawnPlayer(): resets the players coordinates to the start of the level
-    
-    const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
-    
-    player.x = currentLevel.playerSpawn[0];
-    player.y = currentLevel.playerSpawn[1];
-    player.phasing = false;
-
-    fallingDirection = "down";
-    resetGravity();
-}
-
-
-function playMusic() {
-    // playMusic(): plays a song based off the current level's terrain
-
-    // ends the function if there hasn't been any user interaction
-    if (!interaction) return;
-
-    
-    // determine the type of terrain
-    const terrainIsGrassy = currentLvlNum < 6 || currentLvlNum === 9;
-
-    // determine what type of terrain the last song was playing in
-    const grassLevelSongWasPlaying = lastPlayingAudioEl?.id === "a-new-start" || lastPlayingAudioEl?.id === "8-bit-christmas";
-    const caveLevelSongWasPlaying = lastPlayingAudioEl?.id === "left-in-desire" || lastPlayingAudioEl?.id === "done-with-pain";
-
-    // determine if the terrain has changed
-    const terrainChange = (caveLevelSongWasPlaying && terrainIsGrassy) || (grassLevelSongWasPlaying && !terrainIsGrassy);
-
-    // get every audio element
-    const audioElements = Array.from(document.querySelectorAll("audio"));
-
-    // find an element thats not paused
-    const songIsCurrentlyPlaying = audioElements.find((audio) => !audio.paused);
-
-
-    // for there to be a song change, the level terrain must change or every song must be paused
-    if (terrainChange || !songIsCurrentlyPlaying) {
-        // get the audio elements
-        const aNewStart = document.getElementById("a-new-start");
-        const leftInDesire = document.getElementById("left-in-desire");
-        const eightBC = document.getElementById("8-bit-christmas");
-        const doneWithPain = document.getElementById("done-with-pain");
-
-        let nextSong;
-
-        // choose songs based on the terrain of the current level / background level
-        if (terrainIsGrassy) {
+    // Ability controls
+    if ((event.code === "KeyQ" || event.code === "KeyJ") && gameState !== "endlessOver") {
+        if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
             
-            // choose a random song if the last song was a cave-type song or undefined (page just loaded)
-            if (caveLevelSongWasPlaying || lastPlayingAudioEl === "none") {
-                const rand = Math.random();
-                nextSong = rand > 0.5 ? aNewStart : eightBC;
+        if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
+            shockwave.activated = true;
+            shockwave.facingAngle = player.facingAngle;
+            
+            shockwave.x = player.x;
+            shockwave.y = player.y;
+            shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
+            shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
+            
+            shockwave.used = shockwave.active;
+            if (shockwave.used === "Shockwave") { shockwave.cd = 7500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
+            else if (shockwave.used === "Shockray") { shockwave.cd = 4500; shockwave.effect = 0.5; }
+        }
+
+        if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
+            eventHorizon.activated = true;
+            eventHorizon.lastUsed = Date.now();
+            eventHorizon.av = 0;
+            eventHorizon.accretionDisk = createAccretionDisk();
+        }
+    } else if ((event.code === "KeyE" || event.code === "KeyK") && gameState !== "endlessOver") {
+        if (player.dodger === "jötunn" && absoluteZero.usable) {
+            absoluteZero.usable = false;
+            absoluteZero.lastEnded = Date.now();
+            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
+            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
+            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
+        }
+        
+        if (player.dodger === "jolt") {
+            if (shockwave.active === "Shockwave") shockwave.active = "Shockray";
+            else shockwave.active = "Shockwave";
+        }
+    }
+}
+
+function recordKeyUp(event) {
+    if (loadingScreen(false)) return;
+    if (event.code === "KeyW" || event.code === "ArrowUp") wPressed = false;
+    if (event.code === "KeyA" || event.code === "ArrowLeft") aPressed = false;
+    if (event.code === "KeyS" || event.code === "ArrowDown") sPressed = false;
+    if (event.code === "KeyD" || event.code === "ArrowRight") dPressed = false;
+    if (event.code === "ShiftLeft" || event.code === "ShiftRight") shiftPressed = 1;
+    if (!wPressed && !aPressed && !sPressed && !dPressed) keyboardMovementOn = false;
+}
+
+function recordRightClick() {
+    lastPressing = "mouse";
+    if (loadingScreen(true)) return;
+    
+    // Ability Activations
+    if (gameState !== "endlessOver") {
+        if (player.dodger === "j-sab" && dash.usable && !dash.activated) dash.activated = true;
+        
+        if (player.dodger === "jolt" && shockwave.usable && !shockwave.activated) {
+            shockwave.activated = true;
+            shockwave.facingAngle = player.facingAngle;
+            shockwave.x = player.x;
+            shockwave.y = player.y;
+            shockwave.movex = Math.cos(shockwave.facingAngle) * 7;
+            shockwave.movey = Math.sin(shockwave.facingAngle) * 7;
+            shockwave.used = shockwave.active;
+            if (shockwave.used === "Shockwave") { shockwave.cd = 7500; shockwave.effect = 0.75; shockwave.lastEnded = 0; }
+            else if (shockwave.used === "Shockray") { shockwave.cd = 4500; shockwave.effect = 0.5; }
+        }
+
+        if (player.dodger === "quasar" && eventHorizon.usable && !eventHorizon.activated) {
+            eventHorizon.activated = true;
+            eventHorizon.lastUsed = Date.now();
+            eventHorizon.av = 0;
+            eventHorizon.accretionDisk = createAccretionDisk();
+        }
+    }
+}
+
+function recordMiddleClick() {
+    lastPressing = "mouse";
+    if (loadingScreen(true)) return;
+    
+    if (gameState !== "endlessOver") {
+        if (player.dodger === "jötunn" && absoluteZero.usable) {
+            absoluteZero.usable = false;
+            absoluteZero.lastEnded = Date.now();
+            if (absoluteZero.passive === "Absolute Zero") absoluteZero.passive = "Glaciation"
+            else if (absoluteZero.passive === "Glaciation") absoluteZero.passive = "Stagnation";
+            else if (absoluteZero.passive === "Stagnation") absoluteZero.passive = "Absolute Zero";
+        }
+
+        if (player.dodger === "jolt") {
+            if (shockwave.active === "Shockwave") shockwave.active = "Shockray";
+            else shockwave.active = "Shockwave";
+        }
+    }
+}
+
+function recordLeftClick() {
+    lastPressing = "mouse";
+
+    const mouseInAbilityBtn = abilityOneBtn.contains(event.target) || abilityTwoBtn.contains(event.target);
+    
+    if (loadingScreen(true) || mouseInAbilityBtn) return;
+    
+    let previousMM = false;
+    
+    // Mouse Movement
+    if (!isMobile()) {
+        if (mouseMovementOn && !settings.disableMM) {
+            mouseMovementOn = false;
+            previousMM = true;
+        } else if (!mouseMovementOn && !settings.disableMM) {
+            mouseMovementOn = true;
+            previousMM = false;
+        }
+    }
+    // mobile MM stays on for normal screen taps
+    else {
+        if (!settings.disableMM) mouseMovementOn = true;
+        else mouseMovementOn = false;
+
+        previousMM = mouseMovementOn;
+    }
+    
+    // Start screen buttons
+    if (innerGameState === "mainMenu" && (mouseOver.play || mouseOver.selector)) {
+        if (mouseOver.play) innerGameState = "selectDifficulty";
+        else if (mouseOver.selector) innerGameState = "selectDodger";
+        
+        resetBgVars();
+        mouseMovementOn = previousMM;
+    }
+
+    // Links
+    else if ((mouseOver.evades || mouseOver.jsab) && !isMobile()) {
+        const evadesAnchor = document.getElementById("evades-link");
+        const jsabAnchor = document.getElementById("jsab-link");
+        
+        if (mouseOver.evades) evadesAnchor.click();
+        if (mouseOver.jsab) jsabAnchor.click();
+        
+        mouseMovementOn = previousMM;
+    }
+    
+    // Gear button
+    else if (innerGameState !== "settings" && mouseOver.settings) {
+        previousGameState = innerGameState;
+        innerGameState = "settings";
+        
+        resetBgVars();
+        mouseMovementOn = previousMM;
+    }
+        
+    // Buttons that redirect back to the start screen
+    else if (gameState === "endlessOver" && mouseOver.restart ||
+            innerGameState === "settings" && mouseOver.settings ||
+            innerGameState === "selectDodger" && mouseOver.selector ||
+            innerGameState === "selectDifficulty" && mouseOver.play) {
+        // Plays 'A New Start' when users are redirected back to the Main Menu from endless mode
+        if (gameState === "endlessOver") {
+            allEnemies = [];
+            dash.lastEnded = 0;
+            shockwave.reset();
+            amplify.reset();
+            eventHorizon.reset();
+            music = {var: aNewStart, name: "A New Start", artist: "Thygan Buch"};
+            music.var.currentTime = 0;
+            music.promise = music.var.play();
+        }
+        // Saves the users settings options when they exit the settings
+        if (innerGameState === "settings") {
+            userData.settings = settings;
+            if (now - clickEventSave > 500) {
+                localStorage.setItem('localDodgeData', JSON.stringify(userData));
+                clickEventSave = Date.now();
+            }
+            innerGameState = previousGameState;
+        }
+        else innerGameState = "mainMenu";
+        gameState = "startScreen";
+        resetBgVars();
+        mouseMovementOn = previousMM;
+    }
+
+    // Settings
+    else if (innerGameState === "settings") {
+        ["enemyOutBtn", "disableMMBtn", "musicSlider", "sfxSlider", "aZ_RangeBtn", "aZ_AvSlider", "customCursorBtn", "cursorTrailSlider"].forEach(setting => {
+            if (mouseOver?.[setting]) {
+                // Buttons
+                if (mouseOver?.enemyOutBtn) {
+                    if (settings.enemyOutlines) settings.enemyOutlines = false;
+                    else settings.enemyOutlines = true;
+                }
+                if (mouseOver?.disableMMBtn) {
+                    if (settings.disableMM) settings.disableMM = false;
+                    else { settings.disableMM = true; mouseMovementOn = false; }
+                }
+                if (mouseOver?.aZ_RangeBtn) {
+                    if (settings.aZ_Range) settings.aZ_Range = false;
+                    else settings.aZ_Range = true;
+                }
+                if (mouseOver?.customCursorBtn) {
+                    if (settings.customCursor) settings.customCursor = false;
+                    else settings.customCursor = true;
+                }
+                // Sliders
+                if (mouseOver?.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
+                if (mouseOver?.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
+                if (mouseOver?.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 555), 705);
+                if (mouseOver?.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
+    
+                // Saves the users settings options
+                userData.settings = settings;
+
+                if (now - clickEventSave > 500) {
+                    localStorage.setItem('localDodgeData', JSON.stringify(userData));
+                    clickEventSave = Date.now();
+                }
+    
+                if (!settings.disableMM) mouseMovementOn = previousMM;
+            }
+        })
+    }
+
+    // Hero Choice
+    else if (innerGameState === "selectDodger") {
+        if (!player.invincible && (mouseOver.evader || mouseOver.j_sab || mouseOver.jötunn || mouseOver.jolt || mouseOver.crescendo || mouseOver.quasar)) {
+            if (mouseOver.evader) {
+                player.dodger = "evader";
+                player.color = "rgb(255, 255, 255)";
+                player.subColor = "rgb(230, 230, 230)";
+                amplify.reset();
+            }
+            if (mouseOver.j_sab && highscore.andromeda === 100) {
+                player.dodger = "j-sab";
+                player.color = "rgb(255, 0, 0)";
+                player.subColor = "rgb(230, 0, 0)";
+                amplify.reset();
+            }
+            if (mouseOver.jötunn && highscore.limbo === 100) {
+                player.dodger = "jötunn";
+                player.color = "rgb(79, 203, 255)";
+                player.subColor = "rgb(70, 186, 235)";
+                amplify.reset();
+            }
+            if (mouseOver.jolt && highscore.medium >= 30) {
+                player.dodger = "jolt";
+                player.color = "rgb(255, 255, 0)";
+                player.subColor = "rgb(230, 230, 0)";
+                amplify.reset();
+            }
+            if (mouseOver.crescendo && highscore.hard >= 60) {
+                player.dodger = "crescendo";
+                player.color = "rgb(0, 0, 0)";
+                player.subColor = "rgb(40, 40, 40)";
+            }
+            if (mouseOver.quasar && highscore.euphoria === 100) {
+                player.dodger = "quasar";
+                player.color = "rgb(255, 165, 0)";
+                player.subColor = "rgb(230, 153, 11)";
+                amplify.reset();
             }
 
-            // if it is a grass level song, alternate between A New Start and 8 Bit Christmas
-            else if (lastPlayingAudioEl?.id === "a-new-start") nextSong = eightBC;
-            else nextSong = aNewStart;
+            [abilityOneBtn, abilityTwoBtn].forEach((abilityBtn) => {
+                colorAbilityButtons(abilityBtn);
+            })
+
+            // saves the players values to the local storage to keep track of the players dodger
+            userData.player = player;
+            if (now - clickEventSave > 500) {
+                localStorage.setItem('localDodgeData', JSON.stringify(userData));
+                clickEventSave = Date.now();
+            }
+            
+            mouseMovementOn = previousMM;
+        }
+    }
+        
+    // Difficulty Choice
+    else if (innerGameState === "selectDifficulty" && mouseOver) {
+        let locked = false;
+        if (mouseOver?.medium && highscore?.easy < 45) locked = true;
+        if (mouseOver?.hard && highscore?.medium < 45) locked = true;
+        if (mouseOver?.limbo && highscore?.easy < 30) locked = true;
+        if (mouseOver?.andromeda && highscore?.limbo < 75) locked = true;
+        if (mouseOver?.euphoria && highscore?.andromeda < 75) locked = true;
+
+        
+        ["easy", "medium", "hard"].forEach(level => {
+            if (mouseOver?.[level]) mouseMovementOn = previousMM;
+            if (mouseOver?.[level] && !locked) {
+                pauseAudio(music.promise, music.var);
+                
+                if (mouseOver?.easy) difficulty = {level: "easy", color: "rgb(0, 225, 255)"};
+                if (mouseOver?.medium) difficulty = {level: "medium", color: "rgb(255, 255, 0)"};
+                if (mouseOver?.hard) difficulty = {level: "hard", color: "rgb(0, 0, 0)"};
+                
+                music = {var: interstellar, name: "interstellar", artist: "pandora., chillwithme, & cødy",
+                         color: "rgb(105, 105, 105)", subColor: "rgb(115, 115, 115)",};
+                restartEndless();
+            }
+        });
+        ["limbo", "andromeda", "euphoria"].forEach(level => {
+            if (mouseOver?.[level]) mouseMovementOn = previousMM;
+            if (mouseOver?.[level] && !locked) {
+                pauseAudio(music.promise, music.var);
+                
+                if (mouseOver?.limbo) createLimbo();
+                if (mouseOver?.andromeda) createAndromeda();
+                if (mouseOver?.euphoria) createEuphoria();
+                
+                music.timestamps.sort((a, b) => a[0] - b[0]);
+                music.backUpTS = [...music.timestamps];
+                restartMusicMode();
+            }
+        })
+    }
+}
+
+function detectHover() {
+    mouseOver.play = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
+    mouseOver.selector = gameState === "startScreen" && (innerGameState === "mainMenu" || innerGameState === "selectDodger") && mouseX > 250 && mouseX < 550 && mouseY > 475 && mouseY < 575;
+    mouseOver.settings = gameState === "startScreen" && Math.hypot(770 - mouseX, 620 - mouseY) < 30;
+    mouseOver.restart = gameState === "endlessOver" && mouseX > 250 && mouseX < 550 && mouseY > 50 && mouseY < 150;
+    mouseOver.evades = gameState === "startScreen" && innerGameState === "mainMenu" && mouseX > 485 && mouseX < 570 && mouseY > 11 && mouseY < 28;
+    mouseOver.jsab = gameState === "startScreen" && innerGameState === "mainMenu" && mouseX > 612 && mouseX < 795 && mouseY > 11 && mouseY < 28;
+
+    const dodgerSelection = gameState === "startScreen" && innerGameState === "selectDodger";
+    mouseOver.evader = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 25 && mouseY < 125;
+    mouseOver.jolt = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 25 && mouseY < 125;
+    mouseOver.jötunn = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 25 && mouseY < 125;
+    mouseOver.crescendo = dodgerSelection && mouseX > 50 && mouseX < 250 && mouseY > 150 && mouseY < 250;
+    mouseOver.j_sab = dodgerSelection && mouseX > 300 && mouseX < 500 && mouseY > 150 && mouseY < 250;
+    mouseOver.quasar = dodgerSelection && mouseX > 550 && mouseX < 750 && mouseY > 150 && mouseY < 250;
+
+    const difficultySelection = gameState === "startScreen" && innerGameState === "selectDifficulty";
+    mouseOver.easy = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 250 && mouseY < 350;
+    mouseOver.medium = difficultySelection && mouseX > 300 && mouseX < 500 && mouseY > 250 && mouseY < 350;
+    mouseOver.hard = difficultySelection && mouseX > 550 && mouseX < 750 && mouseY > 250 && mouseY < 350;
+    mouseOver.limbo = difficultySelection && mouseX > 50 && mouseX < 250 && mouseY > 450 && mouseY < 550;
+    mouseOver.andromeda = difficultySelection && mouseX > 300 && mouseX < 500 && mouseY > 450 && mouseY < 550;
+    mouseOver.euphoria = difficultySelection && mouseX > 550 && mouseX < 750 && mouseY > 450 && mouseY < 550;
+
+    const settingsMenu = gameState === "startScreen" && innerGameState === "settings";
+    mouseOver.enemyOutBtn = settingsMenu && mouseX > 216 && mouseX < 236 && mouseY > 35 && mouseY < 55;
+    mouseOver.disableMMBtn = settingsMenu && mouseX > 318 && mouseX < 338 && mouseY > 85 && mouseY < 105;
+    mouseOver.musicSlider = settingsMenu && mouseX >= 555 && mouseX <= 725 && mouseY >= 30 && mouseY <= 60;
+    mouseOver.sfxSlider = settingsMenu && mouseX >= 542 && mouseX <= 712 && mouseY >= 80 && mouseY <= 110;
+    mouseOver.aZ_RangeBtn = settingsMenu && mouseX > 266 && mouseX < 286 && mouseY > 135 && mouseY < 155;
+    mouseOver.aZ_AvSlider = settingsMenu && mouseX >= 545 && mouseX <= 715 && mouseY >= 130 && mouseY <= 160;
+    mouseOver.customCursorBtn = settingsMenu && mouseX > 167 && mouseX < 187 && mouseY > 185 && mouseY < 205;
+    mouseOver.cursorTrailSlider = settingsMenu && mouseX >= 540 && mouseX <= 710 && mouseY >= 180 && mouseY <= 210;
+}
+
+// FUNCTIONS THAT DRAWS STUFF TO THE SCREEN
+function drawCircle(x = 0, y = 0, r = 12.5, type = "fill") {
+    ctx.beginPath();
+    ctx.arc(x, y, r, Math.PI * 2, 0);
+    if (type === "fill") ctx.fill();
+    else if (type === "stroke") ctx.stroke();
+}
+
+function decideFillStyle(bool, color1, color2) {
+    if (bool) ctx.fillStyle = color1;
+    else ctx.fillStyle = color2;
+}
+
+function createCursor() {
+    let rad;
+    if (isMobile()) rad = 7.5/2;
+    else rad = window.innerWidth * (7.5/1397);
+    let cursor = {
+        r: rad,
+        av: 1,
+        subR: rad/Math.max(1, 30*trailDensity),
+        subAv: 1/Math.max(1, 30*trailDensity),
+    }
+    cursor.x = cursorX;
+    cursor.y = cursorY;
+    
+    let playerColor = player.color.slice(4, player.color.length-1);
+    cursor.color = `rgba(${playerColor}, ${cursor.av})`;
+    
+    cursor.div = document.createElement("div");
+    cursor.div.classList.add("trail");
+    document.getElementById("cursor-trail").appendChild(cursor.div);
+                
+    return cursor;
+}
+
+function createClick(button) {
+    let rad;
+    if (isMobile()) rad = 12.5;
+    else rad = window.innerWidth * (25/1397);
+    let click = {
+        r: 0,
+        av: 1,
+        addR: rad/15, // add a 15th of whatever number i want it to reach
+        subAv: 1/15, // subtract a 15th of 1 until it reaches 0 (then deletes itself cuz its invisible)
+        button: button,
+    }
+    click.x = cursorX;
+    click.y = cursorY;
+    
+    let playerColor = player.color.slice(4, player.color.length-1);
+    let playerSubColor = player.subColor.slice(4, player.subColor.length-1);
+    click.colorLeft = `rgba(${playerColor}, ${click.av})`;
+    click.colorRight = `rgba(${playerSubColor}, ${click.av})`;
+
+    click.div = document.createElement("div");
+    click.div.classList.add("click");
+    document.getElementById("cursor-clicks").appendChild(click.div);
+    if (click.button === "middle") {
+        click.divMid = document.createElement("div");
+        click.divMid.classList.add("click");
+        document.getElementById("cursor-clicks").appendChild(click.divMid);
+    }
+    
+    return click;
+}
+
+function drawStartScreen() {
+    // Line across the screen
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgb(170, 170, 170)";
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(GAME_WIDTH, GAME_HEIGHT);
+    ctx.stroke();
+
+    // Main Menu Background Animation
+    ctx.fillStyle = "rgb(170, 170, 170)";
+    ctx.font = '150px Arial';
+    ctx.textAlign = 'center';
+
+    // top text
+    ctx.save();
+    ctx.rotate(Math.atan(GAME_HEIGHT/GAME_WIDTH));
+    ctx.fillText(bgTopText, bgTopX, 0);
+    ctx.restore();
+
+    // bottom text
+    ctx.save();
+    ctx.rotate(Math.atan(GAME_HEIGHT/GAME_WIDTH));
+    ctx.fillText(bgBottomText, bgBottomX, 103);
+    ctx.restore();
+
+    // Subtracs the current X from the destination, then divides that number by the destination and multiplies it by 100
+    let dBgTopX = 75 * Math.max(0.001, (bgTopMax - bgTopX) / bgTopMax);
+    let dBgBottomX = 75 * Math.min(-0.001, (bgBottomMax - bgBottomX) / bgBottomMax);
+    
+    if (bgTopX <= bgTopMax) bgTopX += dBgTopX;
+    if (bgBottomX >= bgBottomMax && bgTopX >= bgTopMax - 25) bgBottomX += dBgBottomX;
+
+    if (innerGameState === "mainMenu" || innerGameState === "selectDifficulty") {
+        // ME //
+        ctx.strokeStyle = player.color;
+        ctx.lineWidth = 1.5;
+        ctx.font = '30px Roboto';
+        ctx.textAlign = 'left';
+        ctx.strokeText("Vasto", 5, 30);
+        // ctx.drawImage(document.getElementById("instalogo"), 85, 5, 30, 30);
+
+        // CREDITS //
+        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.font = "bold 16px Verdana";
+        ctx.textAlign = "left";
+        if (isMobile()) {
+            ctx.textAlign = "right";
+            ctx.fillText("Inspired by Evades.io and Just Shapes & Beats", GAME_WIDTH-5, 25);
         }
         else {
+            ctx.fillText("Inspired by                 and", 378, 25);
+                
+            if (mouseOver?.evades) ctx.fillStyle = "#8ad3ff";
+            else ctx.fillStyle = "#6bc6ff";
+            ctx.fillText("Evades.io", 485, 25);
+    
+            if (mouseOver?.jsab) ctx.fillStyle = "#ff699f";
+            else ctx.fillStyle = "#ff2f7a";
+            ctx.textAlign = "right";
+            ctx.fillText("Just Shapes & Beats", GAME_WIDTH-5, 25);
+        }
+        
+        // PLAY BUTTON //
+        const playBtn = {
+            x: 250,
+            y: 50,
+            w: 300,
+            h: 100,
+        }
+        playBtn.xw = playBtn.x + playBtn.w;
+        playBtn.yh = playBtn.y + playBtn.h;
+        const playGrad = ctx.createLinearGradient(playBtn.x, playBtn.y, playBtn.xw, playBtn.yh);
+        const playGrad2 = ctx.createLinearGradient(playBtn.x, playBtn.yh, playBtn.xw, playBtn.y);
+        
+        if (mouseOver.play) {
+            playGrad.addColorStop(0, "rgb(0, 255, 0)");
+            playGrad.addColorStop(1, "rgb(255, 255, 255)");
 
-            // choose a random song if the last song was a grassy-type song or undefined
-            if (grassLevelSongWasPlaying || lastPlayingAudioEl === "none") {
-                const rand = Math.random();
-                nextSong = rand > 0.5 ? leftInDesire : doneWithPain;
+            playGrad2.addColorStop(0, "rgb(255, 255, 255)");
+            playGrad2.addColorStop(1, "rgb(0, 255, 0)");
+        } else {
+            playGrad.addColorStop(0, "rgb(255, 255, 255)");
+            playGrad.addColorStop(1, "rgb(0, 255, 0)");
+
+            playGrad2.addColorStop(0, "rgb(0, 255, 0)");
+            playGrad2.addColorStop(1, "rgb(255, 255, 255)");
+        }
+
+        ctx.fillStyle = playGrad;
+        ctx.fillRect(playBtn.x, playBtn.y, playBtn.w, playBtn.h);
+        
+        ctx.strokeStyle = playGrad2;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(playBtn.x, playBtn.y, playBtn.w, playBtn.h);
+        ctx.beginPath()
+        ctx.moveTo(playBtn.x, playBtn.yh)
+        ctx.lineTo(playBtn.xw, playBtn.y)
+        ctx.stroke()
+        
+        ctx.lineWidth = 1.5;
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        let greenBtnColors = ['lime', 'white'];
+
+        if (mouseOver.play) greenBtnColors = ['white', 'lime'];
+        else greenBtnColors = ['lime', 'white'];
+        
+        // swaps between 2 types of buttons for going in and out of the difficulty selection screen
+        if (innerGameState === "mainMenu") {
+            ctx.strokeStyle = greenBtnColors[0];
+            ctx.strokeText('Start', playBtn.x + 70, playBtn.y + 30);
+        
+            ctx.strokeStyle = greenBtnColors[1];
+            ctx.strokeText('Playing', playBtn.x + 220, playBtn.y + 85);
+        } else if (innerGameState === "selectDifficulty") {
+            ctx.strokeStyle = greenBtnColors[0];
+            ctx.strokeText('Back To', playBtn.x + 70, playBtn.y + 30);
+        
+            ctx.strokeStyle = greenBtnColors[1];
+            ctx.strokeText('Main Menu', playBtn.x + 220, playBtn.y + 85);
+        }
+    }
+    if (innerGameState === "mainMenu" || innerGameState === "selectDodger") {
+        // DODGER SLECTOR BUTTON //
+        const selectorBtn = {
+            x: 250,
+            y: 475,
+            w: 300,
+            h: 100,
+        }
+        selectorBtn.xw = selectorBtn.x + selectorBtn.w;
+        selectorBtn.yh = selectorBtn.y + selectorBtn.h;
+        const selectorGrad = ctx.createLinearGradient(selectorBtn.x, selectorBtn.y, selectorBtn.xw, selectorBtn.yh);
+        const selectorGrad2 = ctx.createLinearGradient(selectorBtn.x, selectorBtn.yh, selectorBtn.xw, selectorBtn.y);
+        
+        if (mouseOver.selector) {
+            selectorGrad.addColorStop(0, "rgb(114, 114, 114)");
+            selectorGrad.addColorStop(1, "rgb(255, 255, 255)");
+
+            selectorGrad2.addColorStop(0, "rgb(255, 255, 255)");
+            selectorGrad2.addColorStop(1, "rgb(114, 114, 114)");
+        } else {
+            selectorGrad.addColorStop(0, "rgb(255, 255, 255)");
+            selectorGrad.addColorStop(1, "rgb(114, 114, 114)");
+
+            selectorGrad2.addColorStop(0, "rgb(114, 114, 114)");
+            selectorGrad2.addColorStop(1, "rgb(255, 255, 255)");
+        }
+
+        ctx.fillStyle = selectorGrad;
+        ctx.fillRect(selectorBtn.x, selectorBtn.y, selectorBtn.w, selectorBtn.h);
+        
+        ctx.strokeStyle = selectorGrad2;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(selectorBtn.x, selectorBtn.y, selectorBtn.w, selectorBtn.h);
+        ctx.beginPath()
+        ctx.moveTo(selectorBtn.x, selectorBtn.yh)
+        ctx.lineTo(selectorBtn.xw, selectorBtn.y)
+        ctx.stroke()
+
+        ctx.lineWidth = 1.5;
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        let greyBtnColors = ['grey', 'white'];
+
+        if (mouseOver.selector) greyBtnColors = ['white', 'grey'];
+        else greyBtnColors = ['grey', 'white'];
+
+        // swaps between 2 types of buttons for going in and out of the dodger selection screen
+        if (innerGameState === "mainMenu") {
+            ctx.strokeStyle = greyBtnColors[0];
+            ctx.strokeText('Dodger', selectorBtn.x + 70, selectorBtn.y + 30);
+        
+            ctx.strokeStyle = greyBtnColors[1];
+            ctx.strokeText('Selection', selectorBtn.x + 220, selectorBtn.y + 85);
+        } else if (innerGameState === "selectDodger") {
+            ctx.strokeStyle = greyBtnColors[0];
+            ctx.strokeText('Back To', selectorBtn.x + 70, selectorBtn.y + 30);
+        
+            ctx.strokeStyle = greyBtnColors[1];
+            ctx.strokeText('Main Menu', selectorBtn.x + 220, selectorBtn.y + 85);
+        }
+    }
+}
+
+function drawSettings() {
+    const gear = { x: 750, y: 600, };
+    const distGear = Math.hypot(gear.x+20 - mouseX, gear.y+20 - mouseY); // (770, 620) is the center of the gear
+
+    settings.musicSliderX = Math.min(Math.max(settings.musicSliderX, 565), 715);
+    settings.sfxSliderX = Math.min(Math.max(settings.sfxSliderX, 552), 702);
+    settings.aZ_Av = Math.min(Math.max(settings.aZ_Av, 555), 705);
+    settings.cursorTrail = Math.min(Math.max(settings.cursorTrail, 550), 700);
+    
+    musicVolume = Math.max(Math.min((settings.musicSliderX - 565) / (715 - 565), 1), 0);
+    sfxVolume = Math.max(Math.min((settings.sfxSliderX - 552) / (702 - 552), 1), 0);
+    absoluteZero.av = Math.max(Math.min((settings.aZ_Av - 555) / (705 - 555), 1), 0)
+    trailDensity = Math.max(Math.min((settings.cursorTrail - 550) / (700 - 550), 1), 0);
+    music.var.volume = musicVolume;
+    sharpPop.volume = sfxVolume;
+
+    if (gameState === "startScreen" && innerGameState != "settings") ctx.drawImage(document.getElementById("gear-filled"), gear.x, gear.y, 40, 40);
+    else if (innerGameState === "settings") {
+        ctx.drawImage(document.getElementById("gear-unfilled"), gear.x, gear.y, 40, 40);
+        
+        ctx.textAlign = "left";
+        ctx.font = "bold 15px Arial";
+        
+        // Settings Title Texts
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.fillText("Show Enemy Outlines", 50, 50);
+        ctx.fillText("Disable Mouse Movement Activation", 50, 100);
+        ctx.fillText("Show Absolute Zero's Range", 50, 150);
+        ctx.fillText("Custom Cursor", 50, 200);
+        
+        ctx.fillText("Music Volume", 450, 50);
+        ctx.fillText("SFX Volume", 450, 100);
+        ctx.fillText("AZ's Opacity", 450, 150);
+        ctx.fillText("Cursor Trail", 450, 200);
+
+        function drawSettingsButton(x, y, bool) {
+            ctx.lineWidth = 2;
+            if (bool) {
+                ctx.fillStyle = "rgba(0, 220, 0, 0.8)";
+                ctx.strokeStyle = "rgba(0, 255, 0, 0.8)";
+                ctx.fillRect(x, y, 20, 20);
+                ctx.strokeRect(x, y, 20, 20);
             }
+            else {
+                ctx.fillStyle = "rgba(220, 0, 0, 0.8)";
+                ctx.strokeStyle = "rgba(255, 0, 0, 0.8)";
+                ctx.fillRect(x, y, 20, 20);
+                ctx.strokeRect(x, y, 20, 20);
+            }
+        }
+        
+        // Buttons
+        drawSettingsButton(216, 35, settings.enemyOutlines);
+        drawSettingsButton(316, 85, settings.disableMM);
+        drawSettingsButton(266, 135, settings.aZ_Range);
+        drawSettingsButton(167, 185, settings.customCursor);
+        
+        // Sliders
+        if (mouseDown && mouseOver.musicSlider) settings.musicSliderX = Math.min(Math.max(mouseX, 565), 715);
+        if (mouseDown && mouseOver.sfxSlider) settings.sfxSliderX = Math.min(Math.max(mouseX, 552), 702);
+        if (mouseDown && mouseOver.aZ_AvSlider) settings.aZ_Av = Math.min(Math.max(mouseX, 555), 705);
+        if (mouseDown && mouseOver.cursorTrailSlider) settings.cursorTrail = Math.min(Math.max(mouseX, 550), 700);
+
+        function drawSettingsSlider(x, y, sliderX, number) { 
+            ctx.beginPath();
+            ctx.roundRect(x, y, 150, 10, 5);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.roundRect(x, y, sliderX - x, 10, 5);
+            ctx.fill();
+            drawCircle(sliderX, y+5, 10);
+            if (number !== undefined) ctx.fillText(number, x+165, y+10);
+        }
+        
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.textAlign = "left";
+        ctx.font = "bold 15px Arial";
+
+        // Sliders
+        drawSettingsSlider(565, 40, settings.musicSliderX, Math.floor(musicVolume*100));
+        drawSettingsSlider(552, 90, settings.sfxSliderX, Math.floor(sfxVolume*100));
+        drawSettingsSlider(555, 140, settings.aZ_Av, Math.floor(absoluteZero.av*100));
+        drawSettingsSlider(550, 190, settings.cursorTrail, Math.floor(trailDensity*100));
+    }
+}
+
+function drawDifficultySelection() {
+    // Nested functions cuz fuck doing this shit over and over again
+    function drawDifficultyCard(mouseOver, unlocked, x, y, colors, difficultyName, score, requirement, adversary, ...description) {
+        // Rect
+        decideFillStyle(mouseOver, colors[0], colors[1]);
+        ctx.fillRect(x, y, 200, 100);
+        
+        // Level Name
+        ctx.fillStyle = colors[2];
+        ctx.textAlign = "left";
+        ctx.font = "bold 19px 'Lucida Console'";
+        ctx.fillText(difficultyName, x+10, y+30);
+
+        // Level Score
+        if (score !== "none") {
+            ctx.textAlign = "right";
+            ctx.fillText(score, x + 190, y+30);
+        }
+
+        // Level Description
+        ctx.textAlign = "left";
+        ctx.font = "15.5px 'Lucida Console'";
+        ctx.fillText(`${adversary}:  ${description[0]}`, x+10, y + 55);
+        if (description[1]) ctx.fillText(description[1], x+10, y + 80);
+
+        if (!unlocked) {
+            if (difficultyName === "HARD") ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            else if (difficultyName === "LIMBO") ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            else if (difficultyName === "ANDROMEDA") ctx.fillStyle = "rgba(0, 0, 0, 0.92)";
+            else ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+            ctx.fillRect(x, y, 200, 100);
+
+            ctx.lineWidth = 1.25;
+            ctx.textAlign = "center";
+
+            ctx.strokeStyle = "rgb(255, 255, 255)";
+            ctx.font = "bold 20px Arial";
+            ctx.strokeText(requirement, x + 100, y + 55);
             
-            // if it is a cave level song, alternate between Left In Desire and Done With Pain
-            else if (lastPlayingAudioEl?.id === "left-in-desire") nextSong = doneWithPain;
-            else nextSong = leftInDesire;
+            ctx.strokeStyle = colors[2];
+            ctx.font = "bold 19.5px Arial";
+            ctx.strokeText(requirement, x + 100, y + 55);
         }
+    }
+    function drawPercentCompleted(x, y, color, percent) {
+        ctx.strokeStyle = "rgb(255, 255, 255)";
+        ctx.lineWidth = 2;
+        if (percent === 100) ctx.strokeStyle = color;
+
+        // 50 + 200 + 50 = 300 || 1/6 + 2/3 + 1/6 = 1
+        let left = Math.min(1/6*100, percent) * 3; // 0 to 1/6
+        let middle = Math.max(Math.min(5/6*100-1/6*100, percent-1/6*100), 0) * 3; // 1/6 to 2/3
+        let right = Math.max(percent-(5/6*100), 0) * 3; // 2/3 to 1
         
+        ctx.beginPath();
+        ctx.moveTo(x, y+50);
+        ctx.lineTo(x, y+50-left);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y+50);
+        ctx.lineTo(x, y+50+left);
+        ctx.stroke();
 
-        // pause the last song and play the next
-        if (lastPlayingAudioEl !== "none" && !lastPlayingAudioEl.paused) lastPlayingAudioEl.pause();
-        nextSong.currentTime = 0;
-        nextSong.volume = 0.25;
-        nextSong.play();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + middle, y)
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y+100);
+        ctx.lineTo(x + middle, y+100)
+        ctx.stroke();
         
-
-        // reset the variable for the last song
-        lastPlayingAudioEl = nextSong;
-
-        // play the animation
-        songText.reset();
-        songText.active = true;
-
-        const songContentOptions = {
-            "a-new-start": "A New Start - Thygan Buch",
-            "left-in-desire": "Left In Desire - Thygan Buch",
-            "8-bit-christmas": "8 Bit Chirstmas - Thygan Buch",
-            "done-with-pain": "Done With Pain - Thygan Buch",
-        }
-        
-        songText.content = songContentOptions[nextSong.id];
-    }
-}
-
-
-//* Processes (Seldom) *//
-
-function setUpLevels() {
-    // setUpLevels(): creates every single level in the game
-
-    // LEVEL 1 (Tutorial for Left/Right movement)
-    const level1PortalCoord = [800, 320];
-    const level1PlayerSpawn = [200, 250];
-
-    const level1 = new Level(1, "grassy", [], level1PortalCoord, level1PlayerSpawn); // Level(number, obstacles, portalCoord, playerSpawn)
-
-    level1.addText(100, 250, 15, "Press A/D or ⇐/⇒ to move around", "left", "fill", 0, grassColor);
-    
-    allLevels.push(level1);
-
-    // call proceedToNextLevel() to actualize level 1's values 
-    currentLvlNum = 0;
-    proceedToNextLevel();
-    
-
-    // Set Up The Template of the Following Levels
-    for (let i = 1; i < 9; i++) {
-        const previousLevel = allLevels[i-1];
-
-        // by default, the portal coordinates reflect where the last portal originally was
-        const portalIsOnTheRightSide = previousLevel.portalCoord[0] > cnv.width/2;
-        
-        const portalCoordX = portalIsOnTheRightSide ? cnv.width/5 : cnv.width - cnv.width/5;
-        const portalCoord = [portalCoordX, cnv.height/2];
-
-        // levels 1-5 & 9 are grassy, levels 6-8 are rocky
-        const terrain = (i+1 <= 5 || i+1 === 9) ? "grassy" : "rocky";
-
-        // playerSpawn's default value is the players current coordinates
-        const newLevel = new Level(i+1, terrain, [], portalCoord);
-        allLevels.push(newLevel);
-    }
-    
-
-    // LEVEL 2 (Tutorial for Gravity Swapping)
-    const level2 = allLevels.find((level) => level.number === 2);
-    level2.portalCoord = [300, 185];
-
-    level2.addText(900, 250, 15, "Press W or ⇑ to swap gravity", "right", "fill", 0, grassColor);
-    level2.addBlock(200, cnv.height-borderHeight-135, 200, 135, "tallGrass");
-
-
-    // LEVEL 3
-    const level3 = allLevels.find((level) => level.number === 3);
-    
-    level3.addBlock(940, 0, 50, cnv.height, "normal", 0, true, dirtColor); // border
-
-    level3.addBlock(225, cnv.height-borderHeight-150/4, 150, 150/4, "shortGrass");
-    level3.addBlock(225+150, cnv.height-borderHeight-80, 120, 80, "tallGrass");
-    
-    // floating flatform
-    level3.addBlock(525, borderHeight+60, 100, 30, "shortGrass", Math.PI);
-    level3.addBlock(525+35, borderHeight+20, 30, 40, "normal", 0, true, dirtColor);
-    level3.addBlock(525+35+30, borderHeight+20, 350, 20, "normal", 0, true, dirtColor);
-
-    level3.addBlock(500+100, 300, 150, 150/4, "shortGrass");
-    level3.addBlock(500+150, 300+37, 50, 50, "normal", 0, true, dirtColor);
-    level3.addBlock(500+150+50, 300+60, 240, 27, "normal", 0, true, dirtColor);
-
-
-    // LEVEL 4 (First level with spikes)
-    const level4 = allLevels.find((level) => level.number === 4);
-    level4.portalCoord = [500 + 125, cnv.height/2-25];
-
-    level4.addBlock(700, 0, 30, cnv.height, "normal", 0, true, dirtColor); // border
-    
-    level4.addSpike(900, cnv.height-borderHeight-25, 25, "normal", 0, lightGrassColor);
-
-    level4.addBlock(100, cnv.height-borderHeight-100, 150, 100, "tallGrass");
-    level4.addSpike(100, cnv.height-borderHeight-125, 25, "normal", 0, grassColor);
-
-    level4.addBlock(260, borderHeight, 150, 100, "cloud");
-    level4.addSpike(260, borderHeight+100, 20, "normal", Math.PI, cloudColor);
-
-    for (let i = 0; i < 5; i++) {
-        level4.addSpike(250+i*40, cnv.height-borderHeight-30, 40, "wide", 0, lightGrassColor);
-    }
-    for (let i = 0; i < 7; i++) {
-        if (i < 2 || i > 4) level4.addSpike(410+i*40, borderHeight-15, 40, "wide", Math.PI, cloudColor);
-    }
-    
-    level4.addBlock(450, cnv.height-borderHeight-100, 125, 100, "tallGrass");
-    level4.addBlock(575, cnv.height-borderHeight-100, 125, 100, "tallGrass");
-    level4.addSpike(510, cnv.height-borderHeight-125, 25, "normal", 0, grassColor);
-    
-
-    // LEVEL 5 (intro to cave section)
-    const level5 = allLevels.find((level) => level.number === 5);
-    level5.portalCoord = [level5.portalCoord[0] + 5, level5.portalCoord[1]];
-
-    level5.addBlock(700, 0, 30, cnv.height, "normal", 0, true, rockColor); // border
-
-    for (let i = 0; i < 5; i++) {
-        level5.addBlock(300+i*75, borderHeight, 100, 75, "cloud");
-        level5.addBlock(300+i*75, cnv.height-borderHeight-100, 100, 100, "tallGrass");
-    }
-
-    for (let i = 0; i < 3; i++) {
-        level5.addSpike(365+i*125, borderHeight+65, 35, "wide", Math.PI, cloudColor2);
-        level5.addSpike(300+i*125, cnv.height-borderHeight-126, 35, "wide", 0, grassColor);
-    }
-
-    for (let i = 0; i < 29; i++) {
-        level5.addSpike(-5+i*35, borderHeight-10, 35, "wide", Math.PI, cloudColor2);
-    }
-    
-    level5.addBlock(85, cnv.height-borderHeight-100, 140, 100, "tallGrass");
-
-    level5.addBlock(0, cnv.height-borderHeight-25, 700, 25, "normal", 0, true, "rgb(133, 82, 39)");
-    level5.addBlock(700, cnv.height-borderHeight-25, 300, 25, "normal", 0, true, rockColor);
-
-    for (let i = 0; i < 9; i++) {
-        level5.addSpike(-14+i*35, cnv.height-borderHeight-51, 35, "wide", 0, "rgb(133, 82, 39)");
-        level5.addSpike(730+i*35, cnv.height-borderHeight-51, 35, "wide", 0, rockColor);
-    }
-    
-    level5.addSpike(110, cnv.height-borderHeight-125, 25, "normal", 0, grassColor);
-
-    // platforms connecting to the border
-    level5.addBlock(730, borderHeight+20, 270, 30, "normal", 0, true, rockColor)
-    level5.addBlock(0, borderHeight+20, 100, 30, "normal", 0, true, rockColor)
-    level5.addBlock(70, borderHeight+50, 30, 20, "normal", 0, true, rockColor)
-
-    // floating platforms
-    level5.addBlock(0, borderHeight+70, 80, 35, "normal", 0, true, rockColor)
-    level5.addBlock(-80, borderHeight+70, 80, 35, "normal", 0, true, rockColor)
-    level5.addBlock(80, borderHeight+70, 80, 35, "normal", 0, true, rockColor)
-    level5.addBlock(950, borderHeight+70, 120, 35, "normal", 0, true, rockColor)
-
-    level5.addSpike(0, borderHeight+41, 35, "wide", Math.PI, rockColor);
-    level5.addSpike(35, borderHeight+41, 35, "wide", Math.PI, rockColor);
-    for (let i = 0; i < 8; i++) {
-        level5.addSpike(730+i*35, borderHeight+41, 35, "wide", Math.PI, rockColor);
-    }
-
-    level5.addBlock(890, 285, 80, 60, "cloud");
-    level5.addBlock(830, 305, 60, 40, "cloud");
-
-
-    // LEVEL 6 (first cave level and first level with phase)
-    const level6 = allLevels.find((level) => level.number === 6);
-    level6.portalCoord = [120, level6.portalCoord[1]];
-
-    for (let i = 0; i < 5; i++) { // spike border
-        level6.addSpike(850+i*35, cnv.height-borderHeight-26, 35, "wide", 0, rockColor);
-        level6.addSpike(850+i*35, borderHeight-9, 35, "wide", Math.PI, rockColor);
-    }
-    
-    level6.addText(600, 175, 12.5, "Press S or ⇓ while midair to phase through transparent objects", "left");
-
-    // beginning section //
-    level6.addSpike(680, 370, 30, "normal", 0, rockColor);
-    level6.addBlock(650, 250, 30, 150, "vert-rock", 0, true, rockColor);
-    level6.addSpike(650, 228, 22, "normal", 0, rockColor);
-    level6.addSpike(665, 235, 15, "normal", 0, rockColor);
-
-    level6.addSpike(575, borderHeight, 30, "normal", Math.PI, rockColor);
-    level6.addBlock(545, borderHeight, 30, 180, "vert-rock", 0, true, rockColor);
-    level6.addSpike(545, 280, 10, "normal", Math.PI, rockColor);
-    level6.addSpike(548, 280, 27, "normal", Math.PI, rockColor);
-
-    level6.addBlock(575, 250, 75, 30, "phase", 0, true, phaseColor);
-    level6.addSpike(445, 370, 30, "normal", 0, rockColor);
-
-    level6.addBlock(370, 270, 75, 30, "horiz-rock", 0, true, rockColor);
-    level6.addBlock(415, 175, 30, 225, "vert-rock", 0, true, rockColor);
-    level6.addSpike(415, 165, 10, "normal", 0, rockColor);
-    level6.addSpike(421, 157, 18, "normal", 0, rockColor);
-    level6.addSpike(435, 165, 10, "normal", 0, rockColor);
-
-    // middle section //
-    // phase spikes
-    level6.addBlock(445, 175, 100, 30, "phase", 0, true, "rgba(81, 79, 77, 0.7)");
-    for (let i = 0; i < 3; i++) {
-        level6.addSpike(445+i*(100/3), 150, 100/3, "phaseWide", 0, phaseColor);
-        level6.addSpike(445+i*(100/3), 196.5, 100/3, "phaseWide", Math.PI, phaseColor);
-    }
-    
-    level6.addBlock(250, 270, 75, 30, "horiz-rock");
-    level6.addBlock(325, 270, 45, 30, "phase", 0, true, phaseColor);
-    level6.addBlock(250, borderHeight, 30, 200, "vert-rock");
-
-    // left top spikes
-    level6.addSpike(280, 240, 30, "normal", 0, rockColor);
-    level6.addSpike(300, 246, 24, "normal", 0, rockColor);
-    
-    // right top spikes
-    level6.addSpike(397, 252, 18, "normal", 0, rockColor);
-    level6.addSpike(380, 243, 27, "normal", 0, rockColor);
-    level6.addSpike(370, 250, 20, "normal", 0, rockColor);
-
-    // end section //
-    // left bottom spikes
-    level6.addSpike(250, 300, 24, "normal", Math.PI, rockColor);
-    level6.addSpike(265, 300, 20, "normal", Math.PI, rockColor);
-    level6.addSpike(273, 300, 28, "normal", Math.PI, rockColor);
-    level6.addSpike(295, 300, 22, "normal", Math.PI, rockColor);
-    level6.addSpike(313, 300, 12, "normal", Math.PI, rockColor);
-
-    // right bottom spikes
-    level6.addSpike(385, 300, 30, "normal", Math.PI, rockColor);
-    level6.addSpike(370, 300, 25, "normal", Math.PI, rockColor);
-
-    level6.addSpike(385, 370, 30, "normal", 0, rockColor);
-    level6.addSpike(170, 370, 30, "normal", 0, rockColor);
-    
-
-    // LEVEL 7
-    const level7 = allLevels.find((level) => level.number === 7);
-
-    // center phase block
-    level7.addBlock(0, 235, cnv.width, 30, "phase", 0, true, phaseColor);
-
-    // start //
-    // bottom spikes
-    level7.addSpike(220, 340, 30, "normal", 0, rockColor);
-    level7.addSpike(320, 265, 30, "normal", Math.PI, rockColor);
-    level7.addSpike(320, 340, 30, "normal", 0, rockColor);
-
-    // top spikes
-    level7.addSpike(220, 130, 30, "normal", Math.PI, rockColor);
-    level7.addSpike(220, 205, 30, "normal", 0, rockColor);
-    level7.addSpike(320, 130, 30, "normal", Math.PI, rockColor);
-
-    // middle //
-    // top obstacles
-    level7.addSpike(380, 205, 30, "normal", 0, rockColor);
-    level7.addSpike(440, 130, 30, "normal", Math.PI, rockColor);
-    level7.addSpike(480, 205, 30, "normal", 0, rockColor);
-    level7.addSpike(520, 130, 30, "normal", Math.PI, rockColor);
-    level7.addSpike(560, 205, 30, "normal", 0, rockColor);
-    
-    level7.addSpike(650, 205, 30, "phaseNormal", 0, phaseColor);
-    level7.addSpike(720, 130, 30, "normal", Math.PI, rockColor);
-    level7.addSpike(845, 130, 30, "normal", Math.PI, rockColor);
-    
-
-    // bottom obstacles
-    level7.addSpike(380, 265, 30, "normal", Math.PI, rockColor);
-    level7.addSpike(380, 340, 30, "normal", 0, rockColor);
-    level7.addSpike(430, 265, 30, "phaseNormal", Math.PI, phaseColor);
-    level7.addBlock(520, 320, 30, 170, "vert-rock");
-    level7.addSpike(520, 297.5, 30, "wide", 0, rockColor);
-    
-    level7.addBlock(605, 265, 30, 50, "phase", 0, true, phaseColor);
-    level7.addSpike(605, 307.5, 30, "wide", Math.PI, phaseColor);
-    
-    level7.addBlock(690, 320, 30, 170, "vert-rock");
-    level7.addSpike(690, 290, 30, "normal", 0, rockColor);
-
-    level7.addSpike(770, 340, 30, "normal", 0, rockColor);
-    level7.addSpike(800, 340, 30, "normal", 0, rockColor);
-    
-    // phase spikes design
-    for (let i = 0; i < 3; i++) {
-        level7.addSpike(755+i*30, 205, 30, "phaseNormal", 0, phaseColor);
-        level7.addSpike(755+i*30, 265, 30, "phaseNormal", Math.PI, phaseColor);
-    }
-
-    // left corners
-    level7.addBlock(70, 30, 30, 150, "vert-rock"); // top left
-    level7.addBlock(-50, 160, 150, 25, "horiz-rock"); // top left
-    level7.addBlock(70, 320, 30, 150, "vert-rock"); // bottom left
-    level7.addBlock(-50, 315, 150, 25, "horiz-rock"); // bottom left
-    
-    // right corners
-    level7.addBlock(900, 30, 30, 150, "vert-rock"); // top right
-    level7.addBlock(900, 160, 150, 25, "horiz-rock"); // top right
-    level7.addBlock(900, 320, 30, 150, "vert-rock"); // bottom right
-    level7.addBlock(900, 315, 150, 25, "horiz-rock"); // bottom right
-
-
-    // border //
-    for (let i = 0; i < 6; i++) {
-        level7.addBlock(i*169, 100, 170, 30, "horiz-rock"); // top blocks
-        level7.addBlock(30+i*169, 370, 170, 30, "horiz-rock"); // bottom blocks
-    }
-
-    // left border blocks
-    level7.addBlock(0, borderHeight, 30, 170, "vert-rock");
-    level7.addBlock(0, 269, 30, 170, "vert-rock");
-
-    // right border blocks
-    level7.addBlock(970, 70, 30, 170, "vert-rock");
-    level7.addBlock(970, 230, 30, 170, "vert-rock");
-
-    
-    // LEVEL 8
-    const level8 = allLevels.find((level) => level.number === 8);
-    level8.portalCoord = [425, level8.portalCoord[1]];
-    
-    // borders around the portal
-    level8.addBlock(355, 175, 145, 140, "phase", 0, true, "rgba(0, 255, 0, 0.1)");
-    level8.addBlock(355, 307, 145, 20, "shortGrass");
-    level8.addBlock(425, 307-15, 18, 15, "tallGrass", 0, false);
-    level8.addBlock(410, 307-5, 15, 5, "shortGrass", 0, false);
-    level8.addBlock(370, 275, 25, 15, "cloud", 0, false);
-    level8.addBlock(410, 265, 25, 15, "cloud", 0, false);
-    level8.addBlock(455, 268, 25, 15, "cloud", 0, false);
-    
-    level8.addBlock(412.5, 320, 30, 170, "vert-rock");
-    level8.addBlock(340, 315, 170, 30, "horiz-rock");
-
-    level8.addBlock(325, 155, 75, 20, "horiz-rock");
-    level8.addBlock(400, 155, 50, 20, "phase", 0, true, "rgba(0, 255, 0, 0.2)");
-    level8.addBlock(450, 155, 75, 20, "horiz-rock");
-
-    level8.addBlock(325, 155, 30, 190, "vert-rock");
-    level8.addBlock(519, 140, 10, 50, "vert-rock");
-    level8.addBlock(499, 155, 30, 190, "vert-rock");
-
-    for (let i = 0; i < 6; i++) {
-        const triSize = 14.5;
-        level8.addSpike(325+i*triSize, 385.5, triSize, "normal", 0, rockColor);
-        level8.addSpike(325+i*triSize, 345, triSize, "normal", Math.PI, rockColor);
-        level8.addSpike(442.5+i*triSize, 385.5, triSize, "normal", 0, rockColor);
-        level8.addSpike(442.5+i*triSize, 345, triSize, "normal", Math.PI, rockColor);
-    }
-    level8.addSpike(398.5, 357.5, 14.5, "normal", 3*Math.PI/2, rockColor);
-    level8.addSpike(398.5, 372, 14.5, "normal", 3*Math.PI/2, rockColor);
-    level8.addSpike(442, 357.5, 14.5, "normal", Math.PI/2, rockColor);
-    level8.addSpike(442, 372, 14.5, "normal", Math.PI/2, rockColor);
-
-
-    // spawn //
-    level8.addBlock(570, 180, 90, 20, "horiz-rock");
-    level8.addBlock(660, 180, 90, 20, "horiz-rock");
-    level8.addBlock(660, 320, 90, 20, "horiz-rock");
-    level8.addBlock(730, borderHeight, 20, 120, "vert-rock");
-    level8.addBlock(730, borderHeight+120, 20, 120, "vert-rock");
-    level8.addBlock(850, borderHeight, 20, 120, "vert-rock");
-    level8.addBlock(850, borderHeight+120, 20, 120, "vert-rock");
-    for (let i = 0; i < 5; i++) {
-        level8.addSpike(750+i*20, borderHeight, 20, "normal", Math.PI, rockColor);
-    }
-
-
-    // left path start
-    level8.addSpike(700, 380, 20, "normal", 0, rockColor);
-    level8.addSpike(680, 380, 20, "normal", 0, rockColor);
-    level8.addSpike(590, 380, 20, "normal", 0, rockColor);
-
-    level8.addBlock(590, 250, 20, 120, "phase", 0, true, phaseColor);
-    level8.addBlock(610, 250, 75, 20, "phase", 0, true, phaseColor);
-    level8.addBlock(550, 320, 40, 20, "phase", 0, true, phaseColor);
-    level8.addSpike(610, 270, 15, "phaseNormal", Math.PI, phaseColor);
-    level8.addSpike(675, 270, 10, "phaseNormal", Math.PI, phaseColor);
-    level8.addSpike(535, 320, 20, "phaseWide", 3*Math.PI/2, phaseColor);
-    level8.addSpike(524, 310, 20, "wide", Math.PI/2, rockColor);
-    level8.addSpike(524, 330, 20, "wide", Math.PI/2, rockColor);
-
-
-    // left path middle
-    level8.addSpike(723, 200, 7, "normal", Math.PI, rockColor);
-    level8.addSpike(640, 200, 12, "normal", Math.PI, rockColor);
-    level8.addSpike(628, 200, 12, "normal", Math.PI, rockColor);
-    level8.addSpike(616, 200, 12, "normal", Math.PI, rockColor);
-    level8.addSpike(570, 200, 10, "normal", Math.PI, rockColor);
-
-
-    // left path end
-    level8.addBlock(529, 180, 41, 20, "phase", 0, true, phaseColor);
-    for (let i = 0; i < 4; i++) {
-        level8.addBlock(519+i*43, 137.5, 43, 5, "horiz-rock");
-    }
-    level8.addSpike(450, borderHeight, 10, "normal", Math.PI, rockColor);
-
-
-    // right path start
-    level8.addSpike(897, 390, 10, "normal", 0, rockColor);
-    level8.addSpike(850, 340, 10, "normal", Math.PI, rockColor);
-    level8.addBlock(907, 280, 20, 120, "vert-rock");
-    level8.addBlock(907, 160, 20, 120, "vert-rock");
-    for (let i = 0; i < 3; i++) {
-        level8.addBlock(870+i*120, borderHeight-10, 120, 20, "horiz-rock");
-        level8.addBlock(907+i*120, 160, 120, 20, "horiz-rock");
-        
-        level8.addBlock(-250+i*120, borderHeight-10, 120, 20, "horiz-rock");
-        level8.addBlock(-300+i*120, 160, 120, 20, "horiz-rock");
-    }
-    level8.addSpike(927.5, 105, 20, "wide", Math.PI, rockColor);
-    level8.addSpike(982.5, 145, 20, "wide", 0, rockColor);
-    level8.addSpike(0, 145, 20, "wide", 0, rockColor);
-
-    level8.addBlock(108, borderHeight, 20, 120, "vert-rock");
-    level8.addSpike(55, 160, 20, "wide", Math.PI/2, rockColor);
-
-
-    // right path middle
-    level8.addBlock(108, 220, 20, 120, "vert-rock");
-
-    level8.addBlock(0, 230, 108, 20, "phase", 0, true, phaseColor);
-    level8.addBlock(-108, 230, 108, 20, "phase", 0, true, phaseColor);
-    level8.addBlock(927, 230, 100, 20, "phase", 0, true, phaseColor);
-    level8.addBlock(1000, 230, 100, 20, "phase", 0, true, phaseColor);
-    level8.addSpike(20, 220, 10, "phaseNormal", 0, phaseColor);
-    level8.addSpike(970, 180, 10, "normal", Math.PI, rockColor);
-
-    level8.addBlock(0, 300, 108, 20, "horiz-rock");
-    level8.addBlock(-108, 300, 108, 20, "horiz-rock");
-    level8.addBlock(927, 300, 43, 20, "phase", 0, true, phaseColor);
-    level8.addBlock(970, 300, 108, 20, "horiz-rock");
-
-    for (let i = 0; i < 9; i++) {
-        level8.addSpike(-108+i*24, 282, 24, "wide", 0, rockColor);
-    }
-    for (let i = 0; i < 4; i++) {
-        level8.addSpike(927+i*43/4, 289.3, 43/4, "phaseNormal", 0, phaseColor);
-        level8.addSpike(927+i*43/4, 320, 43/4, "phaseNormal", Math.PI, phaseColor);
-    }
-
-    level8.addSpike(970, 282, 24, "wide", 0, rockColor);
-    level8.addSpike(970+24, 282, 24, "wide", 0, rockColor);
-    level8.addSpike(970+24*2, 282, 24, "wide", 0, rockColor);
-
-    level8.addSpike(20, 382, 24, "wide", 0, rockColor);
-    level8.addSpike(70, 314, 24, "wide", Math.PI, rockColor);
-    level8.addSpike(107.5, 334.5, 21, "wide", Math.PI, rockColor);
-
-    
-    // right path end
-    level8.addBlock(180, 280, 20, 120, "vert-rock");
-    level8.addBlock(180, 280-120, 20, 120, "vert-rock");
-    level8.addBlock(252, borderHeight, 20, 120, "vert-rock");
-    level8.addBlock(252, borderHeight+120, 20, 120, "vert-rock");
-
-    for (let i = 0; i < 10; i++) {
-        level8.addSpike(162, 376-i*24, 24, "wide", 3*Math.PI/2, rockColor);
-        level8.addSpike(194, 160+i*24, 24, "wide", Math.PI/2, rockColor);
-    }
-    level8.addSpike(245, borderHeight, 7, "normal", Math.PI, rockColor);
-
-    level8.addSpike(252, 335, 20, "wide", Math.PI, rockColor);
-    level8.addSpike(390, borderHeight, 10, "normal", Math.PI, rockColor);
-
-
-    
-    // LEVEL 9
-    const level9 = allLevels.find((level) => level.number === 9);
-    level9.portalCoord = [-500, -500]; // No Portal
-
-    level9.addText(500, 250, 35, "Thanks for playing!", "center", "fill", 0, grassColor);
-}
-
-function setUpButtons() {
-// setUpButtons(): defines every button in the game with the `Button` class then stores them in the `buttons` array
-
-    // Button Class Constructor Parameters
-    // (x, y, w, h, name, content, location, event)
-
-    // Buttons on the title screem
-    const playBtn = new Button(cnv.width/2 - 75, 200, 150, 75, "Play", "Play 60px", "titleScreen", () => { gameState = "levels"; });
-    const levelsBtn = new Button(cnv.width/2 - 75, 285, 70, 35, "Level Select", "Levels 22px", "titleScreen", () => { gameState = "levelSelect"; });
-    const skinsBtn = new Button(cnv.width/2 + 5, 285, 70, 35, "Skin Select", "Skins 22px", "titleScreen", () => { gameState = "skinSelect"; });
-
-
-    // Buttons to exit to the title screen
-    const leaveLevelsBtn = new Button(cnv.width/2 - 35, 290, 70, 35, "Leave Level Select", "Menu 22px", "levelSelect", () => { gameState = "titleScreen"; });
-    const leaveSkinsBtn = new Button(cnv.width/2 - 35, 290, 70, 35, "Leave Skin Select", "Menu 22px", "skinSelect", () => { gameState = "titleScreen"; });
-
-    
-    // In game buttons
-    const homeBtn = new Button(cnv.width-40, 15, 25, 25, "Home", "home-btn img", "levels", () => { gameState = "titleScreen"; });
-    const restartBtn = new Button(cnv.width-80, 15, 25, 25, "Restart", "restart-btn img", "levels", respawnPlayer);
-
-
-    // Buttons for choosing a skin
-    const greyball = document.getElementById("grey-ball");
-    const arrowball = document.getElementById("arrow-ball");
-
-    const greyBallBtn = new Button(cnv.width/2 - 85, 200, 80, 80, "Choose Greyball", "grey-ball img", "skinSelect", () => { player.img = greyball; });
-    const arrowBallBtn = new Button(cnv.width/2 + 5, 200, 80, 80, "Choose Arrowball", "arrow-ball img", "skinSelect", () => { player.img = arrowball; });
-
-
-    // adds every button to the `buttons` array
-    buttons = [playBtn, levelsBtn, skinsBtn, leaveLevelsBtn, leaveSkinsBtn, homeBtn, restartBtn, greyBallBtn, arrowBallBtn];
-
-    
-    // player spawn coordinates for levels 1-9 in order (for the buttons below)
-    const defaultSpawns = [
-        [200, 250], [800, 350], [100, 350], [775, 350], [650, 250], [775, 300], [100, 200], [800, 200], [500-17.5/2, 250-17.5/2]
-    ];
-    
-    // buttons for warping to every level
-    for (let i in allLevels) {
-        let levelBtn;
-        
-        if (i < 5) { // top row | first 5 levels
-            levelBtn = new Button(cnv.width/2-15 - (2-i)*40, 200, 30, 30, "Select Level 1", `${Number(i)+1} 20px`, "levelSelect", warpToLevel.bind(this, Number(i)+1, defaultSpawns[i]));
-        }
-        else {  // bottom row | final 4 levels
-            levelBtn = new Button(cnv.width/2+7.5 - (7-i)*40, 245, 30, 30, "Select Level 1", `${Number(i)+1} 20px`, "levelSelect", warpToLevel.bind(this, Number(i)+1, defaultSpawns[i]));
-        }
-        
-        buttons.push(levelBtn);
-    }
-}
-
-function setUpKeys() {
-    // setUpKeys(): defines every key object in the game
-
-    // Key Class Constructor Parameters
-    // x, y, w, h, img, level, unlock
-    const greyKey = new Key(200, 200, 40, 20, "grey-key", 8, "arrow-skin");
-
-    keys = [greyKey];
-}
-
-//* Draw Functions *//
-
-function drawCircle(x, y, r, lw = 0) {
-    // drawCircle(): takes in the 'x' and 'y' parameters for location and the 'r' and 'lw' parameters for design
-
-    ctx.beginPath();
-    ctx.arc(x, y, r, Math.PI*2, 0);
-
-    // if there isn't a linewidth value, then fill by default
-    if (lw === 0) ctx.fill();
-    else {
-        ctx.lineWidth = lw;
+        ctx.beginPath();
+        ctx.moveTo(x+200, y);
+        ctx.lineTo(x+200, y+right)
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x+200, y+100);
+        ctx.lineTo(x+200, y+100-right)
         ctx.stroke();
     }
+    
+    // Titles
+    ctx.textAlign = "center";
+    ctx.fillStyle = "grey";
+    
+    ctx.font = "bold 30px Arial";
+    ctx.fillText("ENDLESS LEVELS", GAME_WIDTH/2, 220);
+    ctx.fillText("FINITE LEVELS", GAME_WIDTH/2, 420);
+
+    // Levels
+    drawDifficultyCard(mouseOver.easy, true, 50, 250,
+                       ["rgb(0, 191, 216)", "rgb(0, 171, 194)", "rgb(0, 225, 255)"],
+                       "EASY", `${highscore.easy}s`, "None", "Enemies", "Normals");
+    
+    drawDifficultyCard(mouseOver.medium, highscore.easy >= 45, 300, 250,
+                       ["rgb(220, 220, 0)", "rgb(200, 200, 0)", "rgb(255, 255, 0)"],
+                       "MEDIUM", `${highscore.medium}s`, "EASY 45S", "Enemies", "Normals", "Decelerators");
+    
+    drawDifficultyCard(mouseOver.hard, highscore.medium >= 45, 550, 250,
+                       ["rgb(40, 40, 40)", "rgb(50, 50, 50)", "rgb(0, 0, 0)"],
+                       "HARD", `${highscore.hard}s`, "MEDIUM 45S", "Enemies", "Normals", "Decelerators  Homings");
+    
+    drawDifficultyCard(mouseOver.limbo, highscore.easy >= 30, 50, 450,
+                       ["rgb(128, 0, 128)", "rgb(100, 0, 100)", "rgb(163, 0, 163)"],
+                       "LIMBO", `${highscore.limbo}%`, "EASY 30S", "Dangers", "Beams");
+    
+    drawDifficultyCard(mouseOver.andromeda, highscore.limbo >= 75, 300, 450,
+                       ["rgb(240, 240, 240)", "rgb(220, 220, 220)", "rgb(0, 0, 0)"],
+                       "ANDROMEDA", `${highscore.andromeda}%`, "LIMBO 75%", "Dangers", "Beams  Bombs", "Rings");
+    
+    drawDifficultyCard(mouseOver.euphoria, highscore.andromeda >= 75, 550, 450,
+                       ["rgb(224, 255, 232)", "rgb(223, 255, 156)", "rgb(255, 165, 252)"],
+                       "EUPHORIA", `${highscore.euphoria}%`, "ANDROMEDA 75%", "Dangers", "Beams  Bombs", "Rings  Spikes");
+
+    drawPercentCompleted(50, 450, "rgb(163, 0, 163)", highscore.limbo);
+    drawPercentCompleted(300, 450, "rgb(0, 0, 0)", highscore.andromeda);
+    drawPercentCompleted(550, 450, "rgb(255, 165, 252)", highscore.euphoria);
 }
 
-function drawPlayer(x, y, r, rotation) {
-    // drawPlayer(): draws the player while accounting for rotation and phasing
+function drawDodgerSelection() {
+    // Nested functions to make life easier
+    function drawDodgerCard(mouseOver, unlocked, dodger, dodgerName, abilityName, requirement, ...colors) {
+        // Rectangle
+        decideFillStyle(mouseOver, colors[0], colors[1]);
+        ctx.fillRect(dodger.x, dodger.y, 200, 100);
+        
+        ctx.strokeStyle = colors[2];
+        ctx.lineWidth = 2;
+        ctx.strokeRect(dodger.x, dodger.y, 200, 100);
 
-    ctx.save();
-    ctx.translate(player.x, player.y);
-    ctx.rotate(player.rotation); // checks rotation (in radians)
+        // Circle
+        ctx.fillStyle = colors[2];
+        drawCircle(dodger.x + 170, dodger.y + 22);
 
-    if (fallingDirection === "up") ctx.filter = "invert(1)"; // the player's colors are inverted when it swaps gravity
+        // Text
+        ctx.textAlign = "left";
+        ctx.font = "bold 22px 'Lucida Console'";
+        ctx.fillText(dodgerName, dodger.x + 10, dodger.y + 30);
+        ctx.font = "14px 'Lucida Console'";
+        ctx.fillText(`ABILITY: ${abilityName}`, dodger.x + 10, dodger.y + 80);
 
-    if (player.phasing) ctx.globalAlpha = 0.5; // the player becomes transparent when its phasing
+        // Locked
+        if (!unlocked) {
+            if (dodgerName === "CRESCENDO") ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            else ctx.fillStyle = "rgba(0, 0, 0, 0.9)";
+            ctx.fillRect(dodger.x, dodger.y, 200, 100);
+            
+            ctx.lineWidth = 1.25;
+            ctx.textAlign = "center";
+
+            ctx.strokeStyle = "rgb(255, 255, 255)";
+            ctx.font = "bold 20px Arial";
+            ctx.strokeText(requirement, dodger.x + 100, dodger.y + 55);
+            
+            ctx.strokeStyle = colors[2];
+            ctx.font = "bold 19.5px Arial";
+            ctx.strokeText(requirement, dodger.x + 100, dodger.y + 55);
+        }
+    }
+    function drawAbilityDesc(mouseOver, unlocked, bgColor, lockedColor, textColor, abilityName, ...description) {
+        if (mouseOver) {
+            ctx.fillStyle = bgColor;
+            ctx.strokeStyle = textColor;
+            ctx.fillRect(50, 275, 700, 175);
+            ctx.lineWidth = 5;
+            ctx.strokeRect(50, 275, 700, 175);
+
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "center";
+            ctx.font = "30px Arial";
+            ctx.fillText(abilityName, GAME_WIDTH/2, 310);
+            
+            ctx.textAlign = "left";
+            ctx.font = "17.5px Arial";
+            for (let i = 0; i < description.length; i++) ctx.fillText(description[i], 70, 335 + i*25);
+
+            if (!unlocked) {
+                if (abilityName === "AMPLIFY") ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+                else ctx.fillStyle = "rgba(0, 0, 0, 0.925)";
+                ctx.fillRect(50, 275, 700, 175);
+                
+                ctx.lineWidth = 2;
+                ctx.textAlign = "center";
+                
+                ctx.strokeStyle = "rgb(255, 255, 255)";
+                ctx.font = "bold 71px Arial";
+                ctx.strokeText("LOCKED", GAME_WIDTH/2, 387);
+                
+                ctx.strokeStyle = lockedColor;
+                ctx.font = "bold 70px Arial";
+                ctx.strokeText("LOCKED", GAME_WIDTH/2, 387);
+            }
+        }
+    }
     
-    ctx.drawImage(player.img, -player.r * 1.5, -player.r * 1.5, player.r * 3, player.r * 3);
+    // Dodger coords
+    const evader = { x: 50, y: 25, };
+    const jolt = { x: 300, y: 25, };
+    const jötunn = { x: 550, y: 25, };
+    const crescendo = { x: 50, y: 150, };
+    const j_sab = { x: 300, y: 150, };
+    const quasar = { x: 550, y: 150, };
 
-    ctx.restore();
+    // Dodger Cards
+    drawDodgerCard(mouseOver.evader, true, evader, "EVADER", "SKILL", "NONE", "rgb(230, 230, 230)", "rgb(220, 220, 220)", "white");
+    drawDodgerCard(mouseOver.jolt, highscore.medium >= 30, jolt, "JOLT", "SHOCKWAVE", "MEDIUM 30S", "rgb(230, 230, 0)", "rgb(220, 220, 0)", "yellow");
+    drawDodgerCard(mouseOver.jötunn, highscore.limbo === 100, jötunn, "JÖTUNN", "ABSOLUTE ZERO", "LIMBO 100%", "rgb(75, 180, 225)", "rgb(68, 168, 212)", "rgb(79, 203, 255)");
+    drawDodgerCard(mouseOver.crescendo, highscore.hard >= 60, crescendo, "CRESCENDO", "AMPLIFY", "HARD 60S", "rgb(30, 30, 30)", "rgb(40, 40, 40)", "rgb(0, 0, 0)");
+    drawDodgerCard(mouseOver.j_sab, highscore.andromeda === 100, j_sab, "J-SAB", "DASH", "ANDROMEDA 100%", "rgb(230, 0, 0)", "rgb(220, 0, 0)", "rgb(255, 0, 0)");
+    drawDodgerCard(mouseOver.quasar, highscore.euphoria === 100, quasar, "QUASAR", "EVENT HORIZON", "EUPHORIA 100%", "rgb(230, 153, 11)", "rgb(219, 144, 7)", "rgb(255, 165, 0)");
 
-    // reset the filter and global alpha
-    ctx.filter = "none";
-    ctx.globalAlpha = 1;
+    // Ability Descriptions
+    drawAbilityDesc(mouseOver.evader, true, "rgba(255, 255, 255, 0.7)", "rgba(220, 220, 220, 0.9)", "rgba(200, 200, 200, 0.7)", "SKILL",
+                    "Evaders have no unique abilities or traits; they rely solely on familiarity with their",
+                    "adversaries to weave past offensive attacks.",
+                    "Base Speed: 5");
+    drawAbilityDesc(mouseOver.jolt, highscore.medium >= 30, "rgba(255, 255, 0, 0.7)", "rgba(230, 230, 0, 0.9)", "rgba(200, 200, 0, 0.7)", "SHOCKWAVE",
+                    "Jolts summon electromagnetic shockwaves at will—shrinking and stunning any",
+                    "unfortunate soul stricken by the electrically infused pluse.",
+                    "Shockwave Effect Reduction: 25% | Shockray Effect Reduction: 50%",
+                    "Effect Duration: Danger - 2.93s, Enemy - 5.43s",
+                    "Shockwave Cooldown: 7.5s | Shockray Cooldown: 4.5s");
+    drawAbilityDesc(mouseOver.jötunn, highscore.limbo === 100, "rgba(79, 203, 255, 0.7)", "rgba(70, 186, 235, 0.9)", "rgba(52, 157, 201, 0.7)", "ABSOLUTE ZERO",
+                    "Jötunns create spasmodic endothermic reactions within their cores, causing their",
+                    "surroundings to rapidly freeze to absolute zero. Such gigantic and erratic drops in",
+                    "temperature decelerate the speeds and spawn-rates of nearby adversaries.",
+                    "Glaciate affects speed. Stagnate affects spawn-rate. Absolute Zero freezes both.",
+                    "Speed Reduction: 0% - 70% | Spawn-rate Reduction: 0% - 20% | Swap Cooldown: 1s");
+    drawAbilityDesc(mouseOver.crescendo, highscore.hard >= 60, "rgba(20, 20, 20, 0.85)", "rgba(20, 20, 20, 0.9)", "rgba(0, 0, 0, 0.7)", "AMPLIFY",
+                    "Crescendos harness the sound waves of their environment to augment their cores.",
+                    "Whenever a melody is audible, these dodgers, as if adapting to the rhythm, accelerate",
+                    "with the music, continually modifying their cores until they outpace the waves",
+                    "themselves.",
+                    "Top Speed: 10.5");
+    drawAbilityDesc(mouseOver.j_sab, highscore.andromeda === 100, "rgba(255, 0, 0, 0.6)", "rgba(210, 0, 0, 0.9)", "rgba(200, 0, 0, 0.7)", "DASH",
+                    "J-sabs manipulate space and bend it to their will. By eradicating the field ahead of",
+                    "them, these dodgers instantaneously warp forward through the erased void, allowing",
+                    "them to maneuver swiftly, precisely, and covertly at supersonic speeds.",
+                    "Top Speed: 17.5 | Dash Duration: 0.25s | Post-Dash Invinciblility Duration: 0.25s",
+                    "Cooldown: 2s");
+    drawAbilityDesc(mouseOver.quasar, highscore.euphoria === 100, "rgba(255, 165, 0, 0.7)", "rgba(230, 153, 11, 0.9)", "rgba(201, 135, 14, 0.9)", "EVENT HORIZON",
+                   "Quasars manifest the properties of black holes within their cores to replicate their",
+                   "indecipherable physics. Sorrounded by an accretion disk and lost within relatavistic",
+                   "space-time they not only become impossible to touch, but their event horizon causes",
+                   "their surroundings to accelerate indefinitely, meanwhile, they lie stuck in time.",
+                   "Duration: 5s | Cooldown: 7s");
 }
 
-function drawPortal() {
-    // drawPlayer(): draws the portal and handles it's rotation
+function drawGameOver() {
+    const grad = ctx.createLinearGradient(250, 50, 550, 150)
+    const grad2 = ctx.createLinearGradient(250, 150, 550, 50)
 
-    // Outer Portal
-    ctx.globalAlpha = 0.75;
-    ctx.save();
-    ctx.translate(portal.x, portal.y)
-    ctx.rotate(-portal.rotation);
-    
-    ctx.drawImage(document.getElementById("black-portal"), -portal.r * 2, -portal.r * 2, portal.r * 4, portal.r * 4);
-    
-    ctx.restore();
+    if (mouseOver.restart) {
+        grad.addColorStop(0, "rgb(255, 0, 0)");
+        grad.addColorStop(1, "rgb(255, 255, 255)");
 
-    // Inner Portal
-    const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
-    ctx.globalAlpha = 1;
+        grad2.addColorStop(0, "rgb(255, 255, 255)");
+        grad2.addColorStop(1, "rgb(255, 0, 0)");
+    } else {
+        grad.addColorStop(0, "rgb(255, 255, 255)");
+        grad.addColorStop(1, "rgb(255, 0, 0)");
+
+        grad2.addColorStop(0, "rgb(255, 0, 0)");
+        grad2.addColorStop(1, "rgb(255, 255, 255)");
+    }
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(250, 50, 300, 100);
+
+    ctx.strokeStyle = grad2;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(250, 50, 300, 100);
+    ctx.beginPath();
+    ctx.moveTo(250, 150);
+    ctx.lineTo(550, 50);
+    ctx.stroke();
     
-    ctx.save();
-    ctx.translate(portal.x, portal.y)
-    ctx.rotate(portal.rotation);
-    
-    if ((currentLevel.terrain === "rocky" || currentLvlNum === 5) && currentLvlNum !== 8) {
-        ctx.drawImage(document.getElementById("blue-portal"), -portal.r * 1.5, -portal.r * 1.5, portal.r * 3, portal.r * 3);
+    ctx.lineWidth = 1.5;
+    ctx.font = '30px Arial';
+    ctx.textAlign = 'center';
+
+    let endlessOverColor = 'red'
+    let tryAgainColor = 'white'
+    if (mouseOver.restart) {
+        endlessOverColor = 'white'
+        tryAgainColor = 'red'
     }
     else {
-        ctx.drawImage(document.getElementById("geen-portal"), -portal.r * 1.5, -portal.r * 1.5, portal.r * 3, portal.r * 3);
+        endlessOverColor = 'red'
+        tryAgainColor = 'white'
     }
     
-    ctx.restore();
+    ctx.strokeStyle = endlessOverColor;
+    ctx.strokeText('Game Over', 335, 80);
 
-    portal.rotation += portal.spinSpeed;
+    ctx.strokeStyle = tryAgainColor;
+    ctx.strokeText('Try Again', 480, 135);
 }
 
-function drawObstacles() {
-    // drawObstacles(): loops through the current level's obstacles-array and draws every obstacle in it
-
-    const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
-    
-    for (let i in currentLevel.obstacles) {
-        currentLevel.obstacles[i].draw();
-    }
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
 }
 
-function drawTitleScreen() {
-    // drawTitleScreen(): draws the games title screen which includes a large, rotatable player, and some credits
-    
-    // Player Ball
-    ctx.save();
-    ctx.translate(cnv.width/2, cnv.height/2);
-    ctx.rotate(player.rotation);
-    ctx.drawImage(player.img, -player.r * 10, -player.r * 10, player.r * 20, player.r * 20);
-    ctx.restore();
-
-    // Credits
-    ctx.fillStyle = "black";
-    ctx.font = "20px Outfit";
-    ctx.textAlign = "center";
-    ctx.fillText("This Took Forever", cnv.width/2, cnv.height/6-45);
-    ctx.fillText("Credits To Gavin Diep For The Art", cnv.width/2, cnv.height/6-22.5);
-    ctx.fillText("Credits To Thygan Buch For The Music", cnv.width/2, cnv.height/6);
-}
-
-function drawCursor() {
-    // drawCursor(): creates a custom cursor by drawing a circle at the cursors coordinates
-    
-    // Cursor
-    if (mouseX !== undefined && mouseY !== undefined) {
-        hoveringOverAButton = false;
-        for (let i in buttons) {
-            if (buttons[i].mouseOver) hoveringOverAButton = true;
-        }
-        
-        
-        const currentLevel = allLevels.find((level) => level.number === currentLvlNum);
-
-        if (currentLevel.terrain === "grassy") {
-            ctx.fillStyle = hoveringOverAButton ? "rgb(89, 216, 255)" : "rgb(0, 153, 255)";
-        } else {
-            ctx.fillStyle = hoveringOverAButton ? "rgb(100, 100, 100)" : "rgb(25, 25, 25)";
-        }
-        
-        drawCircle(mouseX, mouseY, 5);
-    }
-}
-
-function drawButtons() {
-    // drawButtons(): draws every button in the `buttons` array.
-    // doesn't need to check for gamestate because the `Button` class does that logic on its own
-    
-    for (let i in buttons) {
-        const btn = buttons[i];
-        btn.draw();
-    }
-}
-
-function animateArtistPopUp() {
-    // animateArtistPopUp(): when a song begins playing, the song's name and artist slide in from the bottom left of the screen
-
-    // get all audio elements
-    const audioElements = Array.from(document.querySelectorAll("audio"));
-
-    // get the element thats playing
-    const playingAudio = audioElements.find((audio) => !audio.paused && audio.currentTime > 1);
-
-    // wait until a new song is playing AND the audio element has actually started (.play() is async) before running the animation
-    if (songText.active && playingAudio) {
-
-        // text color depends on the terrain
-        const grassyTerrain = currentLvlNum < 6 || currentLvlNum === 9;
-        if (grassyTerrain) ctx.fillStyle = `rgba(82, 213, 82, ${songText.alpha})`;
-        else ctx.fillStyle = `rgba(255, 255, 255, ${songText.alpha})`;
-
-        ctx.textAlign = "left";
-        ctx.font = "400 17.5px Outfit";
-
-        ctx.fillText("♬ " + songText.content, songText.x, songText.y);
-
-        // it's x coordinate slowly reaches 25 to create the 'slide in' effect
-        if (songText.x < 25) {
-            songText.x += (25 - songText.x) / 15;
-        }
-
-        if (songText.fadeIn) {
-            // the alpha value increments in proportion to the songText's x coordinate (for that 'fade-in' effect)
-            songText.alpha += (1 - songText.x/100) / 75;
-
-            // once the alpha value reaches a certain point, `fadeIn` becomes false
-            songText.fadeIn = !(songText.alpha >= 2);
+function drawPlayer() {
+    let prevStrokeStyle = ctx.strokeStyle;
+    // Draws Absolute Zero's range
+    if (player.dodger === "jötunn" && settings.aZ_Range) {
+        const azGradient = ctx.createRadialGradient(player.x, player.y, absoluteZero.slowEnd, player.x, player.y, absoluteZero.slowStart);
+        if (gameState !== "musicMode") {
+            let azColor = [];
+            if (absoluteZero.passive === "Absolute Zero") azColor = [0, 127, 255];
+            if (absoluteZero.passive === "Glaciation") azColor = [50, 151, 255];
+            if (absoluteZero.passive === "Stagnation") azColor = [102, 177, 255];
             
-        } else {
-            // rapidly decrease the alpha value if `fadeIn` is false
-            songText.alpha -= 0.05;
-            songText.alpha = Math.max(songText.alpha, 0); // can't drop below 0
+            azGradient.addColorStop(0, `rgba(${azColor[0]}, ${azColor[1]}, ${azColor[2]}, ${absoluteZero.av})`);
+            azGradient.addColorStop(1, `rgba(79, 203, 255, ${absoluteZero.av})`);
+            ctx.fillStyle = azGradient;
+            ctx.strokeStyle = `rgba(${azColor[0]}, ${azColor[1]}, ${azColor[2]}, 0.75)`;
+        } else if (timeLeft <= 0 || innerGameState === "musicModeFail") {
+            azGradient.addColorStop(1, `rgba(255, 255, 255, ${absoluteZero.av})`);
+            ctx.fillStyle = azGradient;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+        } else if (gameState === "musicMode") {
+            azGradient.addColorStop(0, `rgba(255, 255, 255, ${absoluteZero.av})`);
+            if (prevStrokeStyle[0] === "#") {
+                azGradient.addColorStop(1, `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, ${absoluteZero.av})`);
+                ctx.strokeStyle = `rgba(${hexToRgb(prevStrokeStyle).r}, ${hexToRgb(prevStrokeStyle).g}, ${hexToRgb(prevStrokeStyle).b}, 0.75)`;
+            } else {
+                let prevRGB = prevStrokeStyle.slice(5, 17);
+                azGradient.addColorStop(1, `rgba(${prevRGB}, ${absoluteZero.av})`);
+                ctx.strokeStyle = `rgba(${prevRGB}, 0.75)`;
+            }
+            ctx.fillStyle = azGradient;
+        }
+        drawCircle(player.x, player.y, absoluteZero.slowStart, "fill");
+        ctx.lineWidth = 2;
+        drawCircle(player.x, player.y, absoluteZero.slowStart, "stroke");
+    }
+
+    // Draws the player
+    ctx.fillStyle = player.color;
+    drawCircle(player.x, player.y, player.r);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = player.subColor;
+    drawCircle(player.x, player.y, player.r, "stroke");
+    
+    // Draws player lives
+    if (gameState === "musicMode") {
+        ctx.textAlign = "center";
+        ctx.font = "17.5px Impact";
+        ctx.fillStyle = player.subColor;
+        ctx.fillText(player.lives, player.x, player.y + 5.4);
+    }
+
+    // Determines player invincibility and draws the shield
+    if (now-player.hit < 1500 || dash.activated || now-dash.lastEnded < 250 || eventHorizon.activated) {
+        player.invincible = true;
+        
+        ctx.lineWidth = 1.75;
+        ctx.strokeStyle = player.subColor;
+    
+        ctx.beginPath();
+        ctx.moveTo(player.x-7.5, player.y+2.5);
+        ctx.lineTo(player.x-7.5, player.y-8);
+    
+        ctx.quadraticCurveTo(player.x-3.75, player.y-6, player.x, player.y-9.5);
+        ctx.quadraticCurveTo(player.x+3.75, player.y-6, player.x+7.5, player.y-8);
+    
+        ctx.lineTo(player.x+7.5, player.y+3);
+        ctx.lineTo(player.x, player.y+10);
+        ctx.lineTo(player.x-7.5, player.y+2.5);
+        ctx.stroke();
+    }
+    else player.invincible = false;
+}
+
+function drawEnemies() {
+    allEnemies.forEach(enemy => {
+        if (enemy.ability == "decelerator") {
+            ctx.fillStyle = "rgba(177, 88, 88, 0.47)";
+            drawCircle(enemy.x, enemy.y, enemy.auraRadius);
+        }
+
+        ctx.fillStyle = enemy.color;
+        drawCircle(enemy.x, enemy.y, enemy.r);
+
+        // shows jolt's effect
+        if (gameState !== "endlessOver") enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // clamped between 0 and 1;
+        let swav = 0.8 - enemy.swcv*0.8;
+        ctx.fillStyle = `rgba(150, 150, 0, ${swav})`;
+        drawCircle(enemy.x, enemy.y, enemy.r);
+
+        // show jötunn's effect
+        const enemyDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+        const clampDist = Math.min(Math.max(absoluteZero.slowEnd, enemyDist), absoluteZero.slowStart);
+        enemy.azcv = (clampDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd);
+        let azav = 0.7 - enemy.azcv*0.7;
+        if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
+            ctx.fillStyle = `rgba(17, 47, 56, ${azav})`;
+            drawCircle(enemy.x, enemy.y, enemy.r);
+        }
+
+        if (settings.enemyOutlines) {
+            let cv;
+            if (player.dodger === "jolt") {
+                cv = 255 - enemy.swcv*255; // jolts effect on enemy outlines
+                ctx.strokeStyle = `rgb(${cv}, ${cv}, 0)`;
+            } else if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
+                cv = 100 - enemy.azcv*100;  // jötunns effect on enemy outlines
+                ctx.strokeStyle = `rgb(0, 0, ${cv})`;
+            } else ctx.strokeStyle = `rgb(0, 0, 0)`;
+
+            ctx.lineWidth = enemy.r/12.5;
+            drawCircle(enemy.x, enemy.y, enemy.r, "stroke");
+        }
+    })
+}
+
+function drawText() { // draws the current time, highest time, and enemy count
+    // Current time in seconds
+    if (gameState !== "endlessOver") currentTime = ((now-startTime) / 1000).toFixed(2);
+    timeLeft = (music.var.duration - music.var.currentTime).toFixed(2);
+    if (gameState === "endlessMode" || gameState === "endlessOver" || gameState === "musicMode") {
+        // Difficulty Highscore
+        if (Number(currentTime) > Number(highscore?.[difficulty.level]) && gameState !== "musicMode") {
+            highscore[difficulty.level] = currentTime;
+            highscoreColor = difficulty.color
+        }
+
+        // Level Percentage
+        let percentage = Math.floor(music.var.currentTime / music.var.duration * 100);
+        if (gameState === "musicMode") {
+            if (music.name === "Alarm 9") highscore.limbo = Math.min(Math.max(highscore.limbo, percentage), 100);
+            if (music.name === "Astral Projection") highscore.andromeda = Math.min(Math.max(highscore.andromeda, percentage), 100);
+            if (music.name === "Divine") highscore.euphoria = Math.min(Math.max(highscore.euphoria, percentage), 100);
         }
         
-        // reset the object
-        if (songText.alpha <= 0) songText.reset();
+        // Saves data every 1.5 seconds incase the user disconnects/crashes
+        userData.highscore = highscore;
+        if (now - lastSave > 1500) {
+            localStorage.setItem('localDodgeData', JSON.stringify(userData));
+            lastSave = Date.now();
+        }
+    }
+    if (gameState === "endlessMode" || gameState === "endlessOver") {
+        // Draws the times and the enemy count
+        ctx.font = "20px Verdana";
+        ctx.textAlign = 'center';
+        ctx.fillStyle = "rgb(87, 87, 87)";
+        ctx.fillText(`Time Elapsed: ${currentTime}s`, 200, 40);
+        ctx.fillText(`Enemy Count: ${allEnemies.length}`, 600, 620);
+
+        if (highscoreColor === difficulty.color) ctx.font = "bold 20px 'Verdana'";
+        ctx.fillStyle = highscoreColor;
+        // Displays the highest score and the current difficulty (capitalized)
+        ctx.fillText(`Highest Time (${difficulty.level.charAt(0).toUpperCase() + difficulty.level.slice(1)}): ${highscore[difficulty.level]}s`, 600, 40);
+    }
+    if (gameState === "musicMode") {
+        // Draws the time left
+        ctx.font = "30px Verdana";
+        ctx.textAlign = 'center';
+
+        let timeLeftColor;
+        
+        if (timeLeft > 4 || timeLeft == 0) timeLeftColor = music.textColor;
+        else if (timeLeft >= 3) timeLeftColor = "rgb(235, 235, 30)";
+        else if (timeLeft >= 2) timeLeftColor = "rgb(235, 102.5, 30)";
+        else if (timeLeft > 0) timeLeftColor = "rgb(235, 0, 0)";
+        
+        ctx.fillStyle = timeLeftColor;
+        ctx.fillText(`${timeLeft}s`, GAME_WIDTH/2, 40);
+        
+        ctx.fillStyle = music.textColor; // credit fillStyle
+    }
+    else ctx.fillStyle = "rgb(150, 150, 150)";
+    // Credits artist in the bottom left corner
+    ctx.font = "12.5px Verdana";
+    ctx.textAlign = "left";
+    ctx.fillText(`Song - ${music.name} by ${music.artist}`, 10, GAME_HEIGHT - 10);
+    
+    // Abilites
+    ctx.font = "20px Verdana";
+    ctx.textAlign = 'center';
+    ctx.fillStyle = player.subColor;
+
+    // The text should be centered unless the gameState is endlessMode or endlessOver
+    textX = 200;
+    if (gameState === "endlessMode" || gameState === "endlessOver") {
+        if (player.dodger === "jolt") textX = 220;
+        else textX = 200;
+    }
+    else textX = GAME_WIDTH/2
+
+    let controls;
+    if (lastPressing === "mouse") controls = ["RMB", "MMB"];
+    else if (lastPressing === "kb") controls = ["Q/J", "E/K"];
+
+    // No Abiliy
+    if (player.dodger === "evader") ctx.fillText(`Passive: Skill`, textX, 620);
+
+    // Dash
+    if (player.dodger === "j-sab") {
+        // Dash CD
+        let dashCDLeft = ((1100 - (now - dash.lastEnded)) / 1000).toFixed(2);
+
+        if (now - dash.lastEnded >= 1100) { // 1.1s
+            dash.usable = true;
+            ctx.fillText(`Active: Dash (${controls[0]})`, textX, 620);
+        } else {
+            dash.usable = false;
+            ctx.fillText(`Active: Dash (${dashCDLeft}s)`, textX, 620);
+        }
+    }
+
+    // Absolute Zero
+    if (player.dodger === "jötunn") {
+        // Absolute Zero CD
+        let absoluteZeroCDLeft = ((1000 - (now - absoluteZero.lastEnded)) / 1000).toFixed(3);
+
+        if (now - absoluteZero.lastEnded >= 1000) { // 1s
+            absoluteZero.usable = true;
+            ctx.fillText(`Passive: ${absoluteZero.passive} | Swap (${controls[1]})`, textX, 620);
+        } else {
+            absoluteZero.usable = false;
+            ctx.fillText(`Passive: ${absoluteZero.passive} | Swap (${absoluteZeroCDLeft})`, textX, 620);
+        }
+    }
+
+    // Shockwave
+    if (player.dodger === "jolt") {
+        // Shockwave CD
+        let shockwaveCDLeft = ((shockwave.cd - (now - shockwave.lastEnded)) / 1000).toFixed(2);
+
+        if (now - shockwave.lastEnded >= shockwave.cd) { // 7.5s and 4.5s
+            shockwave.usable = true;
+            ctx.fillText(`Active: ${shockwave.active} (${controls[0]}) | Swap (${controls[1]})`, textX, 620);
+        } else {
+            shockwave.usable = false;
+            ctx.fillText(`Active: ${shockwave.active} (${shockwaveCDLeft}s) | Swap (${controls[1]})`, textX, 620);
+        }
+    }
+
+    // Amplify
+    if (player.dodger === "crescendo") ctx.fillText(`Passive: Amplify ${player.baseSpeed.toFixed(1)}`, textX, 620);
+
+    // Event Horizon
+    if (player.dodger === "quasar") {
+        // Event Horizon CD
+        let eventHorizonCDLeft = ((7000 - (now - eventHorizon.lastEnded)) / 1000).toFixed(2);
+
+        if (now - eventHorizon.lastEnded >= 7000) {
+            eventHorizon.usable = true;
+            ctx.fillText(`Active: Event Horizon (${controls[0]})`, textX, 620);
+        } else {
+            eventHorizon.usable = false;
+            ctx.fillText(`Active: Event Horizon (${eventHorizonCDLeft}s)`, textX, 620);
+        }
     }
 }
 
-function drawKeys() {
-    for (let i in keys) {
-        keys[i].draw();
+function createEnemy() { // Creates an individual enemy with unique attributes
+    let enemy = {
+        x: (Math.random() * (GAME_WIDTH-60))+30,  // between 30 and 770
+        y: (Math.random() * (GAME_HEIGHT-60))+30,  // between 30 and 520
+        r: (Math.random() * 7.5) + 10,  // between 10 and 17.5
+        color: "rgb(100, 100, 100)",
+        vulnerable: "None",
+        reset: 0, // for jolts
     }
+    enemy.swcv = Math.min(1, (now-enemy.reset)/5000); // also for jolts
+    enemy.azcv = 1; // for jötunns
+    enemy.baseRadius = enemy.r;
+    
+    // Initializes the enemy's ability and other important values based on their ability
+    enemyAbilitiesAndStats(enemy);
+    
+    if (difficulty.level === "easy") enemy.speed = (Math.random() * 2) + 2; // between 2 and 4
+    if (difficulty.level === "medium") enemy.speed = (Math.random() * 2) + 2.5; // between 2.5 and 4.5
+    if (difficulty.level === "hard") {
+        if (enemy.ability === "homing") enemy.speed = (Math.random() * 1.55) + 2.75; // between 2.75 and 4.3 (homings should be slower than the player)
+        else enemy.speed = (Math.random() * 2) + 3; // between 3 and 5 (as fast as the player)
+    }
+    enemy.baseSpeed = enemy.speed;
+
+    let dx = player.x - enemy.x;
+    let dy = player.y - enemy.y;
+    let distFromPlayer = Math.hypot(dx, dy);
+
+    // used to prevent the enemy from spawning too close to the player
+    while(distFromPlayer < 300) {
+        enemy.x = (Math.random() * (GAME_WIDTH-60))+30;
+        enemy.y = (Math.random() * (GAME_HEIGHT-60))+30;
+
+        dx = player.x - enemy.x;
+        dy = player.y - enemy.y;
+        distFromPlayer = Math.hypot(dx, dy);
+    }
+    // Initialization for the angle the enemy moves towards (avoids the weird snapping-towards-the-player effect)
+    enemy.facingAngle = Math.atan2(dy, dx); // angle toward the player
+    
+    // used to make the enemy move toward the player once it spanws
+    enemy.movex = Math.cos(enemy.facingAngle) * enemy.speed;
+    enemy.movey = Math.sin(enemy.facingAngle) * enemy.speed;
+
+    // Using base values to extend the possibility of what can be done to the enemies speed
+    enemy.baseMoveX = enemy.movex;
+    enemy.baseMoveY = enemy.movey;
+
+    if (player.dodger === "jolt") {
+        Object.defineProperty(enemy, "collisionPoints", {
+            get() {
+                const piOver3X = this.r*Math.cos(Math.PI/3);
+                const piOver3Y = this.r*Math.sin(Math.PI/3);
+                const piOver6X = this.r*Math.cos(Math.PI/6);
+                const piOver6Y = this.r*Math.sin(Math.PI/6);
+                return [[this.x+this.r, this.y], [this.x+piOver6X, this.y+piOver6Y], [this.x+piOver3X, this.y+piOver3Y],
+                        [this.x, this.y+this.r], [this.x-piOver3X, this.y+piOver3Y], [this.x-piOver6X, this.y+piOver6Y],
+                        [this.x-this.r, this.y], [this.x-piOver6X, this.y-piOver6Y], [this.x-piOver3X, this.y-piOver3Y],
+                        [this.x, this.y-this.r], [this.x+piOver3X, this.y-piOver3Y], [this.x+piOver6X, this.y-piOver6Y]];
+            }
+        })
+    }
+    
+    return enemy;
+}
+
+function spawnEnemyPeriodically() {
+    if (allEnemies.length < 100 && now - lastSpawn >= enemySpawnPeriod) {
+        allEnemies.push(createEnemy());  
+
+        // filter and re-order the array just like in the restartEndless() function (prevents inconsistent overlapping)
+        allEnemies = [...allEnemies.filter(enemy => enemy.ability === "decelerator"), ...allEnemies.filter(enemy => enemy.ability !== "decelerator")]
+        
+        lastSpawn = Date.now();
+
+        // Enemy spawn period is 3000ms by default. This decreases it by 200ms for every 10 enemies spawned to increase difficulty
+        if (allEnemies.length % 10 == 0) enemySpawnPeriod -= 200;
+    }
+}
+
+
+// PLAYER AND ENEMY MOVEMENT
+function keyboardControls() {
+    const playerExists = player?.x !== undefined && player?.y !== undefined;
+    
+    // Moves the player with the keyboard
+    if (keyboardMovementOn && playerExists) {
+        lastPressing = "kb";
+
+        let dxKB = 0;
+        let dyKB = 0;
+    
+        if (wPressed) dyKB -= 1;
+        if (sPressed) dyKB += 1;
+        if (aPressed) dxKB -= 1;
+        if (dPressed) dxKB += 1;
+    
+        // Normalize diagonal movement
+        if (dxKB !== 0 && dyKB !== 0) {
+            const scale = Math.SQRT1_2; // 1 / √2 ≈ 0.7071
+            dxKB *= scale;
+            dyKB *= scale;
+        }
+        
+        if (!dash.activated) player.speed = player.baseSpeed * shiftPressed * player.slowed;
+        if (dxKB !== 0 || dyKB !== 0) player.facingAngle = Math.atan2(dyKB, dxKB);
+        
+        player.x += dxKB * player.speed;
+        player.y += dyKB * player.speed;
+
+        // Anti-no-clip (wall collisions)
+        player.x = Math.min(Math.max(player.x, player.r), GAME_WIDTH-player.r);
+        player.y = Math.min(Math.max(player.y, player.r), GAME_HEIGHT-player.r);
+    }
+}
+
+function mouseMovement() {
+    const playerExists = player?.x !== undefined && player?.y !== undefined;
+    
+    // Moves the player towards the cursor
+    if (mouseMovementOn && !keyboardMovementOn && playerExists) {
+        lastPressing = "mouse";
+        
+        const dxMouse = mouseX - player.x;
+        const dyMouse = mouseY - player.y;
+        const mouseDist = Math.hypot(dxMouse, dyMouse);
+        
+        if (!dash.activated) player.speed = player.baseSpeed * shiftPressed * player.slowed;
+        player.facingAngle = Math.atan2(dyMouse, dxMouse);
+
+        const slowStart = player.r + 40;
+        const clampDist = Math.min(slowStart, mouseDist);
+        const factor = clampDist / slowStart;
+        const slowFactor = 0.3 + 0.7 * factor;
+
+        // Prevents player moving into itself when the mouse is directly overtop it
+
+        if (mouseDist > player.speed/6) {
+            player.x += Math.cos(player.facingAngle) * player.speed * slowFactor;
+            player.y += Math.sin(player.facingAngle) * player.speed * slowFactor;
+        }
+        
+
+        // Anti-no-clip (wall collisions)
+        player.x = Math.min(Math.max(player.x, player.r+1.5), GAME_WIDTH-player.r-1.5); // players lineWidth included
+        player.y = Math.min(Math.max(player.y, player.r+1.5), GAME_HEIGHT-player.r-1.5);
+    }
+}
+
+function moveEnemies() { // Loops through the allEnemies array to move each enemy with their movex and movey
+    allEnemies.forEach(enemy => {
+        const dxEnemy = player.x - enemy.x;
+        const dyEnemy = player.y - enemy.y;
+        const enemyDist = Math.hypot(dxEnemy, dyEnemy);
+        let homingIn = false;
+        
+        // Homing enemies move toward the player (if the player is close enough)
+        if (enemy.ability === "homing" && enemyDist < enemy.detectionRadius)  {
+            const angleToPlayer = Math.atan2(dyEnemy, dxEnemy); // Target angle
+
+            // Calculate shortest angular difference
+            let angleDiff = angleToPlayer - enemy.facingAngle;
+
+            // Normalize to [-PI, PI] for shortest rotation direction
+            angleDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+
+            const turnSpeed = 0.01; // radians per frame
+            enemy.facingAngle += Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), turnSpeed);
+
+            // Move forward in direction of facingAngle — speed stays constant
+            enemy.baseMoveX = Math.cos(enemy.facingAngle) * enemy.speed;
+            enemy.baseMoveY = Math.sin(enemy.facingAngle) * enemy.speed;
+
+            // Set homingIn to true so they bounce off the walls correctly
+            homingIn = true;
+        } else {
+            enemy.baseMoveX = Math.cos(enemy.facingAngle) * enemy.speed;
+            enemy.baseMoveY = Math.sin(enemy.facingAngle) * enemy.speed;
+        }
+        
+        enemy.movex = enemy.baseMoveX;
+        enemy.movey = enemy.baseMoveY;
+        enemy.x += enemy.movex;
+        enemy.y += enemy.movey;
+        
+        // Anti-no-clip (wall collisions)
+        enemy.x = Math.min(Math.max(enemy.x, enemy.r), GAME_WIDTH-enemy.r);
+        enemy.y = Math.min(Math.max(enemy.y, enemy.r), GAME_HEIGHT-enemy.r);
+        if (enemy.x === enemy.r || enemy.x === GAME_WIDTH-enemy.r) enemy.facingAngle = Math.PI - enemy.facingAngle;
+        if (enemy.y === enemy.r || enemy.y === GAME_HEIGHT-enemy.r) enemy.facingAngle = -enemy.facingAngle;
+        
+        // Normalize the angle with the ever reliable Math.atan2()
+        enemy.facingAngle = Math.atan2(Math.sin(enemy.facingAngle), Math.cos(enemy.facingAngle));
+    })
+}
+
+
+// GAMESTATE CHANGES
+function restartEndless() { // Resets certain variables once the play button is pressed
+    allEnemies = []
+    // The starting amount of enemies is different based on the difficulty
+    startAmount = 10;
+    if (difficulty.level === "medium") startAmount = 15;
+    if (difficulty.level === "hard") startAmount = 20;
+    for(let i = 1; i < startAmount; i++) allEnemies.push(createEnemy());
+    
+    // Re-order the allEnemies array to draw the enemies with the auras (decelerator enemies) first
+    // this prevents inconsistent overlapping when they're drawn
+    allEnemies = [...allEnemies.filter(enemy => enemy.ability === "decelerator"), ...allEnemies.filter(enemy => enemy.ability !== "decelerator")];
+
+    music.var.currentTime = 0;
+    music.promise = music.var.play();
+    
+    startTime = Date.now();
+    currentTime = 0;
+    enemySpawnPeriod = 3000;
+    lastSpawn = 0;
+    
+    dash.lastEnded = 0;
+    shockwave.reset();
+    amplify.reset();
+    eventHorizon.reset();
+    
+    innerGameState = "inEndless";
+    gameState = "endlessMode"
+}
+
+function collisions() { // Keeps track of when the player touches any enemy in the allEnemies array
+    let underAura = 0;
+    allEnemies.forEach(enemy => {
+        const enemyDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+        if (!player.invincible) {
+            if (enemyDist < player.r + enemy.r) {
+                pauseAudio(music.promise, music.var);
+                gameState = "endlessOver";
+                // Saves data once the user dies
+                userData.highscore = highscore;
+                localStorage.setItem('localDodgeData', JSON.stringify(userData));
+            }
+        }
+        if (gameState === "endlessOver") underAura = 0;
+        else if (enemy.ability === "decelerator" && enemyDist < player.r + enemy.auraRadius) underAura++;
+    });
+    
+    player.slowed = Math.max(1 - (underAura/10), 0.7);
+}
+
+// ABILITIES
+function abilities() { // player-specific abilities
+    // Dash gives the player a powerful but short-lived burst of speed
+    if (dash.activated) {
+        // changes the players colors
+        player.color = "rgb(255, 100, 100)";
+        player.subColor = "rgb(230, 100, 100)";
+
+        // changes the ability buttons colors
+        const abilityOneBtnColorsUnchanged = abilityOneBtn.style.backgroundColor === "rgb(255, 0, 0)";
+        const abilityTwoBtnColorsUnchanged = abilityTwoBtn.style.backgroundColor === "rgb(255, 0, 0)";
+        if (abilityOneBtnColorsUnchanged) colorAbilityButtons(abilityOneBtn);
+        if (abilityTwoBtnColorsUnchanged) colorAbilityButtons(abilityTwoBtn);
+
+        // speeds up the player
+        player.speed += dash.accel;
+        if (player.speed > 17.5) {
+            dash.deccelerating = true;
+            dash.accel *= -1;
+            player.speed += dash.accel;
+        }
+
+        // resets the player after the ability is finished
+        if (player.speed <= player.baseSpeed && dash.deccelerating) {
+            player.speed = player.baseSpeed;
+            player.color = "rgb(255, 0, 0)";
+            player.subColor = "rgb(230, 0, 0)";
+            
+            dash.activated = false;
+            dash.deccelerating = false;
+            dash.accel *= -1;
+            dash.lastEnded = Date.now();
+
+            colorAbilityButtons(abilityOneBtn);
+            colorAbilityButtons(abilityTwoBtn);
+        }
+    }
+    // Absolute Zero's effect changes enemy speed based on distance
+    if (player.dodger === "jötunn" && absoluteZero.passive !== "Stagnation") {
+        allEnemies.forEach(enemy => {
+            const enemyDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+            // Calculates the distance from the edge of the enemy to the edge of the player, so I subtract the radii
+            const realDist = enemyDist - enemy.r - player.r;
+            // Limit the distance in order to get a factor between 0 and 1
+            const clampDist = Math.min(Math.max(realDist, absoluteZero.slowEnd), absoluteZero.slowStart);
+            const factor = (clampDist - absoluteZero.slowEnd) / (absoluteZero.slowStart - absoluteZero.slowEnd);
+            const slowFactor = 0.3 + 0.7 * factor;
+    
+            enemy.speed = enemy.baseSpeed * slowFactor;
+        })
+    } else if (player.dodger === "jötunn" && absoluteZero.passive === "Stagnation") {
+        allEnemies.forEach(enemy => {enemy.speed = enemy.baseSpeed})
+    }
+    // Shockwave launches an electromagnetic pulse that stuns and shrinks adversaries
+    if (shockwave.activated) {
+        // create the shockwaves path
+        shockwave.path = new Path2D();
+        if (shockwave.used === "Shockwave") shockwave.path.arc(0, 0, shockwave.radius, Math.PI*2, 0);
+        else if (shockwave.used === "Shockray") {
+            shockwave.path.moveTo(0, -shockwave.radius);
+            shockwave.path.bezierCurveTo(shockwave.radius, -2, shockwave.radius, 2, 0, shockwave.radius);
+            shockwave.path.bezierCurveTo(shockwave.radius/2, 2, shockwave.radius/2, -2, 0, -shockwave.radius);
+        }
+
+        // save and transform the canvas
+        ctx.save();
+        ctx.translate(shockwave.x, shockwave.y);
+        ctx.rotate(shockwave.facingAngle);
+
+        // draw the shockwave
+        if (shockwave.used === "Shockwave") ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+        else if (shockwave.used === "Shockray") ctx.fillStyle = 'rgba(255, 255, 0, 0.8)';
+        ctx.fill(shockwave.path);
+
+        // check for collisions
+        allEnemies.forEach(enemy => { 
+            enemy.collisionPoints.forEach(point => {
+                if (ctx.isPointInPath(shockwave.path, point[0], point[1])
+                    && (enemy.vulnerable === shockwave.used || enemy.vulnerable === "None")) {
+                    enemy.reset = Date.now(); // starts the time for which an enemy got hit
+                    enemy.vulnerable = shockwave.used;
+                }
+            })
+        })
+
+        ctx.restore();
+
+        // pauses beam if the player dies
+        if (gameState !== "endlessOver") {
+            shockwave.radius *= 1.022;
+            if (shockwave.used === "Shockray") {
+                shockwave.x += shockwave.movex;
+                shockwave.y += shockwave.movey;
+            }
+        }
+        
+        // once the radius is big enough, end the entire ability
+        if ((shockwave.radius > 1250 && shockwave.used === "Shockwave") || (shockwave.radius > 250 && shockwave.used === "Shockray")) {
+            shockwave.activated = false;
+            shockwave.radius = 25;
+            shockwave.lastEnded = Date.now();
+        }
+    }
+    if (player.dodger === "jolt" && gameState !== "endlessOver") {
+        allEnemies.forEach(enemy => {
+            // Restore the stats of enemies after 5 seconds have passed
+            if (now - enemy.reset >= 5000) {
+                if (enemy.r < enemy.baseRadius-0.0001) enemy.r += enemy.baseRadius/100;
+                else { enemy.r = enemy.baseRadius; enemy.vulnerable = "None"; }
+                if (enemy.speed < enemy.baseSpeed-0.0001) enemy.speed += enemy.baseSpeed/100;
+                else enemy.speed = enemy.baseSpeed;
+                if (enemy.ability === "decelerator") {
+                    if (enemy.auraRadius < enemy.baseAuraRadius-0.0001) enemy.auraRadius += enemy.baseAuraRadius/100;
+                    else enemy.auraRadius = enemy.baseAuraRadius;
+                }
+            }
+            // Decrease the stats of enemies under the effect of shockwave
+            else {
+                enemy.r = enemy.baseRadius*shockwave.effect;
+                enemy.speed = enemy.baseSpeed*shockwave.effect;
+                if (enemy.ability === "decelerator") enemy.auraRadius = enemy.baseAuraRadius*shockwave.effect;
+            }
+        })
+    }
+    // Amplify accelerates the player over time
+    if (player.dodger === "crescendo") {
+        amplify.accel = 1/music.var.duration * 7;
+        if (musicVolume > 0 && gameState !== "endlessOver") { // only accelerate if the music is audible and we're not in the game over screen
+            if (gameState === "musicMode") { // reach your peak speed 78.57%~ into a song
+                amplify.speed = music.var.currentTime/music.var.duration * 7;
+                player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed); // limit is 10.5
+            } else {
+                if (now - amplify.accelRate > 1000) {
+                    amplify.speed += amplify.accel;
+                    amplify.accelRate = Date.now();
+                }
+                player.baseSpeed = Math.min(amplify.limit, amplify.baseSpeed + amplify.speed);
+            }
+        }
+        if (musicVolume <= 0) {
+                if (now - amplify.accelRate > 1000) {
+                    amplify.speed -= amplify.accel;
+                    amplify.speed = Math.max(0, amplify.speed);
+                    amplify.accelRate = Date.now();
+                }
+                player.baseSpeed = amplify.baseSpeed + amplify.speed;
+        }
+    }
+    // Event Horizon makes the player invincible but speeds up nearby enemies
+    if (eventHorizon.activated) {
+        // Player Alterations
+        player.color = "rgb(0, 0, 0)";
+        player.subColor = "rgb(255, 165, 0)";
+        if (player.baseSpeed > 1 && now - eventHorizon.lastUsed < 1000) player.baseSpeed -= 0.05;
+        if (player.baseSpeed < 5 && now - eventHorizon.lastUsed > 4000) player.baseSpeed += 0.05;
+
+        // Ability Button Color Alterations
+        const abilityOneBtnColorsUnchanged = abilityOneBtn.style.borderColor === "rgb(230, 153, 11)";
+        const abilityTwoBtnColorsUnchanged = abilityTwoBtn.style.borderColor === "rgb(230, 153, 11)";
+        if (abilityOneBtnColorsUnchanged) colorAbilityButtons(abilityOneBtn);
+        if (abilityTwoBtnColorsUnchanged) colorAbilityButtons(abilityTwoBtn);
+
+        // Event Horizon Gradient
+        const eventHorizonGrad = ctx.createRadialGradient(player.x, player.y, 15, player.x, player.y, 1010);
+        eventHorizonGrad.addColorStop(0, `rgba(255, 255, 255, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.25, `rgba(255, 165, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(0.5, `rgba(255, 0, 0, ${eventHorizon.av})`);
+        eventHorizonGrad.addColorStop(1, `rgba(200, 0, 0, ${eventHorizon.av})`);
+
+        // Background Accretion Disk
+        ctx.fillStyle = eventHorizonGrad;
+        drawCircle(player.x, player.y, 1010, "fill");
+        ctx.strokeStyle = `rgba(165, 0, 0, ${eventHorizon.av})`;
+
+        // Accretion Disk Dust
+        eventHorizon.accretionDisk.forEach(dust => {
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            ctx.rotate(dust.gravity);
+            dust.gravity += dust.baseGravity;
+            
+            ctx.fillStyle = `rgba(${dust.color}, ${eventHorizon.av})`;
+            drawCircle(dust.x, dust.y, 2.5, "fill");
+            
+            ctx.restore();
+        })
+
+        if (eventHorizon.av < 0.65 && now - eventHorizon.lastUsed < 1300) eventHorizon.av += 0.01;
+        else if (eventHorizon.av > 0 && now - eventHorizon.lastUsed > 3700) eventHorizon.av -= 0.01;
+
+        // Speed up enemies
+        allEnemies.forEach(enemy => {
+            let dist = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+            let relativity = 1 + dist/300;
+            let max = enemy.baseSpeed * relativity;
+
+            // To max
+            if (enemy.speed < max && now - eventHorizon.lastUsed < 4200) enemy.speed += max/50;
+            if (enemy.speed > max && now - eventHorizon.lastUsed < 4200) enemy.speed -= max/50;
+            
+            // To base speed
+            if (enemy.speed > enemy.baseSpeed && now - eventHorizon.lastUsed > 4200) enemy.speed -= max/50;
+            if (enemy.speed < enemy.baseSpeed - max/50 && now - eventHorizon.lastUsed > 4200) enemy.speed = enemy.baseSpeed;
+        })
+
+        // Reset and Deactivate Event Horizon
+        if (now - eventHorizon.lastUsed >= 5000) {
+            player.baseSpeed = 5;
+            player.color = "rgb(255, 165, 0)";
+            player.subColor = "rgb(230, 153, 11)";
+            
+            eventHorizon.activated = false;
+            eventHorizon.lastEnded = Date.now();
+            eventHorizon.accretionDisk = [];
+
+            colorAbilityButtons(abilityOneBtn);
+            colorAbilityButtons(abilityTwoBtn);
+        }
+    }
+}
+
+function createAccretionDisk() {
+    let accretionDisk = [];
+    function createDust() {
+        let max = 1005, min = 25; // radius of the accretion disk is 1010
+        let randAngle = Math.random() * Math.PI*2; // random angle between 0 and 3.14*2
+        let randDist = Math.random() * max;
+        let dust = {
+            x: randDist * Math.cos(randAngle),
+            y: randDist * Math.sin(randAngle),
+        }
+        
+        while (Math.hypot(dust.x, dust.y) < min) {
+            randDist = Math.random * max;
+            dust.x = randDist * Math.cos(randAngle);
+            dust.y = randDist * Math.sin(randAngle);
+        }
+        
+        let dist = Math.hypot(dust.x, dust.y);
+        if (dist < max*0.166) dust.color = '230, 230, 230'; // 0, 0.25, 0.5, 1
+        else if (dist < max*0.322) dust.color = '201, 136, 14';
+        else if (dist < max*0.5) dust.color = '230, 0, 0';
+        else dust.color = '180, 0, 0';
+
+        // clamping between max and min to get its gravity
+        dust.gravity = (1 - ((Math.hypot(dust.x, dust.y) - min) / (max - min))) / 10;
+        dust.baseGravity = dust.gravity;
+        return dust;
+    }
+
+    for (let i = 0; i < 750; i++) accretionDisk.push(createDust());
+    return accretionDisk;
+}
+
+function enemyAbilitiesAndStats(enemy) {
+    num = Math.random();
+
+    // All enemies on easy difficulty have no abilities
+    if (difficulty.level === "easy")  enemy.ability = "none";
+
+    else if (difficulty.level === "medium") {
+        // 25% Chance to get the decelerator ability
+        if (num > 0.75) enemy.ability = "decelerator";
+        else enemy.ability = "none";
+    }
+        
+    else if (difficulty.level === "hard") {
+        // 25% Chance to get the decelerator ability, 15% for the homing ability
+        if (num > 0.85) enemy.ability = "homing";
+        else if (num > 0.6) enemy.ability = "decelerator";
+        else enemy.ability = "none";
+    }
+
+    
+    if (enemy.ability === "none") enemy.baseColor = "rgb(100, 100, 100)";
+
+    // decelerators need an aura radius for their ability (and are red)
+    else if (enemy.ability === "decelerator") {
+        enemy.baseColor = "rgb(255, 0, 0)";
+        enemy.auraRadius = (Math.random() * 20) + 80;
+        enemy.baseAuraRadius = enemy.auraRadius;
+    }
+
+    // homings need a detection radius for their ability (and are gold)
+    else if (enemy.ability === "homing") {
+        enemy.baseColor = "rgb(255, 196, 0)";
+        enemy.detectionRadius = 200;
+    }
+    enemy.color = enemy.baseColor;
+}
+
+function colorAbilityButtons(abilityBtn) {
+    abilityBtn.style.backgroundColor = player.color;
+    abilityBtn.style.borderColor = player.subColor;
+    abilityBtn.style.color = player.subColor;
 }
